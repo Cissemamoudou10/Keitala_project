@@ -1,3 +1,5 @@
+name: keitala
+
 services:
   db:
     image: postgres:16-alpine
@@ -8,7 +10,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-keitala_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-keitala_dev_password}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:

@@ -11,14 +11,14 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 | | |
 | :--- | :--- |
 | **Dernière mise à jour** | 13/11/2026 |
-| **Phase** | Sprint 0 en cours : socle API terminé ; app avec charte, coquille et proxy. |
+| **Phase** | Sprint 0 en cours : socle API terminé ; socle app terminé sauf l'outillage de tests (S0-16) et l'intégration continue (S0-17). |
 | **Sprint en cours** | Sprint 0 — Fondations |
-| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query ; build, lint et types OK. |
-| **Points bloquants** | Aucun. Commandes de l'API à lancer dans le conteneur (P-012). Rendu tablette (768 px) jamais vu à l'écran (P-013). |
+| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query, formats et champ de montant, quatre états d'écran ; build, lint et types OK ; rendu vérifié à l'écran (bureau et 768 px). |
+| **Points bloquants** | Aucun. Commandes de l'API à lancer dans le conteneur (P-012). Aucun. |
 
 ## Prochaine tâche
 
-**S0-14 : utilitaires de format (montant FCFA, quantité, date) et champ de saisie de montant** (charte, sections 8 et 9). Commencer par vérifier à l'écran S0-11 et S0-12 (P-013).
+**S0-16 : lint, formatage, vérification de types et socle de tests de l'app** (Vitest, Playwright). Premiers tests à écrire : `lib/formats.ts` (les 28 cas vérifiés à la main sont listés dans `JOURNAL.md`) et `ChampMontant`.
 
 ---
 
@@ -63,8 +63,8 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 - [x] S0-11 Jetons de la charte (`design/CHARTE_UX_UI.md`) dans Tailwind ; police ; composants de base (bouton, champ, sélecteur, tableau, étiquette, fenêtre, notification)
 - [x] S0-12 Coquille de l'application : barre latérale, en-tête de page, navigation, version tablette
 - [x] S0-13 Proxy `/api/[...path]` vers FastAPI et client d'appel côté app
-- [ ] S0-14 Utilitaires de format : montant FCFA, quantité, date ; champ de saisie de montant
-- [ ] S0-15 Les quatre états d'écran réutilisables : chargement, vide, erreur, données
+- [x] S0-14 Utilitaires de format : montant FCFA, quantité, date ; champ de saisie de montant
+- [x] S0-15 Les quatre états d'écran réutilisables : chargement, vide, erreur, données
 - [ ] S0-16 Lint, formatage, vérification de types, socle de tests
 
 ### Intégration continue
@@ -150,6 +150,7 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 | :--- | :--- |
 | 13/11/2026 | Analyse du dossier ; spécifications et schéma corrigés en v1.1 ; schéma validé sur PostgreSQL 16 |
 | 13/11/2026 | Mise en place de `AGENTS.md`, des fichiers de suivi, de la charte et de `developpement/` |
+| 13/11/2026 | App : formats, champ de montant, quatre états d'écran (S0-14, S0-15) |
 | 13/11/2026 | App : charte, composants, coquille et proxy vers l'API (S0-11 à S0-13) |
 | 13/11/2026 | Projet Next.js initialisé (S0-10) |
 | 13/11/2026 | Socle API terminé (S0-1 à S0-9) : migration 0001 vérifiée identique à `schema.sql`, modèles alignés, tests sur PostgreSQL |

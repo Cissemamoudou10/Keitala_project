@@ -4,6 +4,15 @@ import * as React from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+
+import { EtatRequete } from "@/components/etats/etat-requete";
+import { EtatVide } from "@/components/etats/etat-vide";
+import {
+  SqueletteChiffresCles,
+  SqueletteFormulaire,
+  SqueletteTableau,
+} from "@/components/etats/squelettes";
 import { ChampMontant } from "@/components/saisie/champ-montant";
 import { Champ } from "@/components/ui/champ";
 import {
@@ -33,6 +42,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ErreurApi } from "@/lib/api";
 import { formaterMontant, formaterQuantite } from "@/lib/formats";
 import { notifier } from "@/lib/notifications";
 
@@ -42,6 +52,88 @@ function Section({ titre, children }: { titre: string; children: React.ReactNode
       <h2 className="text-titre-section font-semibold">{titre}</h2>
       {children}
     </section>
+  );
+}
+
+type Mode = "donnees" | "vide" | "erreur";
+
+type LigneVente = { numero: string; client: string; montant: string };
+
+// Requête simulée pour montrer les quatre états sans dépendre de l'API
+function useVentesDemo(mode: Mode) {
+  return useQuery({
+    queryKey: ["demo-ventes", mode],
+    retry: false,
+    queryFn: async (): Promise<LigneVente[]> => {
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      if (mode === "erreur") {
+        throw new ErreurApi(
+          "API_INJOIGNABLE",
+          "Le serveur ne répond pas. Vos saisies sont conservées ; réessayez dans un instant.",
+          502,
+        );
+      }
+      if (mode === "vide") return [];
+      return [
+        { numero: "FAC-2026-0042", client: "Client de passage", montant: "45000.00" },
+        { numero: "FAC-2026-0041", client: "Boutique Diarra", montant: "2030000.00" },
+      ];
+    },
+  });
+}
+
+function DemoEtats() {
+  const [mode, setMode] = React.useState<Mode>("donnees");
+  const requete = useVentesDemo(mode);
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap gap-2">
+        {(["donnees", "vide", "erreur"] as const).map((choix) => (
+          <Button
+            key={choix}
+            variant="discret"
+            aria-pressed={mode === choix}
+            className="aria-pressed:bg-fond-actif"
+            onClick={() => setMode(choix)}
+          >
+            {{ donnees: "Données", vide: "Vide", erreur: "Erreur" }[choix]}
+          </Button>
+        ))}
+      </div>
+      <EtatRequete
+        requete={requete}
+        chargement={<SqueletteTableau lignes={3} colonnes={3} />}
+        estVide={(lignes) => lignes.length === 0}
+        vide={
+          <EtatVide
+            message="Aucune vente aujourd'hui."
+            action={<Button variant="principal">Nouvelle vente</Button>}
+          />
+        }
+      >
+        {(lignes) => (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Numéro</TableHead>
+                <TableHead>Client</TableHead>
+                <TableHead numerique>Montant</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {lignes.map((ligne) => (
+                <TableRow key={ligne.numero}>
+                  <TableCell className="tabular-nums">{ligne.numero}</TableCell>
+                  <TableCell>{ligne.client}</TableCell>
+                  <TableCell numerique>{formaterMontant(ligne.montant)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </EtatRequete>
+    </div>
   );
 }
 
@@ -138,6 +230,16 @@ export function Catalogue() {
             </TableRow>
           </TableBody>
         </Table>
+      </Section>
+
+      <Section titre="États d'un écran">
+        <DemoEtats />
+      </Section>
+
+      <Section titre="Squelettes de chargement">
+        <SqueletteChiffresCles />
+        <SqueletteTableau lignes={3} colonnes={4} />
+        <SqueletteFormulaire champs={2} />
       </Section>
 
       <Section titre="Fenêtre et notifications">

@@ -1,6 +1,6 @@
 # App — ERP Keitala (frontend)
 
-Frontend Next.js et proxy vers l'API. Socle en place : projet (S0-10), charte et composants (S0-11), coquille (S0-12), proxy et client d'appel (S0-13). Restent S0-14 à S0-16 de `suivi/AVANCEMENT.md`.
+Frontend Next.js et proxy vers l'API. Socle en place : projet (S0-10), charte et composants (S0-11), coquille (S0-12), proxy et client d'appel (S0-13), formats et champ de montant (S0-14), quatre états d'écran (S0-15). Reste S0-16 (outillage de tests) dans `suivi/AVANCEMENT.md`.
 
 À lire avant de travailler ici : `AGENTS.md` (racine) et **`design/CHARTE_UX_UI.md` en entier**. L'expérience utilisateur est la priorité du projet.
 
@@ -93,6 +93,12 @@ Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack 
 - Écrans dans `src/app/(erp)/<module>/page.tsx`, enveloppés par `<Page titre description action largeur>` (`components/coquille/page.tsx`). Entrées de menu : `lib/navigation.ts` (le rôle sera branché au Sprint 1).
 - Proxy : `src/app/api/[...chemin]/route.ts` → `lib/serveur/proxy-api.ts`, relaie vers `API_URL/api/v1/...`. En développement, `API_URL` vaut `http://localhost:8000` par défaut ; en production elle est obligatoire. Le jeton sera lu dans le cookie `keitala_acces` (Sprint 1).
 - Navigateur : `appelerApi<T>(chemin, { methode, corps, parametres })` (`lib/api.ts`) lève une `ErreurApi` dont le `message` s'affiche tel quel. TanStack Query est posé dans `components/fournisseurs.tsx` : pas de nouvel essai automatique d'une écriture.
+
+## Formats, saisie et états d'écran (S0-14, S0-15)
+
+- `lib/formats.ts` : `formaterMontant`, `formaterMontantSeul`, `formaterQuantite(valeur, unite)`, `formaterConversion`, `formaterPourcentage`, `formaterDate`, `formaterDateRelative`, `formaterDateHeure`, `formaterTelephone`. Ils prennent les chaînes décimales de l'API telles quelles : ne jamais les convertir en `Number` pour calculer.
+- `components/saisie/champ-montant.tsx` : `<ChampMontant value onChange />`, valeur en chiffres seuls (`"2030000"`) ; avec React Hook Form, passer par `Controller`.
+- `components/etats/` : `EtatRequete` (chargement, erreur, vide, données à partir d'une requête TanStack Query), `EtatVide`, `EtatErreur`, squelettes `SqueletteTableau`, `SqueletteChiffresCles`, `SqueletteFormulaire`. Tout écran de données passe par `EtatRequete`.
 
 ## Next.js 16 : à savoir
 

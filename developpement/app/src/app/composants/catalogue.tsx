@@ -1,7 +1,10 @@
 "use client";
 
+import * as React from "react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ChampMontant } from "@/components/saisie/champ-montant";
 import { Champ } from "@/components/ui/champ";
 import {
   Dialog,
@@ -30,6 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formaterMontant, formaterQuantite } from "@/lib/formats";
 import { notifier } from "@/lib/notifications";
 
 function Section({ titre, children }: { titre: string; children: React.ReactNode }) {
@@ -42,6 +46,8 @@ function Section({ titre, children }: { titre: string; children: React.ReactNode
 }
 
 export function Catalogue() {
+  const [montant, setMontant] = React.useState("2030000");
+
   return (
     <main className="mx-auto flex w-full max-w-[1200px] flex-col gap-12 px-4 py-8 md:px-8 lg:px-12">
       <h1 className="text-titre-page font-semibold">Composants de base</h1>
@@ -84,6 +90,14 @@ export function Catalogue() {
         </div>
       </Section>
 
+      <Section titre="Saisie d'un montant">
+        <div className="flex max-w-[720px] flex-col gap-2">
+          <Champ libelle="Montant reçu" aide={`Valeur envoyée à l'API : "${montant}"`}>
+            {(controle) => <ChampMontant value={montant} onChange={setMontant} {...controle} />}
+          </Champ>
+        </div>
+      </Section>
+
       <Section titre="Étiquettes">
         <div className="flex flex-wrap gap-2">
           <Badge variant="succes">Payé</Badge>
@@ -108,16 +122,16 @@ export function Catalogue() {
           <TableBody>
             <TableRow>
               <TableCell>Soja Consommation</TableCell>
-              <TableCell numerique>1 250</TableCell>
+              <TableCell numerique>{formaterQuantite("1250.000")}</TableCell>
               <TableCell>kg</TableCell>
-              <TableCell numerique>312 500 FCFA</TableCell>
+              <TableCell numerique>{formaterMontant("312500.00")}</TableCell>
               <TableCell />
             </TableRow>
             <TableRow>
               <TableCell>Gari 200 g</TableCell>
-              <TableCell numerique>12</TableCell>
+              <TableCell numerique>{formaterQuantite("12.000")}</TableCell>
               <TableCell>sachets</TableCell>
-              <TableCell numerique>3 600 FCFA</TableCell>
+              <TableCell numerique>{formaterMontant("3600.00")}</TableCell>
               <TableCell>
                 <Badge variant="danger">Stock bas</Badge>
               </TableCell>

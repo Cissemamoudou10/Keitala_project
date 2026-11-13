@@ -82,4 +82,6 @@ Voir `AGENTS.md` section 10 : tout se lance dans le conteneur `keitala_api` (D-0
 - **Modèles** : reflet de la migration, jamais l'inverse (D-022). Après toute modification de `models/` ou `alembic/`, `alembic check` doit répondre « No new upgrade operations detected ».
 - **Erreurs** : lever `ErreurMetier(code, message, status_code, details)` depuis un service (`app/core/erreurs.py`).
 - **Listes** : `paginer(session, requete, PaginationParams)` dans `app/db/pagination.py`, avec un `ORDER BY` stable ; réponse `PageReponse[T]`.
-- **Tests** : fixture `db_session` (transaction annulée à la fin) ; tests de base dans `tests/db/`, avec les fixtures `gestionnaire`, `article` et `caisse`.
+- **Accès** : tout routeur métier se déclare avec `dependencies=ACCES_METIER` (`app/core/dependances.py`) : session exigée, écritures du Consultant refusées (403). Rôles particuliers : `Depends(exiger_roles(...))`. Utilisateur courant : paramètre `utilisateur: UtilisateurCourant`.
+- **Session** : jeton d'accès (30 min) et de rafraîchissement (7 jours) ; l'utilisateur est relu à chaque requête, et les jetons portent une empreinte du mot de passe (une réinitialisation coupe les sessions ouvertes).
+- **Tests** : fixtures `creer_compte(role)` et `entetes_pour(utilisateur)` (`tests/conftest.py`) ; fixture `db_session` (transaction annulée à la fin) ; tests de base dans `tests/db/`, avec les fixtures `gestionnaire`, `article` et `caisse`.

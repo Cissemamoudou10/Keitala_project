@@ -1,12 +1,25 @@
 "use client";
 
 import * as React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { ErreurApi } from "@/lib/api";
 
+/** Session expirée et non renouvelable (le proxy a déjà tenté) : retour à la connexion. */
+function renvoyerVersConnexionSi401(erreur: unknown) {
+  if (!(erreur instanceof ErreurApi) || erreur.statut !== 401) return;
+  if (window.location.pathname.startsWith("/connexion")) return;
+  const suite = `${window.location.pathname}${window.location.search}`;
+  // Rechargement complet voulu : efface de la mémoire toute donnée de la session
+  // précédente (poste partagé), ce que router.push ne garantit pas.
+  // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+  window.location.assign(`/connexion?suite=${encodeURIComponent(suite)}`);
+}
+
 function creerClient(): QueryClient {
   return new QueryClient({
+    queryCache: new QueryCache({ onError: renvoyerVersConnexionSi401 }),
+    mutationCache: new MutationCache({ onError: renvoyerVersConnexionSi401 }),
     defaultOptions: {
       queries: {
         staleTime: 30_000,

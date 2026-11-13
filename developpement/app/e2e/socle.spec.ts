@@ -1,9 +1,13 @@
 import { expect, test } from "@playwright/test";
 
+import { connecter, estTablette } from "./outils";
+
 // Parcours du socle (Sprint 0) : accueil, navigation, page introuvable, tiroir tablette.
 // Les parcours métier (vente, achat, clôture d'OF) viendront avec leurs écrans.
 
-const estTablette = (largeur: number | undefined) => (largeur ?? 0) < 1024;
+test.beforeEach(async ({ page }) => {
+  await connecter(page, "GESTIONNAIRE");
+});
 
 test("l'accueil mène au tableau de bord", async ({ page }) => {
   await page.goto("/");

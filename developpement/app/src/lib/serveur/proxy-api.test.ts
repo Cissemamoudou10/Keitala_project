@@ -76,3 +76,111 @@ describe("relayerVersApi", () => {
     expect(await reponse.json()).toMatchObject({ code: "CONFIGURATION" });
   });
 });
+
+describe("relayerVersApi : session", () => {
+  const jetons = (suffixe: string) => ({
+    jeton_acces: `acces-${suffixe}`,
+    jeton_rafraichissement: `rafraichissement-${suffixe}`,
+    duree_acces: 1800,
+    duree_rafraichissement: 604800,
+    utilisateur: {},
+  });
+  const cookies = (valeurs: Record<string, string>) =>
+    Object.entries(valeurs)
+      .map(([nom, valeur]) => `${nom}=${valeur}`)
+      .join("; ");
+
+  it.each([
+    ["auth", "login"],
+    ["auth", "refresh"],
+  ])("refuse /api/%s/%s, qui renverrait les jetons au navigateur", async (...chemin) => {
+    vi.stubEnv("API_URL", "http://api.test");
+    const fetchSimule = vi.fn();
+    vi.stubGlobal("fetch", fetchSimule);
+
+    const reponse = await relayerVersApi(
+      requete(`/api/${chemin.join("/")}`, { method: "POST" }),
+      chemin,
+    );
+
+    expect(reponse.status).toBe(404);
+    expect(fetchSimule).not.toHaveBeenCalled();
+  });
+
+  it("renouvelle la session avant l'appel quand le jeton d'accès a expiré", async () => {
+    vi.stubEnv("API_URL", "http://api.test");
+    const fetchSimule = vi
+      .fn()
+      .mockResolvedValueOnce(Response.json(jetons("neuf")))
+      .mockResolvedValueOnce(Response.json({ id: "1" }));
+    vi.stubGlobal("fetch", fetchSimule);
+
+    const reponse = await relayerVersApi(
+      requete("/api/auth/me", {
+        headers: { cookie: cookies({ keitala_rafraichissement: "rafraichissement-ancien" }) },
+      }),
+      ["auth", "me"],
+    );
+
+    expect(reponse.status).toBe(200);
+    expect(fetchSimule.mock.calls[0][0]).toBe("http://api.test/api/v1/auth/refresh");
+    expect((fetchSimule.mock.calls[1][1].headers as Headers).get("authorization")).toBe(
+      "Bearer acces-neuf",
+    );
+    const poses = reponse.headers.getSetCookie().join("\n");
+    expect(poses).toContain("keitala_acces=acces-neuf");
+    expect(poses).toMatch(/HttpOnly/i);
+  });
+
+  it("après un 401, renouvelle puis rejoue la requête avec le même corps", async () => {
+    vi.stubEnv("API_URL", "http://api.test");
+    const fetchSimule = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(null, { status: 401 }))
+      .mockResolvedValueOnce(Response.json(jetons("neuf")))
+      .mockResolvedValueOnce(Response.json({ ok: true }, { status: 201 }));
+    vi.stubGlobal("fetch", fetchSimule);
+
+    const reponse = await relayerVersApi(
+      requete("/api/ventes", {
+        method: "POST",
+        body: JSON.stringify({ montant: "45000" }),
+        headers: {
+          "content-type": "application/json",
+          cookie: cookies({ keitala_acces: "acces-vieux", keitala_rafraichissement: "r" }),
+        },
+      }),
+      ["ventes"],
+    );
+
+    expect(reponse.status).toBe(201);
+    const rejeu = fetchSimule.mock.calls[2][1];
+    expect((rejeu.headers as Headers).get("authorization")).toBe("Bearer acces-neuf");
+    expect(new TextDecoder().decode(rejeu.body as ArrayBuffer)).toBe(
+      JSON.stringify({ montant: "45000" }),
+    );
+  });
+
+  it("efface les cookies quand le renouvellement est refusé", async () => {
+    vi.stubEnv("API_URL", "http://api.test");
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(new Response(null, { status: 401 }))
+        .mockResolvedValueOnce(new Response(null, { status: 401 })),
+    );
+
+    const reponse = await relayerVersApi(
+      requete("/api/auth/me", {
+        headers: { cookie: cookies({ keitala_acces: "a", keitala_rafraichissement: "r" }) },
+      }),
+      ["auth", "me"],
+    );
+
+    expect(reponse.status).toBe(401);
+    const poses = reponse.headers.getSetCookie().join("\n");
+    expect(poses).toMatch(/keitala_acces=;/);
+    expect(poses).toMatch(/keitala_rafraichissement=;/);
+  });
+});

@@ -52,6 +52,8 @@ _MESSAGES_VALIDATION: dict[str, str] = {
     "date_from_datetime_parsing": "Date invalide.",
     "date_parsing": "Date invalide.",
     "enum": "Valeur non autorisée.",
+    # Levée notamment par la validation d'email
+    "value_error": "Valeur invalide : vérifiez la saisie.",
 }
 
 

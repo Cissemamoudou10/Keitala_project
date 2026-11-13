@@ -106,6 +106,15 @@ Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack 
 - `components/saisie/champ-montant.tsx` : `<ChampMontant value onChange />`, valeur en chiffres seuls (`"2030000"`) ; avec React Hook Form, passer par `Controller`.
 - `components/etats/` : `EtatRequete` (chargement, erreur, vide, données à partir d'une requête TanStack Query), `EtatVide`, `EtatErreur`, squelettes `SqueletteTableau`, `SqueletteChiffresCles`, `SqueletteFormulaire`. Tout écran de données passe par `EtatRequete`.
 
+## Session et droits (Sprint 1)
+
+- Connexion : `src/app/connexion/` → `POST /api/auth/connexion`, qui pose les cookies `keitala_acces` et `keitala_rafraichissement` (HttpOnly). Déconnexion : `POST /api/auth/deconnexion`.
+- Le proxy `/api/*` refuse `auth/login` et `auth/refresh` (ils renverraient les jetons au navigateur) et renouvelle la session tout seul (cookie d'accès expiré, ou 401 puis nouvel essai).
+- `src/proxy.ts` (ex-middleware) : sans cookie de session, toute page renvoie à `/connexion?suite=…`. Une session refusée par l'API renvoie aussi à la connexion (`components/fournisseurs.tsx`).
+- Côté écran : `useSession()`, `usePeut(action)` (`lib/session.ts`) et `peut(role, action)` (`lib/droits.ts`). Toute action d'écriture se cache derrière `usePeut("ecrire")` : le Consultant ne voit aucun bouton d'action.
+- Panneau latéral (`components/ui/panneau.tsx`) et pagination (`components/ui/pagination.tsx`), page gardée dans l'adresse.
+- Parcours e2e : sur la pile complète (API lancée, comptes créés par `python -m app.commandes.comptes_e2e`) ; `connecter(page, "CONSULTANT")` dans `e2e/outils.ts`.
+
 ## Next.js 16 : à savoir
 
 - Version récente : lire le guide utile dans `node_modules/next/dist/docs/` avant d'écrire du code (rappel dans `AGENTS.md` de ce dossier, recréé par `next dev`).

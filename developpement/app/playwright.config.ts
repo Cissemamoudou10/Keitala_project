@@ -1,12 +1,22 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = 3100;
 const enCI = Boolean(process.env.CI);
 
+// Mot de passe des comptes de test : variable d'environnement, sinon .env.example
+// (source unique, partagée avec la commande API `comptes_e2e`).
+process.env.E2E_MOT_DE_PASSE ??= /^E2E_MOT_DE_PASSE=(.*)$/m
+  .exec(readFileSync(path.join(__dirname, ".env.example"), "utf8"))?.[1]
+  ?.trim();
+
 /**
- * Parcours de bout en bout. En local, Playwright utilise le Chrome installé sur le
- * poste (aucun navigateur à télécharger) et un serveur de développement ; en CI, son
- * Chromium et l'application compilée.
+ * Parcours de bout en bout, sur la pile complète : l'API (avec les comptes de test) doit
+ * tourner. En local, Playwright utilise le Chrome du poste (aucun navigateur à
+ * télécharger) et un serveur de développement ; en CI, son Chromium et l'application
+ * compilée.
  */
 export default defineConfig({
   testDir: "./e2e",

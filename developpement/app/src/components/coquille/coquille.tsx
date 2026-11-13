@@ -4,18 +4,22 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Dialog as DialogPrimitive } from "radix-ui";
-import { Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
+import { LogOut, Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 
+import { Squelette } from "@/components/etats/squelettes";
 import { Button } from "@/components/ui/button";
+import { LIBELLES_ROLES } from "@/lib/droits";
+import { entreesPourRole, estActive } from "@/lib/navigation";
+import { useDeconnexion, useSession, type Utilisateur } from "@/lib/session";
 import { cn } from "@/lib/utils";
-import { entreesPourRole, estActive, type Role } from "@/lib/navigation";
 
 /**
  * Coquille de l'application (charte, section 6).
  * - Bureau (≥ 1 024 px) : barre latérale de 240 px, repliable.
  * - Tablette et téléphone : barre latérale en tiroir, ouverte par le bouton « Menu ».
  */
-export function Coquille({ role, children }: { role: Role | null; children: React.ReactNode }) {
+export function Coquille({ children }: { children: React.ReactNode }) {
+  const { data: utilisateur } = useSession();
   const [replie, setReplie] = React.useState(false);
   const [tiroirOuvert, setTiroirOuvert] = React.useState(false);
 
@@ -24,7 +28,7 @@ export function Coquille({ role, children }: { role: Role | null; children: Reac
       {/* Bureau */}
       {!replie && (
         <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-bordure bg-fond-doux lg:flex">
-          <BarreLaterale role={role}>
+          <BarreLaterale utilisateur={utilisateur}>
             <Button
               variant="discret"
               size="icone"
@@ -75,7 +79,7 @@ export function Coquille({ role, children }: { role: Role | null; children: Reac
             aria-describedby={undefined}
           >
             <DialogPrimitive.Title className="sr-only">Menu</DialogPrimitive.Title>
-            <BarreLaterale role={role} onNaviguer={() => setTiroirOuvert(false)}>
+            <BarreLaterale utilisateur={utilisateur} onNaviguer={() => setTiroirOuvert(false)}>
               <DialogPrimitive.Close asChild>
                 <Button
                   variant="discret"
@@ -95,11 +99,11 @@ export function Coquille({ role, children }: { role: Role | null; children: Reac
 }
 
 function BarreLaterale({
-  role,
+  utilisateur,
   onNaviguer,
   children,
 }: {
-  role: Role | null;
+  utilisateur: Utilisateur | undefined;
   onNaviguer?: () => void;
   /** Bouton de repli ou de fermeture, à droite du nom. */
   children: React.ReactNode;
@@ -114,7 +118,7 @@ function BarreLaterale({
       </div>
       <nav aria-label="Navigation principale" className="flex-1 overflow-y-auto px-2 py-2">
         <ul className="flex flex-col gap-0.5">
-          {entreesPourRole(role).map(({ href, libelle, icone: Icone }) => {
+          {entreesPourRole(utilisateur?.role ?? null).map(({ href, libelle, icone: Icone }) => {
             const active = estActive(href, cheminCourant);
             return (
               <li key={href}>
@@ -135,6 +139,42 @@ function BarreLaterale({
           })}
         </ul>
       </nav>
+      <CompteUtilisateur utilisateur={utilisateur} />
     </>
+  );
+}
+
+/** Bas de la barre latérale : qui est connecté, et la déconnexion. */
+function CompteUtilisateur({ utilisateur }: { utilisateur: Utilisateur | undefined }) {
+  const deconnecter = useDeconnexion();
+  const [enCours, setEnCours] = React.useState(false);
+
+  return (
+    <div className="flex flex-col gap-2 border-t border-bordure p-3">
+      {utilisateur ? (
+        <div className="flex min-w-0 flex-col px-1">
+          <span className="truncate font-medium">{utilisateur.nom_complet}</span>
+          <span className="text-xs text-texte-2">{LIBELLES_ROLES[utilisateur.role]}</span>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2 px-1 py-1" aria-hidden>
+          <Squelette className="h-3 w-32" />
+          <Squelette className="h-3 w-20" />
+        </div>
+      )}
+      <Button
+        variant="discret"
+        className="justify-start"
+        enCours={enCours}
+        libelleEnCours="Déconnexion…"
+        onClick={() => {
+          setEnCours(true);
+          void deconnecter();
+        }}
+      >
+        <LogOut />
+        Se déconnecter
+      </Button>
+    </div>
   );
 }

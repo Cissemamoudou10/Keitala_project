@@ -152,3 +152,14 @@ async def test_reserve_au_super_admin(
 
 async def test_sans_session(client: AsyncClient) -> None:
     assert (await client.get("/api/v1/utilisateurs")).status_code == 401
+
+
+async def test_email_invalide_explique_en_francais(client: AsyncClient, admin: Utilisateur) -> None:
+    reponse = await client.post(
+        "/api/v1/utilisateurs",
+        json={**NOUVEAU_COMPTE, "email": "nom@domaine.test"},  # domaine réservé
+        headers=entetes_pour(admin),
+    )
+
+    assert reponse.status_code == 422
+    assert reponse.json()["details"]["email"] == ["Valeur invalide : vérifiez la saisie."]

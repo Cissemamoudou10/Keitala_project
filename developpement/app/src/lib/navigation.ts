@@ -9,14 +9,16 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export type Role = "SUPER_ADMIN" | "GESTIONNAIRE" | "CONSULTANT";
+import { peut, type Action, type Role } from "@/lib/droits";
+
+export type { Role };
 
 export type EntreeNavigation = {
   libelle: string;
   href: string;
   icone: LucideIcon;
-  /** Entrée réservée au Super Admin (charte, section 6). */
-  superAdminSeulement?: boolean;
+  /** Entrée affichée seulement si le rôle peut faire cette action (lib/droits). */
+  action?: Action;
 };
 
 /** Six entrées au plus, plus « Administration » pour le Super Admin. */
@@ -31,14 +33,12 @@ export const ENTREES_NAVIGATION: EntreeNavigation[] = [
     libelle: "Administration",
     href: "/administration",
     icone: Settings,
-    superAdminSeulement: true,
+    action: "gerer_utilisateurs",
   },
 ];
 
 export function entreesPourRole(role: Role | null): EntreeNavigation[] {
-  return ENTREES_NAVIGATION.filter(
-    (entree) => !entree.superAdminSeulement || role === "SUPER_ADMIN",
-  );
+  return ENTREES_NAVIGATION.filter((entree) => !entree.action || peut(role, entree.action));
 }
 
 export function estActive(href: string, cheminCourant: string): boolean {

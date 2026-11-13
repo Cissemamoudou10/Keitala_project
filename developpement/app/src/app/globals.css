@@ -1,4 +1,142 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-/* Jetons de la charte (design/CHARTE_UX_UI.md) : tâche S0-11.
-   Thème clair uniquement pour la première version (D-019). */
+/* =============================================================================
+   Jetons de la charte (design/CHARTE_UX_UI.md, section 14).
+   Thème clair uniquement (D-019). Les composants n'utilisent que ces jetons.
+   ============================================================================= */
+:root {
+  /* Neutres */
+  --fond: #ffffff;
+  --fond-doux: #f7f7f5;
+  --fond-survol: #f1f1ef;
+  --fond-actif: #e9e9e7;
+  --bordure: #e9e9e7;
+  --bordure-forte: #d3d2ce;
+  --texte: #37352f;
+  --texte-2: #6b6a66;
+  --texte-3: #8e8d89;
+
+  /* Accent */
+  --accent: #2076cc;
+  --accent-survol: #1a63ad;
+  --accent-doux: #e7f3f8;
+
+  /* États : texte / fond */
+  --succes: #2f6b4f;
+  --succes-fond: #edf3ec;
+  --attention: #8a5a00;
+  --attention-fond: #fbf3db;
+  --danger: #b3261e;
+  --danger-fond: #fdebec;
+  --info: #1f5f85;
+  --info-fond: #e7f3f8;
+  --neutre: #5f5e5b;
+  --neutre-fond: #f1f1ef;
+  --danger-plein: #c4372f;
+
+  /* Voile derrière une fenêtre : absent de la charte, choix le plus sobre (D-024) */
+  --voile: rgba(15, 15, 15, 0.2);
+
+  /* Formes */
+  --rayon-s: 4px;
+  --rayon-m: 6px;
+  --rayon-l: 8px;
+  --ombre-flottant: 0 0 0 1px rgba(15, 15, 15, 0.04), 0 4px 12px rgba(15, 15, 15, 0.1);
+
+  /* Typographie : Inter est servie par next/font sous --font-inter */
+  --police: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Mouvement */
+  --duree: 140ms;
+}
+
+/* Relie les jetons à Tailwind. La palette par défaut est retirée : une couleur
+   hors charte ne produit aucune classe. */
+@theme inline {
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-blanc: #ffffff;
+
+  --color-fond: var(--fond);
+  --color-fond-doux: var(--fond-doux);
+  --color-fond-survol: var(--fond-survol);
+  --color-fond-actif: var(--fond-actif);
+  --color-bordure: var(--bordure);
+  --color-bordure-forte: var(--bordure-forte);
+  --color-texte: var(--texte);
+  --color-texte-2: var(--texte-2);
+  --color-texte-3: var(--texte-3);
+  --color-accent: var(--accent);
+  --color-accent-survol: var(--accent-survol);
+  --color-accent-doux: var(--accent-doux);
+  --color-succes: var(--succes);
+  --color-succes-fond: var(--succes-fond);
+  --color-attention: var(--attention);
+  --color-attention-fond: var(--attention-fond);
+  --color-danger: var(--danger);
+  --color-danger-fond: var(--danger-fond);
+  --color-info: var(--info);
+  --color-info-fond: var(--info-fond);
+  --color-neutre: var(--neutre);
+  --color-neutre-fond: var(--neutre-fond);
+  --color-danger-plein: var(--danger-plein);
+  --color-voile: var(--voile);
+
+  --radius-*: initial;
+  --radius-sm: var(--rayon-s);
+  --radius-md: var(--rayon-m);
+  --radius-lg: var(--rayon-l);
+  --radius-full: 9999px;
+
+  --shadow-*: initial;
+  --shadow-flottant: var(--ombre-flottant);
+
+  --font-sans: var(--police);
+
+  /* Échelle typographique de la charte (section 4), en plus de text-xs/sm/base */
+  --text-titre-page: 28px;
+  --text-titre-page--line-height: 36px;
+  --text-titre-section: 18px;
+  --text-titre-section--line-height: 26px;
+  --text-libelle: 13px;
+  --text-libelle--line-height: 18px;
+  --text-chiffre-cle: 24px;
+  --text-chiffre-cle--line-height: 32px;
+
+  --default-transition-duration: var(--duree);
+  --default-transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+@layer base {
+  html {
+    @apply font-sans;
+  }
+
+  body {
+    @apply bg-fond text-sm text-texte;
+  }
+
+  *,
+  ::before,
+  ::after {
+    @apply border-bordure;
+  }
+
+  /* Focus toujours visible : contour de 2 px accent, décalé de 2 px (section 13) */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

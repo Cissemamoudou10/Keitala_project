@@ -82,6 +82,12 @@ Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack 
 - `build`, `lint`
 - `typecheck` : génère les types des routes (`next typegen`) puis lance `tsc`
 
+## Briques d'interface (S0-11)
+
+- Jetons de la charte dans `src/app/globals.css` ; seules ces couleurs existent dans Tailwind (D-024). Catalogue visuel en développement : http://localhost:3000/composants.
+- `components/ui` : `Button` (`principal`, `secondaire`, `discret`, `danger` ; `enCours` bloque et affiche « Enregistrement… »), `Input`, `Label`, `Champ` (libellé, « (facultatif) », aide, erreur reliés au contrôle), `Select`, `Table` (`numerique` aligne à droite), `Badge` (`succes`, `attention`, `danger`, `info`, `neutre`), `Dialog`, `Toaster`. Notifications : `notifier.succes(...)` / `notifier.erreur(...)` (`lib/notifications.ts`).
+- Ajouter un composant : `corepack pnpm dlx shadcn@4.23.0 add <nom>`, puis remplacer ses classes par les jetons et importer `cn` depuis `@/lib/utils`.
+
 ## Next.js 16 : à savoir
 
 - Version récente : lire le guide utile dans `node_modules/next/dist/docs/` avant d'écrire du code (rappel dans `AGENTS.md` de ce dossier, recréé par `next dev`).

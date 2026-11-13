@@ -10,7 +10,8 @@ class Settings(BaseSettings):
 
     SECRET_KEY: str = _CLE_DE_DEVELOPPEMENT
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     DATABASE_URL: str = (
         "postgresql+asyncpg://keitala_user:keitala_dev_password@localhost:5433/keitala_db"

@@ -5,7 +5,7 @@ entre eux et la base de test reste dans l'état de la migration (données initia
 """
 
 import asyncio
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, Awaitable, Callable
 from pathlib import Path
 
 import pytest
@@ -17,8 +17,11 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import NullPool
 
 from app.core.config import settings
+from app.core.security import creer_jeton_acces, hacher_mot_de_passe
 from app.db.session import get_db
 from app.main import app
+from app.models import Utilisateur
+from app.models.enums import RoleUtilisateur
 
 DOSSIER_API = Path(__file__).resolve().parent.parent
 
@@ -78,3 +81,38 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient]:
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
     app.dependency_overrides.clear()
+
+
+# --- Utilisateurs et sessions -------------------------------------------------------
+
+MOT_DE_PASSE_TEST = "mot-de-passe-de-test"
+
+
+@pytest.fixture
+def creer_compte(db_session: AsyncSession) -> Callable[..., Awaitable[Utilisateur]]:
+    """Fabrique de comptes : `await creer_compte(RoleUtilisateur.GESTIONNAIRE)`."""
+    compteur = 0
+
+    async def fabriquer(
+        role: RoleUtilisateur, *, email: str | None = None, est_actif: bool = True
+    ) -> Utilisateur:
+        nonlocal compteur
+        compteur += 1
+        utilisateur = Utilisateur(
+            nom_complet=f"{role.value.title()} {compteur}",
+            email=email or f"{role.value.lower()}{compteur}@keitala.ml",
+            role=role,
+            est_actif=est_actif,
+            mot_de_passe_hash=hacher_mot_de_passe(MOT_DE_PASSE_TEST),
+        )
+        db_session.add(utilisateur)
+        await db_session.flush()
+        return utilisateur
+
+    return fabriquer
+
+
+def entetes_pour(utilisateur: Utilisateur) -> dict[str, str]:
+    """En-tête d'authentification tel que le pose le proxy Next.js."""
+    jeton = creer_jeton_acces(utilisateur.id, utilisateur.mot_de_passe_hash)
+    return {"Authorization": f"Bearer {jeton}"}

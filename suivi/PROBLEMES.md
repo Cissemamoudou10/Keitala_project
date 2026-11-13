@@ -98,6 +98,12 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Piste** : ouvrir http://localhost:3000/composants et http://localhost:3000/stocks à 1 280 px puis à 768 px ; essayer le tiroir, la fenêtre, les notifications, le repli de la barre latérale et le clavier (Tab, Échap).
 - **Résolution** (13/11/2026) : contrôlé dans Chrome. Bureau (1 456 px) : catalogue, coquille, fenêtre (Échap ferme), notification d'erreur. 768 px (via un cadre de 768 px, la fenêtre étant maximisée) : barre du haut « Menu », tiroir, cibles et champs de 44 px, texte 16 px. Conforme à la charte. Non vu : repli de la barre latérale sur bureau, parcours complet au clavier.
 
+## P-014 — Intégration continue jamais exécutée sur GitHub
+- **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
+- **Constat** : le dépôt n'a pas de dépôt distant. Le workflow `.github/workflows/ci.yml` a été validé (YAML lu, étapes rejouées à l'identique en local : API dans le conteneur sur une base vide, app sur le poste), mais jamais lancé sur GitHub Actions. Non vérifié en conditions réelles : installation de Python 3.12 par uv, service PostgreSQL, installation de Chromium par Playwright, versions des actions (`checkout@v4`, `setup-uv@v6`, `pnpm/action-setup@v4`, `setup-node@v4`, `upload-artifact@v4`). L'outil `actionlint` n'a pas pu être lancé (téléchargement de son image refusé).
+- **Impact** : S0-17 non prouvé tant qu'aucun push n'a eu lieu.
+- **Piste** : créer le dépôt GitHub (décision de l'utilisateur), pousser, lire le résultat du premier passage et corriger.
+
 ## C. Risques à surveiller
 
 | Risque | Effet | Parade |

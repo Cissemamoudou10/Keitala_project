@@ -11,14 +11,14 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 | | |
 | :--- | :--- |
 | **Dernière mise à jour** | 13/11/2026 |
-| **Phase** | Sprint 0 en cours : socle API terminé ; socle app terminé sauf l'outillage de tests (S0-16) et l'intégration continue (S0-17). |
-| **Sprint en cours** | Sprint 0 — Fondations |
-| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query, formats et champ de montant, quatre états d'écran ; build, lint et types OK ; rendu vérifié à l'écran (bureau et 768 px). |
+| **Phase** | Sprint 0 terminé. Prochain : Sprint 1 (authentification et rôles). |
+| **Sprint en cours** | Sprint 1 — Authentification et rôles (à démarrer) |
+| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query, formats et champ de montant, quatre états d'écran ; build, lint et types OK ; rendu vérifié à l'écran (bureau et 768 px) ; 44 tests Vitest, 7 parcours Playwright (bureau et tablette). CI GitHub Actions écrite (`.github/workflows/ci.yml`), rejouée en local, jamais exécutée sur GitHub (P-014). |
 | **Points bloquants** | Aucun. Commandes de l'API à lancer dans le conteneur (P-012). Aucun. |
 
 ## Prochaine tâche
 
-**S0-16 : lint, formatage, vérification de types et socle de tests de l'app** (Vitest, Playwright). Premiers tests à écrire : `lib/formats.ts` (les 28 cas vérifiés à la main sont listés dans `JOURNAL.md`) et `ChampMontant`.
+**Sprint 1, US-AUTH-01 : connexion sécurisée**, en commençant par **S1-T1** (commande de création du premier Super Admin), indispensable pour se connecter. Relire avant : critères d'acceptation de US-AUTH-01 à 03 (backlog), section sécurité de la conception technique, `developpement/app/README.md` (proxy et cookies), D-021 à D-025 si l'utilisateur les a tranchées.
 
 ---
 
@@ -26,7 +26,7 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 
 | Sprint | Contenu | Stories | État |
 | :--- | :--- | :---: | :--- |
-| 0 | Fondations techniques et socle d'interface | — | En cours (API faite) |
+| 0 | Fondations techniques et socle d'interface | — | Terminé |
 | 1 | Authentification, rôles, utilisateurs | 3 | À faire |
 | 2 | Référentiels : tiers, articles, unités, comptes | 4 | À faire |
 | 3 | Stocks : état, alertes, journal, inventaire, pertes | 5 | À faire |
@@ -65,10 +65,10 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 - [x] S0-13 Proxy `/api/[...path]` vers FastAPI et client d'appel côté app
 - [x] S0-14 Utilitaires de format : montant FCFA, quantité, date ; champ de saisie de montant
 - [x] S0-15 Les quatre états d'écran réutilisables : chargement, vide, erreur, données
-- [ ] S0-16 Lint, formatage, vérification de types, socle de tests
+- [x] S0-16 Lint, formatage, vérification de types, socle de tests
 
 ### Intégration continue
-- [ ] S0-17 Vérifications automatiques à chaque push : lint, types, tests (app et api)
+- [x] S0-17 Vérifications automatiques à chaque push : lint, types, tests (app et api)
 
 ---
 
@@ -150,6 +150,7 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 | :--- | :--- |
 | 13/11/2026 | Analyse du dossier ; spécifications et schéma corrigés en v1.1 ; schéma validé sur PostgreSQL 16 |
 | 13/11/2026 | Mise en place de `AGENTS.md`, des fichiers de suivi, de la charte et de `developpement/` |
+| 13/11/2026 | **Sprint 0 terminé** : outillage de tests de l'app (S0-16) et intégration continue (S0-17) |
 | 13/11/2026 | App : formats, champ de montant, quatre états d'écran (S0-14, S0-15) |
 | 13/11/2026 | App : charte, composants, coquille et proxy vers l'API (S0-11 à S0-13) |
 | 13/11/2026 | Projet Next.js initialisé (S0-10) |

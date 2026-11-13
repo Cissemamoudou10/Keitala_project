@@ -17,6 +17,15 @@ Une entrée par session de travail, **la plus récente en haut**. C'est le relai
 
 ---
 
+## 2026-11-13 — Claude Code — Outillage de tests et intégration continue (S0-16, S0-17) : fin du Sprint 0
+- **Tâche** : S0-16 lint, formatage, types, socle de tests de l'app ; S0-17 vérifications automatiques à chaque push. Un commit par tâche.
+- **Fait** : S0-16 : Prettier + tri des classes Tailwind (tout le code reformaté, sans changement de comportement) ; Vitest 5 + Testing Library + jsdom 30.1.3 : 44 tests (formats : les 28 cas de la session précédente ; `ChampMontant` : groupes, lettres, 13 chiffres, effacement d'un espace ; `appelerApi` ; proxy : relais, jeton du cookie, refus de `..`, 502, 504, `API_URL` obligatoire en production ; navigation ; `EtatRequete`) ; Playwright 1.65 : 4 parcours × 2 profils (accueil, navigation et lien actif, page introuvable, tiroir tablette avec cible de 44 px et Échap). Redirection de `/` déplacée dans `next.config.ts` (le `redirect()` dans une page provoquait une erreur de validation de Next 16). S0-17 : `.github/workflows/ci.yml`, tâches `api` (PostgreSQL 16 de service, ruff, format, mypy, migration, `alembic check`, pytest) et `app` (format, lint, types, Vitest, build, Playwright avec Chromium, rapport en cas d'échec).
+- **Non fait / en cours** : CI jamais exécutée sur GitHub, faute de dépôt distant (P-014).
+- **Vérifications** : un test (effacement d'un espace) rendu volontairement faux échoue bien, puis code restauré. jsdom 31.0.1 refusé par la protection `minimumReleaseAge` de pnpm : version précédente retenue, aucune exception ajoutée. Parcours Playwright passés en mode dev et sur l'application compilée (`next start`). Tâche `api` rejouée dans le conteneur sur une base vide, tâche `app` rejouée sur le poste : tout passe. Lancement d'`actionlint` refusé (image Docker externe) : YAML seulement relu avec js-yaml.
+- **Décisions** : D-025 proposée.
+- **Problèmes** : P-014 ouvert.
+- **À reprendre par le suivant** : Sprint 1, S1-T1 puis US-AUTH-01. Si l'utilisateur crée le dépôt GitHub, régler d'abord P-014.
+
 ## 2026-11-13 — Claude Code — Formats, champ de montant et états d'écran (S0-14, S0-15)
 - **Tâche** : S0-14 utilitaires de format et champ de saisie de montant ; S0-15 quatre états d'écran. Un commit par tâche.
 - **Fait** : P-013 réglé d'abord (contrôle visuel dans Chrome, bureau et 768 px). S0-14 : `lib/formats.ts` (montant, quantité accordée à l'unité, conversion, pourcentage, date, date relative, date et heure, téléphone), calculs sur chaînes décimales sans flottant, fuseau `Africa/Bamako` ; `ChampMontant` (groupes pendant la frappe, suffixe FCFA, curseur conservé, effacer l'espace d'un groupe efface le chiffre voisin, 13 chiffres au plus, clavier numérique). S0-15 : `EtatRequete`, `EtatVide`, `EtatErreur` (+ `messageErreur`), squelettes tableau, chiffres clés et formulaire ; démonstrations dans `/composants`. Dossier `public/` absent (non recopié à S0-10) : sans effet tant qu'il n'y a pas d'image.

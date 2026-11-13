@@ -33,9 +33,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: enCI
-      ? `corepack pnpm exec next start -p ${PORT}`
-      : `corepack pnpm exec next dev -p ${PORT}`,
+    // En CI, pnpm est installé par l'action ; en local, il passe par corepack
+    command: enCI ? `pnpm exec next start -p ${PORT}` : `corepack pnpm exec next dev -p ${PORT}`,
     url: `http://localhost:${PORT}/tableau-de-bord`,
     reuseExistingServer: !enCI,
     timeout: 180_000,

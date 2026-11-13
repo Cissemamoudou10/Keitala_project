@@ -1,0 +1,114 @@
+# Vérifications automatiques à chaque push et pull request (S0-17) :
+# lint, format, types et tests, pour l'API et pour l'app.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+# Un nouveau push sur la même branche annule la vérification devenue inutile
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API (FastAPI)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: developpement/api
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: keitala_user
+          POSTGRES_PASSWORD: keitala_ci_password
+          POSTGRES_DB: keitala_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U keitala_user -d keitala_db"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      ENV: dev
+      DATABASE_URL: postgresql+asyncpg://keitala_user:keitala_ci_password@localhost:5432/keitala_db
+      # Base distincte, recréée par les tests (tests/conftest.py)
+      TEST_DATABASE_URL: postgresql+asyncpg://keitala_user:keitala_ci_password@localhost:5432/keitala_test_db
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.8"
+          enable-cache: true
+          cache-dependency-glob: developpement/api/uv.lock
+
+      # Python 3.12 (fichier .python-version) et dépendances figées par uv.lock
+      - run: uv sync --frozen
+
+      - name: Lint
+        run: uv run --frozen ruff check .
+      - name: Format
+        run: uv run --frozen ruff format --check .
+      - name: Types
+        run: uv run --frozen mypy .
+      - name: Migrations, puis modèles alignés sur la base (D-022)
+        run: |
+          uv run --frozen alembic upgrade head
+          uv run --frozen alembic check
+      - name: Tests
+        run: uv run --frozen pytest
+
+  app:
+    name: App (Next.js)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: developpement/app
+    steps:
+      - uses: actions/checkout@v4
+
+      # Version de pnpm lue dans le champ packageManager de package.json
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: developpement/app/package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: developpement/app/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Format
+        run: pnpm format:check
+      - name: Lint
+        run: pnpm lint
+      - name: Types
+        run: pnpm typecheck
+      - name: Tests
+        run: pnpm test
+      - name: Build
+        run: pnpm build
+
+      - name: Navigateur des parcours de bout en bout
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Parcours de bout en bout
+        run: pnpm test:e2e
+
+      - name: Rapport Playwright en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-playwright
+          path: developpement/app/playwright-report/
+          retention-days: 7

@@ -122,4 +122,26 @@ Une story est terminée quand :
 
 ## 10. Commandes
 
-Cette section est à compléter par l'agent qui réalise le Sprint 0, avec les commandes réelles (installation, lancement, tests, lint, migrations) pour `developpement/app` et `developpement/api`.
+### Base de données (Docker)
+- Démarrage : `docker-compose -f developpement/docker-compose.yml up -d db`
+- Arrêt : `docker-compose -f developpement/docker-compose.yml down`
+- Statut : `docker-compose -f developpement/docker-compose.yml ps`
+- Port exposé localement : `5433` (évite les conflits avec un autre PostgreSQL local)
+
+### Backend API (`developpement/api`)
+- Installation des dépendances : `uv sync` (ou `python -m uv sync`)
+- Lancement dev : `uv run uvicorn app.main:app --reload --port 8000`
+- Migrations Alembic :
+  - Appliquer : `uv run alembic upgrade head`
+  - Créer une révision : `uv run alembic revision --autogenerate -m "nom_revision"`
+- Tests : `uv run pytest`
+- Lint et formatage : `uv run ruff check .` et `uv run ruff format .`
+- Vérification des types : `uv run mypy .`
+
+### Frontend App (`developpement/app`)
+- Installation des dépendances : `pnpm install`
+- Lancement dev : `pnpm dev`
+- Build production : `pnpm build`
+- Tests : `pnpm test`
+- Lint : `pnpm lint`
+- Vérification des types : `pnpm typecheck`

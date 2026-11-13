@@ -1,6 +1,6 @@
 # App — ERP Keitala (frontend)
 
-Frontend Next.js et proxy vers l'API. **Ce dossier ne contient pas encore de code** : il est à initialiser au Sprint 0 (`suivi/AVANCEMENT.md`, tâches S0-10 à S0-16).
+Frontend Next.js et proxy vers l'API. Projet initialisé (S0-10) ; charte, coquille, proxy et socle de tests : tâches S0-11 à S0-16 de `suivi/AVANCEMENT.md`.
 
 À lire avant de travailler ici : `AGENTS.md` (racine) et **`design/CHARTE_UX_UI.md` en entier**. L'expérience utilisateur est la priorité du projet.
 
@@ -75,4 +75,15 @@ app/
 
 ## Commandes
 
-À renseigner au Sprint 0 (installation, lancement, tests, lint), puis à reporter dans `AGENTS.md` section 10.
+Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack pnpm` (version fixée par `packageManager` dans `package.json`) :
+
+- `install` : dépendances ; copier `.env.example` en `.env.local`
+- `dev` : http://localhost:3000 (l'API doit tourner, voir `AGENTS.md` §10)
+- `build`, `lint`
+- `typecheck` : génère les types des routes (`next typegen`) puis lance `tsc`
+
+## Next.js 16 : à savoir
+
+- Version récente : lire le guide utile dans `node_modules/next/dist/docs/` avant d'écrire du code (rappel dans `AGENTS.md` de ce dossier, recréé par `next dev`).
+- **Cache Components** est activé (`next.config.ts`). Rien n'est mis en cache sans directive `use cache` : ne jamais en poser sur des données métier ou propres à un utilisateur sans décision notée dans `DECISIONS.md`.
+- `LayoutProps` et `PageProps` sont des types globaux générés par Next.

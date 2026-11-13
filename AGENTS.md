@@ -131,6 +131,7 @@ Tout se lance **dans le conteneur** (le poste Windows bloque Python 3.12, voir P
 - Migrations : `alembic upgrade head` ; nouvelle révision : `alembic revision --autogenerate -m "..."`, puis `alembic check` doit être muet
 - Tests : `pytest` (base `keitala_test_db` recréée à chaque fois)
 - Lint, format, types : `ruff check .`, `ruff format .`, `mypy .`
+- Premier Super Admin : `python -m app.commandes.creer_super_admin --nom "..." --email ...` (avec `docker exec -it`) ; comptes de test e2e : `app.commandes.comptes_e2e`
 
 ### Frontend App (`developpement/app`)
 `pnpm` (ou `corepack pnpm`) suivi de `install`, `dev`, `build`, `lint`, `format:check`, `typecheck`, `test`, `test:e2e`.

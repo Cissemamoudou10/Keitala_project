@@ -104,6 +104,17 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Impact** : S0-17 non prouvé tant qu'aucun push n'a eu lieu.
 - **Piste** : créer le dépôt GitHub (décision de l'utilisateur), pousser, lire le résultat du premier passage et corriger.
 
+## P-015 — Pas de limitation des tentatives de connexion
+- **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Majeur · **Signalé par** : Claude
+- **Constat** : `/api/v1/auth/login` accepte un nombre illimité d'essais, et les mots de passe ne demandent que 8 caractères.
+- **Impact** : mot de passe devinable par essais répétés une fois l'application en ligne.
+- **Piste** : limiter dans Nginx (`limit_req` sur `/api/v1/auth/login`) au Sprint 9 (S9-1), ou compteur d'échecs par email côté API (nouvelle migration). À trancher avant la mise en production.
+
+## P-016 — Les parcours e2e laissent des comptes dans la base de développement
+- **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
+- **Constat** : chaque passage de Playwright crée des comptes (`e2e-…@keitala.ml`, adresses uniques) qu'on ne peut que désactiver. En CI la base est neuve ; en local, la liste des utilisateurs s'allonge.
+- **Piste** : base dédiée aux parcours e2e (ex. `keitala_e2e_db`, API lancée dessus), à mettre en place avec les parcours métier.
+
 ## C. Risques à surveiller
 
 | Risque | Effet | Parade |

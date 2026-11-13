@@ -11,14 +11,14 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 | | |
 | :--- | :--- |
 | **Dernière mise à jour** | 13/11/2026 |
-| **Phase** | Sprint 0 terminé. Prochain : Sprint 1 (authentification et rôles). |
-| **Sprint en cours** | Sprint 1 — Authentification et rôles (à démarrer) |
-| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query, formats et champ de montant, quatre états d'écran ; build, lint et types OK ; rendu vérifié à l'écran (bureau et 768 px) ; 44 tests Vitest, 7 parcours Playwright (bureau et tablette). CI GitHub Actions écrite (`.github/workflows/ci.yml`), rejouée en local, jamais exécutée sur GitHub (P-014). |
+| **Phase** | Sprints 0 et 1 terminés. Prochain : Sprint 2 (référentiels). |
+| **Sprint en cours** | Sprint 2 — Référentiels (à démarrer) |
+| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query, formats et champ de montant, quatre états d'écran ; build, lint et types OK ; rendu vérifié à l'écran (bureau et 768 px) ; 44 tests Vitest, 7 parcours Playwright (bureau et tablette). CI GitHub Actions écrite (`.github/workflows/ci.yml`), rejouée en local, jamais exécutée sur GitHub (P-014). Sprint 1 : connexion par cookies HttpOnly, gestion des comptes, contrôle d'accès par rôle (API 53 tests, app 62 tests, 19 parcours e2e sur la pile complète). |
 | **Points bloquants** | Aucun. Commandes de l'API à lancer dans le conteneur (P-012). Aucun. |
 
 ## Prochaine tâche
 
-**Sprint 1, US-AUTH-01 : connexion sécurisée**, en commençant par **S1-T1** (commande de création du premier Super Admin), indispensable pour se connecter. Relire avant : critères d'acceptation de US-AUTH-01 à 03 (backlog), section sécurité de la conception technique, `developpement/app/README.md` (proxy et cookies), D-021 à D-025 si l'utilisateur les a tranchées.
+**Sprint 2, US-REF-03 : comptes de trésorerie et soldes d'ouverture**, puis US-REF-01, US-REF-02, US-STK-01 (US-REF-03 d'abord : les règlements des Sprints 4 et 5 en dépendent). Chaque routeur se déclare avec `ACCES_METIER` ; chaque écran cache ses actions derrière `usePeut`. Relire avant : critères des stories (backlog, EPIC 2), matrice des droits (backlog, section 4).
 
 ---
 
@@ -27,7 +27,7 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 | Sprint | Contenu | Stories | État |
 | :--- | :--- | :---: | :--- |
 | 0 | Fondations techniques et socle d'interface | — | Terminé |
-| 1 | Authentification, rôles, utilisateurs | 3 | À faire |
+| 1 | Authentification, rôles, utilisateurs | 3 | Terminé |
 | 2 | Référentiels : tiers, articles, unités, comptes | 4 | À faire |
 | 3 | Stocks : état, alertes, journal, inventaire, pertes | 5 | À faire |
 | 4 | Achats et dettes fournisseurs | 4 | À faire |
@@ -74,11 +74,11 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 
 ## Sprint 1 — Authentification et rôles
 
-- [ ] US-AUTH-01 Connexion sécurisée (jetons en cookies `HttpOnly` posés par le proxy)
-- [ ] US-AUTH-02 Gestion des comptes utilisateurs par le Super Admin
-- [ ] US-AUTH-03 Cloisonnement des droits : 403 côté API, actions masquées côté app
-- [ ] S1-T1 Commande de création du premier Super Admin
-- [ ] S1-T2 Écran de connexion et page « accès refusé » conformes à la charte
+- [x] US-AUTH-01 Connexion sécurisée (jetons en cookies `HttpOnly` posés par le proxy)
+- [x] US-AUTH-02 Gestion des comptes utilisateurs par le Super Admin
+- [x] US-AUTH-03 Cloisonnement des droits : 403 côté API, actions masquées côté app
+- [x] S1-T1 Commande de création du premier Super Admin
+- [x] S1-T2 Écran de connexion et page « accès refusé » conformes à la charte
 
 ## Sprint 2 — Référentiels
 
@@ -150,6 +150,7 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 | :--- | :--- |
 | 13/11/2026 | Analyse du dossier ; spécifications et schéma corrigés en v1.1 ; schéma validé sur PostgreSQL 16 |
 | 13/11/2026 | Mise en place de `AGENTS.md`, des fichiers de suivi, de la charte et de `developpement/` |
+| 13/11/2026 | **Sprint 1 terminé** : connexion, comptes, droits par rôle |
 | 13/11/2026 | **Sprint 0 terminé** : outillage de tests de l'app (S0-16) et intégration continue (S0-17) |
 | 13/11/2026 | App : formats, champ de montant, quatre états d'écran (S0-14, S0-15) |
 | 13/11/2026 | App : charte, composants, coquille et proxy vers l'API (S0-11 à S0-13) |

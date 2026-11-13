@@ -69,12 +69,48 @@ jobs:
   app:
     name: App (Next.js)
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: developpement/app
+    # Les parcours de bout en bout tournent sur la pile complète : base, API, app
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: keitala_user
+          POSTGRES_PASSWORD: keitala_ci_password
+          POSTGRES_DB: keitala_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U keitala_user -d keitala_db"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      ENV: dev
+      DATABASE_URL: postgresql+asyncpg://keitala_user:keitala_ci_password@localhost:5432/keitala_db
+      API_URL: http://localhost:8000
     steps:
       - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.8"
+          enable-cache: true
+          cache-dependency-glob: developpement/api/uv.lock
+
+      - name: API pour les parcours de bout en bout
+        working-directory: developpement/api
+        run: |
+          uv sync --frozen
+          uv run --frozen alembic upgrade head
+          # Comptes de test, mot de passe lu dans l'exemple de configuration de l'app
+          export "$(grep '^E2E_MOT_DE_PASSE=' ../app/.env.example)"
+          uv run --frozen python -m app.commandes.comptes_e2e
+          nohup uv run --frozen uvicorn app.main:app --port 8000 > api.log 2>&1 &
+          curl --silent --fail --retry 30 --retry-delay 1 --retry-connrefused http://localhost:8000/api/v1/sante
 
       # Version de pnpm lue dans le champ packageManager de package.json
       - uses: pnpm/action-setup@v4
@@ -105,10 +141,12 @@ jobs:
       - name: Parcours de bout en bout
         run: pnpm test:e2e
 
-      - name: Rapport Playwright en cas d'échec
+      - name: Rapport Playwright et journal de l'API en cas d'échec
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: rapport-playwright
-          path: developpement/app/playwright-report/
+          path: |
+            developpement/app/playwright-report/
+            developpement/api/api.log
           retention-days: 7

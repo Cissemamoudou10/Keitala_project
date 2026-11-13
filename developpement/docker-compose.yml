@@ -19,6 +19,26 @@ services:
       timeout: 5s
       retries: 5
 
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: keitala_api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=dev
+      - DEBUG=true
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-keitala_user}:${POSTGRES_PASSWORD:-keitala_dev_password}@db:5432/${POSTGRES_DB:-keitala_db}
+      # Base distincte, recréée à chaque lancement des tests
+      - TEST_DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-keitala_user}:${POSTGRES_PASSWORD:-keitala_dev_password}@db:5432/keitala_test_db
+    volumes:
+      - ./api:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pgdata:
     name: keitala_pgdata

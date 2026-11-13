@@ -1,6 +1,6 @@
 # API — ERP Keitala (backend)
 
-Backend FastAPI. **Ce dossier ne contient pas encore de code** : il est à initialiser au Sprint 0 (`suivi/AVANCEMENT.md`, tâches S0-4 à S0-9).
+Backend FastAPI. Socle en place (Sprint 0, tâches S0-4 à S0-9) ; les domaines métier arrivent à partir du Sprint 1.
 
 À lire avant de travailler ici : `AGENTS.md` (racine), `schema.sql`, `conception_technique_erp_keitala.md` (sections 3 et 4).
 
@@ -75,4 +75,11 @@ Voir `suivi/PROBLEMES.md` : P-009 (protection contre le double enregistrement, �
 
 ## Commandes
 
-À renseigner au Sprint 0 (installation, lancement, migrations, tests, lint), puis à reporter dans `AGENTS.md` section 10.
+Voir `AGENTS.md` section 10 : tout se lance dans le conteneur `keitala_api` (D-023).
+
+## Repères du socle
+
+- **Modèles** : reflet de la migration, jamais l'inverse (D-022). Après toute modification de `models/` ou `alembic/`, `alembic check` doit répondre « No new upgrade operations detected ».
+- **Erreurs** : lever `ErreurMetier(code, message, status_code, details)` depuis un service (`app/core/erreurs.py`).
+- **Listes** : `paginer(session, requete, PaginationParams)` dans `app/db/pagination.py`, avec un `ORDER BY` stable ; réponse `PageReponse[T]`.
+- **Tests** : fixture `db_session` (transaction annulée à la fin) ; tests de base dans `tests/db/`, avec les fixtures `gestionnaire`, `article` et `caisse`.

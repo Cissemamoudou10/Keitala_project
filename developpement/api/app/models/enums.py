@@ -1,0 +1,75 @@
+"""Types énumérés, identiques aux types PostgreSQL de schema.sql."""
+
+import enum
+
+
+class RoleUtilisateur(enum.StrEnum):
+    SUPER_ADMIN = "SUPER_ADMIN"
+    GESTIONNAIRE = "GESTIONNAIRE"
+    CONSULTANT = "CONSULTANT"
+
+
+class FamilleArticle(enum.StrEnum):
+    SEMENCE = "SEMENCE"
+    INTRANT = "INTRANT"
+    MATIERE_PREMIERE = "MATIERE_PREMIERE"
+    SEMI_FINI = "SEMI_FINI"
+    EMBALLAGE = "EMBALLAGE"
+    PRODUIT_FINI = "PRODUIT_FINI"
+
+
+class TypeMouvementStock(enum.StrEnum):
+    ENTREE_ACHAT = "ENTREE_ACHAT"
+    SORTIE_VENTE = "SORTIE_VENTE"
+    SORTIE_DON = "SORTIE_DON"
+    CONSO_PRODUCTION = "CONSO_PRODUCTION"
+    ENTREE_PRODUCTION = "ENTREE_PRODUCTION"
+    AJUSTEMENT_INVENTAIRE = "AJUSTEMENT_INVENTAIRE"
+    SORTIE_PERTE = "SORTIE_PERTE"
+    ANNULATION = "ANNULATION"
+
+
+class StatutDocument(enum.StrEnum):
+    VALIDE = "VALIDE"
+    ANNULE = "ANNULE"
+
+
+class TypeOf(enum.StrEnum):
+    TRANSFORMATION = "TRANSFORMATION"
+    CONDITIONNEMENT = "CONDITIONNEMENT"
+
+
+class StatutOf(enum.StrEnum):
+    BROUILLON = "BROUILLON"
+    EN_COURS = "EN_COURS"
+    TERMINE = "TERMINE"
+    ANNULE = "ANNULE"
+
+
+class StatutInventaire(enum.StrEnum):
+    EN_COURS = "EN_COURS"
+    VALIDE = "VALIDE"
+
+
+class MotifEcart(enum.StrEnum):
+    CASSE = "CASSE"
+    AVARIE = "AVARIE"
+    DESSICCATION = "DESSICCATION"
+    ERREUR_COMPTAGE = "ERREUR_COMPTAGE"
+    AUTRE = "AUTRE"
+
+
+class TypeCompteTresorerie(enum.StrEnum):
+    CAISSE = "CAISSE"
+    BANQUE = "BANQUE"
+    MOBILE_MONEY = "MOBILE_MONEY"
+
+
+class TypeFluxTresorerie(enum.StrEnum):
+    SOLDE_INITIAL = "SOLDE_INITIAL"
+    ENCAISSEMENT_VENTE = "ENCAISSEMENT_VENTE"
+    DECAISSEMENT_ACHAT = "DECAISSEMENT_ACHAT"
+    DEPENSE_EXPLOITATION = "DEPENSE_EXPLOITATION"
+    TRANSFERT_INTERNE = "TRANSFERT_INTERNE"
+    ECART_CLOTURE = "ECART_CLOTURE"
+    ANNULATION = "ANNULATION"

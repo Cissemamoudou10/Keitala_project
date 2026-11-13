@@ -133,4 +133,4 @@ Tout se lance **dans le conteneur** (le poste Windows bloque Python 3.12, voir P
 - Lint, format, types : `ruff check .`, `ruff format .`, `mypy .`
 
 ### Frontend App (`developpement/app`)
-`pnpm` (ou `corepack pnpm`) suivi de `install`, `dev`, `build`, `lint`, `typecheck` ; `test` à S0-16.
+`pnpm` (ou `corepack pnpm`) suivi de `install`, `dev`, `build`, `lint`, `format:check`, `typecheck`, `test`, `test:e2e`.

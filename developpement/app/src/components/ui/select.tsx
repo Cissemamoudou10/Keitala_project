@@ -33,7 +33,7 @@ function SelectTrigger({
       className={cn(
         "flex h-11 w-full items-center justify-between gap-2 rounded-sm border border-bordure-forte bg-fond px-3 text-base text-texte transition-colors lg:h-9 lg:text-sm",
         "focus-visible:border-accent focus-visible:outline-offset-0",
-        "data-placeholder:text-texte-3 aria-invalid:border-danger",
+        "aria-invalid:border-danger data-placeholder:text-texte-3",
         "disabled:cursor-not-allowed disabled:bg-fond-doux disabled:text-texte-3",
         "*:data-[slot=select-value]:line-clamp-1",
         className,

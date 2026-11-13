@@ -10,7 +10,12 @@ export class ErreurApi extends Error {
   readonly statut: number;
   readonly details: Record<string, unknown> | null;
 
-  constructor(code: string, message: string, statut: number, details: Record<string, unknown> | null = null) {
+  constructor(
+    code: string,
+    message: string,
+    statut: number,
+    details: Record<string, unknown> | null = null,
+  ) {
     super(message);
     this.name = "ErreurApi";
     this.code = code;
@@ -32,13 +37,16 @@ type OptionsAppel = {
 function construireAdresse(chemin: string, parametres: OptionsAppel["parametres"]): string {
   const recherche = new URLSearchParams();
   for (const [cle, valeur] of Object.entries(parametres ?? {})) {
-    if (valeur !== null && valeur !== undefined && valeur !== "") recherche.set(cle, String(valeur));
+    if (valeur !== null && valeur !== undefined && valeur !== "")
+      recherche.set(cle, String(valeur));
   }
   const suite = recherche.size > 0 ? `?${recherche}` : "";
   return `/api/${chemin.replace(/^\/+/, "")}${suite}`;
 }
 
-function estErreurFormatee(valeur: unknown): valeur is { code: string; message: string; details?: Record<string, unknown> | null } {
+function estErreurFormatee(
+  valeur: unknown,
+): valeur is { code: string; message: string; details?: Record<string, unknown> | null } {
   return (
     typeof valeur === "object" &&
     valeur !== null &&

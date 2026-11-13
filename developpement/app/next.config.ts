@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
@@ -11,6 +10,11 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+  // L'accueil mène au tableau de bord ; la connexion s'intercalera au Sprint 1 (US-AUTH-01).
+  // Redirection déclarée ici plutôt que par redirect() dans une page : sans rendu inutile.
+  async redirects() {
+    return [{ source: "/", destination: "/tableau-de-bord", permanent: false }];
   },
 };
 

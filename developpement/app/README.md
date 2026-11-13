@@ -42,17 +42,20 @@ app/
 ## Règles
 
 ### Proxy et session
+
 - Le navigateur n'appelle **que** `/api/...` sur le domaine de l'app. Le Route Handler relaie vers FastAPI (`API_URL`).
 - Les jetons sont dans des cookies `HttpOnly`, `Secure`, `SameSite=Lax`, posés par le proxy. Aucun jeton dans le JavaScript de la page, ni dans `localStorage`.
 - Sur un 401, le proxy tente un rafraîchissement puis rejoue la requête ; en cas d'échec, retour à la connexion en conservant la page demandée.
 
 ### Données
+
 - Composants serveur par défaut ; composants client pour l'interaction.
 - TanStack Query pour toute donnée côté client. Après une écriture, invalider les listes concernées (stocks, soldes, pièces).
 - Tri, filtres et pagination dans l'adresse de la page.
 - Les montants et quantités arrivent de l'API en chaînes décimales : ne pas les convertir en nombres flottants pour calculer. Les totaux qui font foi viennent de l'API ; ceux affichés en direct sont indicatifs.
 
 ### Interface
+
 - Appliquer la charte sans exception : jetons de couleur uniquement, une action principale par écran, quatre états par écran, formats de la section 8.
 - Construire d'abord les briques de `components/ui` et `components/saisie`, puis les écrans. Ne pas recréer un bouton ou un champ dans un écran.
 - Formulaires : React Hook Form + Zod, une colonne, valeurs par défaut utiles, saisie conservée en cas d'échec, bouton bloqué pendant l'envoi.
@@ -61,6 +64,7 @@ app/
 - Tester chaque écran à 768 px de large et avec le rôle Consultant.
 
 ### Tests
+
 - Vitest : `formats.ts`, `nombres-en-lettres.ts`, `droits.ts`, champs de saisie de montant et de quantité.
 - Playwright, parcours de bout en bout : connexion, vente au comptoir avec règlement, achat en sacs, clôture d'un ordre de fabrication, refus d'action pour un Consultant.
 
@@ -79,8 +83,10 @@ Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack 
 
 - `install` : dépendances ; copier `.env.example` en `.env.local`
 - `dev` : http://localhost:3000 (l'API doit tourner, voir `AGENTS.md` §10)
-- `build`, `lint`
+- `build`, `lint`, `format` (Prettier, classes Tailwind triées), `format:check`
 - `typecheck` : génère les types des routes (`next typegen`) puis lance `tsc`
+- `test` : Vitest (fichiers `src/**/*.test.ts(x)`, jsdom) ; `test:watch` en continu
+- `test:e2e` : Playwright (`e2e/`), profils bureau 1 280 px et tablette 768 px ; en local, utilise le Chrome du poste et lance `next dev` sur le port 3100
 
 ## Briques d'interface (S0-11)
 

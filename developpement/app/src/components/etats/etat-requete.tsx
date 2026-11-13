@@ -20,7 +20,13 @@ type EtatRequeteProps<T> = {
  * TanStack Query : chargement, erreur, vide, données. Si un rechargement échoue alors
  * que des données sont déjà affichées, on les garde plutôt que de les effacer.
  */
-export function EtatRequete<T>({ requete, chargement, estVide, vide, children }: EtatRequeteProps<T>) {
+export function EtatRequete<T>({
+  requete,
+  chargement,
+  estVide,
+  vide,
+  children,
+}: EtatRequeteProps<T>) {
   if (requete.isPending) return <>{chargement}</>;
 
   if (requete.isError && requete.data === undefined) {

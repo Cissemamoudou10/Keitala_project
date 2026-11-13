@@ -82,9 +82,7 @@ const UNITES_INVARIABLES = new Set(["kg", "g", "t", "l", "L", "ml", "cl", "m", "
 function accorderUnite(unite: string, nombre: Decimal): string {
   const [premier, ...reste] = unite.split(" ");
   const pluriel =
-    Number(nombre.entier) >= 2 &&
-    !UNITES_INVARIABLES.has(premier) &&
-    !/[sxz]$/i.test(premier);
+    Number(nombre.entier) >= 2 && !UNITES_INVARIABLES.has(premier) && !/[sxz]$/i.test(premier);
   return [pluriel ? `${premier}s` : premier, ...reste].join(" ");
 }
 

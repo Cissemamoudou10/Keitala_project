@@ -51,7 +51,11 @@ export function Coquille({ role, children }: { role: Role | null; children: Reac
             Menu
           </Button>
           {replie && (
-            <Button variant="discret" className="hidden lg:inline-flex" onClick={() => setReplie(false)}>
+            <Button
+              variant="discret"
+              className="hidden lg:inline-flex"
+              onClick={() => setReplie(false)}
+            >
               <PanelLeftOpen />
               Afficher le menu
             </Button>
@@ -65,15 +69,20 @@ export function Coquille({ role, children }: { role: Role | null; children: Reac
       {/* Tiroir : tablette et téléphone */}
       <DialogPrimitive.Root open={tiroirOuvert} onOpenChange={setTiroirOuvert}>
         <DialogPrimitive.Portal>
-          <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-voile data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 lg:hidden" />
+          <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-voile lg:hidden data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0" />
           <DialogPrimitive.Content
-            className="fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col bg-fond-doux shadow-flottant data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 lg:hidden"
+            className="fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col bg-fond-doux shadow-flottant lg:hidden data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
             aria-describedby={undefined}
           >
             <DialogPrimitive.Title className="sr-only">Menu</DialogPrimitive.Title>
             <BarreLaterale role={role} onNaviguer={() => setTiroirOuvert(false)}>
               <DialogPrimitive.Close asChild>
-                <Button variant="discret" size="icone" aria-label="Fermer le menu" title="Fermer le menu">
+                <Button
+                  variant="discret"
+                  size="icone"
+                  aria-label="Fermer le menu"
+                  title="Fermer le menu"
+                >
                   <X />
                 </Button>
               </DialogPrimitive.Close>

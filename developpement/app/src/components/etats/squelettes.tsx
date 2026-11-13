@@ -8,7 +8,13 @@ export function Squelette({ className }: { className?: string }) {
   return <div aria-hidden className={cn("animate-pulse rounded-sm bg-fond-survol", className)} />;
 }
 
-function ZoneChargement({ children, className }: { children: React.ReactNode; className?: string }) {
+function ZoneChargement({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div role="status" aria-busy="true" className={className}>
       <span className="sr-only">Chargement…</span>
@@ -18,7 +24,13 @@ function ZoneChargement({ children, className }: { children: React.ReactNode; cl
 }
 
 /** Squelette d'un tableau : en-tête puis lignes aux hauteurs du vrai tableau. */
-export function SqueletteTableau({ lignes = 8, colonnes = 4 }: { lignes?: number; colonnes?: number }) {
+export function SqueletteTableau({
+  lignes = 8,
+  colonnes = 4,
+}: {
+  lignes?: number;
+  colonnes?: number;
+}) {
   const cellules = Array.from({ length: colonnes });
   return (
     <ZoneChargement>
@@ -28,7 +40,10 @@ export function SqueletteTableau({ lignes = 8, colonnes = 4 }: { lignes?: number
         ))}
       </div>
       {Array.from({ length: lignes }).map((_, ligne) => (
-        <div key={ligne} className="flex h-13 items-center gap-6 border-b border-bordure px-3 lg:h-10">
+        <div
+          key={ligne}
+          className="flex h-13 items-center gap-6 border-b border-bordure px-3 lg:h-10"
+        >
           {cellules.map((_, i) => (
             <Squelette key={i} className={cn("h-3 flex-1", i === 0 && "flex-[2]")} />
           ))}

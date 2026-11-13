@@ -12,7 +12,9 @@ function creerClient(): QueryClient {
         staleTime: 30_000,
         // Un nouvel essai seulement si le serveur ou le réseau est en cause
         retry: (essais, erreur) =>
-          essais < 2 && erreur instanceof ErreurApi && (erreur.statut === 0 || erreur.statut >= 500),
+          essais < 2 &&
+          erreur instanceof ErreurApi &&
+          (erreur.statut === 0 || erreur.statut >= 500),
       },
       // Jamais de nouvel essai automatique d'une écriture : risque de doublon (P-009)
       mutations: { retry: false },

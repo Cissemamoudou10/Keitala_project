@@ -160,7 +160,10 @@ export function Catalogue() {
           <Champ libelle="Client" facultatif aide="Laisser vide pour un client de passage.">
             {(controle) => <Input placeholder="Nom du client" {...controle} />}
           </Champ>
-          <Champ libelle="Quantité" erreur="Stock insuffisant : il reste 150 kg. Réduisez la quantité.">
+          <Champ
+            libelle="Quantité"
+            erreur="Stock insuffisant : il reste 150 kg. Réduisez la quantité."
+          >
             {(controle) => <Input inputMode="decimal" defaultValue="200" {...controle} />}
           </Champ>
           <Champ libelle="Compte">

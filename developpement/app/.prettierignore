@@ -1,0 +1,8 @@
+.next/
+node_modules/
+playwright-report/
+test-results/
+pnpm-lock.yaml
+next-env.d.ts
+# Écrit et réécrit par `next dev`
+AGENTS.md

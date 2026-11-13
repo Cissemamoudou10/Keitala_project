@@ -123,25 +123,14 @@ Une story est terminée quand :
 ## 10. Commandes
 
 ### Base de données (Docker)
-- Démarrage : `docker-compose -f developpement/docker-compose.yml up -d db`
-- Arrêt : `docker-compose -f developpement/docker-compose.yml down`
-- Statut : `docker-compose -f developpement/docker-compose.yml ps`
-- Port exposé localement : `5433` (évite les conflits avec un autre PostgreSQL local)
+`docker compose -f developpement/docker-compose.yml` suivi de `up -d db`, `ps` ou `down`. Port local : `5433`.
 
 ### Backend API (`developpement/api`)
-- Installation des dépendances : `uv sync` (ou `python -m uv sync`)
-- Lancement dev : `uv run uvicorn app.main:app --reload --port 8000`
-- Migrations Alembic :
-  - Appliquer : `uv run alembic upgrade head`
-  - Créer une révision : `uv run alembic revision --autogenerate -m "nom_revision"`
-- Tests : `uv run pytest`
-- Lint et formatage : `uv run ruff check .` et `uv run ruff format .`
-- Vérification des types : `uv run mypy .`
+Tout se lance **dans le conteneur** (le poste Windows bloque Python 3.12, voir P-012) : préfixer par `docker exec keitala_api uv run --frozen`.
+- Démarrage : même commande Docker avec `up -d --build api` → http://localhost:8000/docs
+- Migrations : `alembic upgrade head` ; nouvelle révision : `alembic revision --autogenerate -m "..."`, puis `alembic check` doit être muet
+- Tests : `pytest` (base `keitala_test_db` recréée à chaque fois)
+- Lint, format, types : `ruff check .`, `ruff format .`, `mypy .`
 
 ### Frontend App (`developpement/app`)
-- Installation des dépendances : `pnpm install`
-- Lancement dev : `pnpm dev`
-- Build production : `pnpm build`
-- Tests : `pnpm test`
-- Lint : `pnpm lint`
-- Vérification des types : `pnpm typecheck`
+`pnpm` (ou `corepack pnpm`) suivi de `install`, `dev`, `build`, `lint`, `typecheck` ; `test` à S0-16.

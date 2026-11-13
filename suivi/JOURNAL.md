@@ -17,6 +17,33 @@ Une entrée par session de travail, **la plus récente en haut**. C'est le relai
 
 ---
 
+## 2026-11-13 — Claude Code — Initialisation du projet Next.js (S0-10)
+- **Tâche** : S0-10 Initialiser le projet Next.js.
+- **Fait** : projet généré par `create-next-app` 16.4.6 (App Router, TypeScript strict, Tailwind 4, ESLint, `src/`, alias `@/*`) puis épuré : page provisoire en français, `lang="fr"`, CSS réduit à Tailwind (jetons à S0-11), police Geist, favicon et images du gabarit retirés. Dépendances de la stack ajoutées (TanStack Query, React Hook Form, Zod, résolveurs, Lucide). `.env.example` (`API_URL`, serveur uniquement) ; `.gitignore` corrigé pour versionner `.env.example` ; script `typecheck` = `next typegen && tsc --noEmit` ; `@types/node` aligné sur Node 24. `AGENTS.md` imbriqué de Next.js conservé (recréé par `next dev`). README de l'app et `AGENTS.md` §10 mis à jour.
+- **Non fait / en cours** : shadcn/ui, police, jetons (S0-11) ; Vitest, Playwright (S0-16). Aucun commit.
+- **Vérifications** : `pnpm build`, `pnpm lint`, `pnpm typecheck` (aussi depuis un dossier `.next` supprimé) : OK. `pnpm dev` : `GET /` répond 200 avec `lang="fr"`. Non vérifié : affichage visuel (page sans contenu utile).
+- **Décisions** : versions de l'app notées dans D-021.
+- **Problèmes** : aucun nouveau. pnpm n'est pas installé globalement : `corepack pnpm` suffit.
+- **À reprendre par le suivant** : S0-11. Lire `design/CHARTE_UX_UI.md` en entier, puis la doc Next 16 sur les polices (`node_modules/next/dist/docs/01-app/01-getting-started/13-fonts.md`).
+
+## 2026-11-13 — Claude Code — Reprise et fin du socle API (S0-5 à S0-9)
+- **Tâche** : S0-5 à S0-9, reprise du travail interrompu de la session Antigravity.
+- **Fait** : migration 0001 vérifiée identique à `schema.sql` (comparaison `pg_dump` structure + données initiales sur deux bases temporaires) puis appliquée sur `keitala_db`. Modèles réécrits et alignés (`alembic check` muet) : `ON DELETE` du schéma, 25 index, colonnes calculées nullables, valeurs par défaut serveur, `StrEnum` ; aides dans `app/models/colonnes.py` ; import circulaire de `db/base.py` retiré. Format d'erreur commun (`app/core/erreurs.py` : `ErreurMetier`, 4xx, validation traduite, 500 sans détail technique). Pagination (`app/db/pagination.py`). `/api/v1/sante` renvoie 503 sans fuite d'exception si la base tombe. `SECRET_KEY` par défaut refusée hors `dev`. Tests sur `keitala_test_db` recréée à chaque lancement, une transaction annulée par test. Dockerfile : uv figé, `uv sync --frozen`, environnement dans `/opt/venv` ; volume `/app/.venv` retiré du compose. `AGENTS.md` §10 mis à jour et repassé sous 10 000 caractères.
+- **Non fait / en cours** : rien côté API. Aucun commit (consigne de l'utilisateur).
+- **Vérifications** : dans le conteneur, `ruff check`, `ruff format --check`, `mypy` strict : OK ; `pytest` : 20 tests verts (contraintes stock négatif, journaux immuables, cohérence des journaux, don, règlement, Mobile Money, colonnes calculées, données initiales, erreurs, pagination, santé). `curl /api/v1/sante` : 200. Non vérifié : `uv` hors conteneur (bloqué, P-012).
+- **Décisions** : versions notées dans D-021 ; D-022 et D-023 proposées.
+- **Problèmes** : P-012 ouvert.
+- **À reprendre par le suivant** : S0-10 (projet Next.js). Rappeler à l'utilisateur de commiter S0-4 à S0-9.
+
+## 2026-11-13 — Antigravity — Initialisation du projet API (S0-4 à S0-6), interrompue
+- **Tâche** : S0-4 à S0-6. Entrée reconstituée par Claude Code d'après le dernier message de l'agent : la session s'est arrêtée sur une limite de quota.
+- **Fait** : projet FastAPI (config, session, `/api/v1/sante`, gestion des erreurs de validation), `Dockerfile` et service `api` dans le compose, modèles SQLAlchemy (11 fichiers), Alembic et migration 0001 écrits par deux sous-agents en parallèle.
+- **Non fait / en cours** : migration jamais appliquée, modèles non vérifiés, journal et avancement non mis à jour, rien de commité.
+- **Vérifications** : `/sante` répondait « connecte ».
+- **Décisions** : aucune notée.
+- **Problèmes** : aucun noté.
+- **À reprendre par le suivant** : voir l'entrée du dessus.
+
 ## 2026-11-13 — Claude — Mise en place du cadre de développement
 - **Tâche** : préparer le projet pour un développement à plusieurs agents.
 - **Fait** : `AGENTS.md` et `CLAUDE.md` ; dossier `suivi/` (avancement, décisions D-001 à D-021, problèmes P-001 à P-011, journal) ; `design/CHARTE_UX_UI.md` ; `developpement/app` et `developpement/api` avec leur README ; `.gitignore`.

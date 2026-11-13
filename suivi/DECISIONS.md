@@ -133,3 +133,17 @@ Chaque décision qui engage le projet est notée ici, avec sa raison. Une décis
 - **Contexte** : la stack validée ne précisait ni les gestionnaires de paquets ni les bibliothèques d'interface et de formulaires.
 - **Décision** : pnpm et uv ; Python 3.12 ; composants de base shadcn/ui restylés selon la charte ; React Hook Form + Zod ; police Inter ; pytest ; Vitest et Playwright.
 - **Conséquences** : à confirmer ou ajuster par l'utilisateur avant le Sprint 0. Les versions exactes retenues seront notées ici à l'initialisation.
+- **Versions retenues (api, figées par `uv.lock`, 13/11/2026)** : Python 3.12, uv 0.13.8, FastAPI 0.162.5, Pydantic 2.14.3, pydantic-settings 2.16.2, SQLAlchemy 2.1.8 (API 2.x), asyncpg 0.32.0, Alembic 1.20.1, Uvicorn 0.54.0, PyJWT 2.15.1, pwdlib 0.3.1 ; outils : pytest 9.2.0, pytest-asyncio 1.5.0, httpx 0.28.1, ruff 0.17.5, mypy 2.4.1.
+- **Versions retenues (app, figées par `pnpm-lock.yaml`, 13/11/2026)** : Node 24.15, pnpm 12.18.0 (via corepack), Next.js 16.4.6, React 19.3.0, TypeScript 5.9.3, Tailwind CSS 4.3.3, ESLint 9.39.5 + eslint-config-next 16.4.6, TanStack Query 5.107.1, React Hook Form 7.92.0, Zod 4.6.7, @hookform/resolvers 7.0.6, lucide-react 1.72.0. Cache Components et Partial Prefetching laissés activés (réglages par défaut de `create-next-app`). shadcn/ui, police Inter, Vitest et Playwright : à installer aux tâches S0-11 et S0-16.
+
+## D-022 — Les modèles SQLAlchemy reflètent la migration, sans la remplacer
+- **Date** : 13/11/2026 · **Statut** : Proposée · **Auteur** : Claude
+- **Contexte** : les premiers modèles divergeaient de la base (clés étrangères, index, colonnes calculées) ; un `--autogenerate` aurait produit une migration destructrice.
+- **Décision** : la base est créée par les migrations seules. Les modèles reprennent ce qu'Alembic compare (types, nullabilité, clés étrangères avec leur `ON DELETE`, index, colonnes `Computed`) ; les CHECK, déclencheurs et vues restent dans les migrations. Aides communes dans `app/models/colonnes.py`.
+- **Conséquences** : `alembic check` doit être muet avant chaque commit touchant `models/` ou `alembic/`. Les colonnes calculées (`quantite_base`, `montant_total` des lignes, `ecart`, `solde_theorique`) ne sont jamais écrites par l'application.
+
+## D-023 — Environnement de développement de l'API dans Docker
+- **Date** : 13/11/2026 · **Statut** : Proposée · **Auteur** : Claude
+- **Contexte** : le poste Windows bloque l'interpréteur Python 3.12 téléchargé par uv (P-012) ; le montage `/app/.venv` laissait un squelette d'environnement Linux dans le dossier.
+- **Décision** : l'API, ses tests et ses outils tournent dans le conteneur `keitala_api` (environnement virtuel dans `/opt/venv`, hors du dossier monté ; dépendances installées avec `uv sync --frozen`). Les tests utilisent une base distincte, `keitala_test_db`, supprimée et recréée par la migration à chaque lancement ; chaque test s'exécute dans une transaction annulée.
+- **Conséquences** : commandes de l'API préfixées par `docker exec keitala_api uv run --frozen` (`AGENTS.md` §10). Après un changement de `pyproject.toml`, reconstruire l'image (`up -d --build api`).

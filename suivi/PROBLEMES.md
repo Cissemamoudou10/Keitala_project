@@ -85,6 +85,12 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Constat** : les diagrammes des documents v1.1 ont été modifiés sans contrôle de rendu.
 - **Piste** : les ouvrir dans un visualiseur Markdown et corriger au besoin.
 
+## P-012 — Python 3.12 bloqué sur le poste Windows
+- **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
+- **Constat** : `uv sync` télécharge CPython 3.12, mais Windows refuse de l'exécuter (« Une stratégie de contrôle d'application a bloqué ce fichier », erreur 4551, vraisemblablement Smart App Control). Le Python installé sur le poste est en 3.14, hors de la stack.
+- **Impact** : aucune commande `uv run` ne fonctionne hors conteneur ; l'éditeur ne trouve pas l'environnement pour l'autocomplétion.
+- **Piste** : contournement en place (D-023, tout dans le conteneur). Pour travailler aussi en local : autoriser l'interpréteur dans la sécurité Windows, ou installer Python 3.12 depuis python.org puis `uv sync --frozen`.
+
 ## C. Risques à surveiller
 
 | Risque | Effet | Parade |

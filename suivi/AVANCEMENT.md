@@ -11,14 +11,14 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 | | |
 | :--- | :--- |
 | **Dernière mise à jour** | 13/11/2026 |
-| **Phase** | Conception terminée (v1.1). Développement non commencé. |
+| **Phase** | Sprint 0 en cours : socle API terminé, projet app initialisé. |
 | **Sprint en cours** | Sprint 0 — Fondations |
-| **Code existant** | Aucun. `developpement/app` et `developpement/api` ne contiennent que leur README. |
-| **Points bloquants** | Aucun pour le Sprint 0. Voir `PROBLEMES.md` pour les données à obtenir du client avant la mise en service. |
+| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16 initialisé (TypeScript strict, Tailwind 4, dépendances de la stack), page provisoire ; build, lint et types OK. |
+| **Points bloquants** | Aucun. Commandes de l'API à lancer dans le conteneur (P-012). Rien n'est encore commité depuis S0-3 (S0-4 à S0-10) : attendre le feu vert de l'utilisateur. |
 
 ## Prochaine tâche
 
-**S0-1 : initialiser le dépôt Git et le projet `api`** (voir Sprint 0 ci-dessous).
+**S0-11 : jetons de la charte dans Tailwind, police, composants de base** (lire `design/CHARTE_UX_UI.md` en entier avant).
 
 ---
 
@@ -26,7 +26,7 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 
 | Sprint | Contenu | Stories | État |
 | :--- | :--- | :---: | :--- |
-| 0 | Fondations techniques et socle d'interface | — | À faire |
+| 0 | Fondations techniques et socle d'interface | — | En cours (API faite) |
 | 1 | Authentification, rôles, utilisateurs | 3 | À faire |
 | 2 | Référentiels : tiers, articles, unités, comptes | 4 | À faire |
 | 3 | Stocks : état, alertes, journal, inventaire, pertes | 5 | À faire |
@@ -46,20 +46,20 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 **But** : un socle qui démarre, se teste et se déploie, avant toute fonctionnalité.
 
 ### Dépôt et outillage
-- [ ] S0-1 Initialiser Git à la racine, vérifier `.gitignore`, premier commit des spécifications
-- [ ] S0-2 `developpement/docker-compose.yml` : PostgreSQL 16 pour le développement
-- [ ] S0-3 Compléter la section « Commandes » de `AGENTS.md` avec les commandes réelles
+- [x] S0-1 Initialiser Git à la racine, vérifier `.gitignore`, premier commit des spécifications
+- [x] S0-2 `developpement/docker-compose.yml` : PostgreSQL 16 pour le développement
+- [x] S0-3 Compléter la section « Commandes » de `AGENTS.md` avec les commandes réelles
 
 ### API (`developpement/api`)
-- [ ] S0-4 Initialiser le projet FastAPI selon `developpement/api/README.md` (structure, config, `.env.example`)
-- [ ] S0-5 Première migration Alembic reproduisant `schema.sql` v1.1 à l'identique (structure, déclencheurs, vues, données initiales)
-- [ ] S0-6 Modèles SQLAlchemy des 24 tables
-- [ ] S0-7 Socle de tests sur un vrai PostgreSQL ; tests des contraintes clés (stock négatif, journaux immuables)
-- [ ] S0-8 Format d'erreur commun, pagination, endpoint `/api/v1/sante`
-- [ ] S0-9 Lint, formatage, vérification de types
+- [x] S0-4 Initialiser le projet FastAPI selon `developpement/api/README.md` (structure, config, `.env.example`)
+- [x] S0-5 Première migration Alembic reproduisant `schema.sql` v1.1 à l'identique (structure, déclencheurs, vues, données initiales)
+- [x] S0-6 Modèles SQLAlchemy des 24 tables
+- [x] S0-7 Socle de tests sur un vrai PostgreSQL ; tests des contraintes clés (stock négatif, journaux immuables)
+- [x] S0-8 Format d'erreur commun, pagination, endpoint `/api/v1/sante`
+- [x] S0-9 Lint, formatage, vérification de types
 
 ### App (`developpement/app`)
-- [ ] S0-10 Initialiser le projet Next.js selon `developpement/app/README.md`
+- [x] S0-10 Initialiser le projet Next.js selon `developpement/app/README.md`
 - [ ] S0-11 Jetons de la charte (`design/CHARTE_UX_UI.md`) dans Tailwind ; police ; composants de base (bouton, champ, sélecteur, tableau, étiquette, fenêtre, notification)
 - [ ] S0-12 Coquille de l'application : barre latérale, en-tête de page, navigation, version tablette
 - [ ] S0-13 Proxy `/api/[...path]` vers FastAPI et client d'appel côté app
@@ -150,3 +150,5 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 | :--- | :--- |
 | 13/11/2026 | Analyse du dossier ; spécifications et schéma corrigés en v1.1 ; schéma validé sur PostgreSQL 16 |
 | 13/11/2026 | Mise en place de `AGENTS.md`, des fichiers de suivi, de la charte et de `developpement/` |
+| 13/11/2026 | Projet Next.js initialisé (S0-10) |
+| 13/11/2026 | Socle API terminé (S0-1 à S0-9) : migration 0001 vérifiée identique à `schema.sql`, modèles alignés, tests sur PostgreSQL |

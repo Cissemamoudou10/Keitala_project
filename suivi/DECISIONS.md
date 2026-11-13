@@ -147,3 +147,10 @@ Chaque décision qui engage le projet est notée ici, avec sa raison. Une décis
 - **Contexte** : le poste Windows bloque l'interpréteur Python 3.12 téléchargé par uv (P-012) ; le montage `/app/.venv` laissait un squelette d'environnement Linux dans le dossier.
 - **Décision** : l'API, ses tests et ses outils tournent dans le conteneur `keitala_api` (environnement virtuel dans `/opt/venv`, hors du dossier monté ; dépendances installées avec `uv sync --frozen`). Les tests utilisent une base distincte, `keitala_test_db`, supprimée et recréée par la migration à chaque lancement ; chaque test s'exécute dans une transaction annulée.
 - **Conséquences** : commandes de l'API préfixées par `docker exec keitala_api uv run --frozen` (`AGENTS.md` §10). Après un changement de `pyproject.toml`, reconstruire l'image (`up -d --build api`).
+
+## D-024 — Mise en œuvre de la charte dans le code de l'app
+- **Date** : 13/11/2026 · **Statut** : Proposée · **Auteur** : Claude
+- **Contexte** : la charte fixe les jetons mais pas leur branchement dans Tailwind et shadcn/ui, ni le voile derrière une fenêtre.
+- **Décision** : palette Tailwind par défaut retirée (`--color-*: initial`) ; seuls les jetons existent, sous leurs noms français (`bg-fond`, `text-texte-2`, `bg-accent`, `text-blanc` pour le texte sur accent). Rayons `sm/md/lg` = 4/6/8 px, ombre unique `shadow-flottant`, tailles `text-titre-page`, `text-titre-section`, `text-libelle`, `text-chiffre-cle`. Voile des fenêtres : `rgba(15,15,15,0.2)`. Composants shadcn (base Radix) gardés sous leur nom anglais (`Button`, `Badge`…) pour rester compatibles avec la CLI, avec des variantes en français (`principal`, `secondaire`, `discret`, `danger` ; `succes`, `attention`…) ; animations réduites au fondu. Tailles tablette par défaut, bureau à partir de `lg:` (1 024 px). `cn` déclare les tailles personnalisées pour ne pas les confondre avec les couleurs.
+- **Conséquences** : un composant ajouté par `shadcn add` arrive avec des classes inconnues (`bg-primary`…) qui ne produisent rien : il faut le restyler avec les jetons avant usage. `next-themes` retiré (thème clair seul).
+

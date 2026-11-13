@@ -91,6 +91,12 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Impact** : aucune commande `uv run` ne fonctionne hors conteneur ; l'éditeur ne trouve pas l'environnement pour l'autocomplétion.
 - **Piste** : contournement en place (D-023, tout dans le conteneur). Pour travailler aussi en local : autoriser l'interpréteur dans la sécurité Windows, ou installer Python 3.12 depuis python.org puis `uv sync --frozen`.
 
+## P-013 — Rendu de l'app non contrôlé à l'écran
+- **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
+- **Constat** : pendant S0-11 à S0-13, la capture d'écran par Chrome a échoué (onglet sans réponse, fenêtre peut-être réduite). Les composants, la coquille et le tiroir ne sont vérifiés que par le build, les classes générées et le HTML servi, pas à l'œil.
+- **Impact** : défauts visuels possibles (espacements, tiroir sous 1 024 px, cibles de 44 px).
+- **Piste** : ouvrir http://localhost:3000/composants et http://localhost:3000/stocks à 1 280 px puis à 768 px ; essayer le tiroir, la fenêtre, les notifications, le repli de la barre latérale et le clavier (Tab, Échap).
+
 ## C. Risques à surveiller
 
 | Risque | Effet | Parade |

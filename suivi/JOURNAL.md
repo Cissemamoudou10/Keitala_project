@@ -17,6 +17,15 @@ Une entrée par session de travail, **la plus récente en haut**. C'est le relai
 
 ---
 
+## 2026-11-13 — Claude Code — Charte, coquille et proxy de l'app (S0-11 à S0-13)
+- **Tâche** : S0-11 jetons, police, composants ; S0-12 coquille ; S0-13 proxy et client d'appel. Travail précédent commité avec l'accord de l'utilisateur (3 commits), puis un commit par tâche.
+- **Fait** : S0-11 : shadcn/ui 4.23 (base Radix) ; palette Tailwind remplacée par les seuls jetons de la charte ; Inter ; `Button` (principal, secondaire, discret, danger, `enCours`), `Input`, `Label`, `Champ`, `Select`, `Table`, `Badge`, `Dialog`, `Toaster` + `notifier` ; `cn` configuré pour les tailles personnalisées (sinon `text-libelle` disparaissait devant `text-texte`) ; `next-themes` retiré ; catalogue `/composants` (dev seulement). S0-12 : `Coquille` (barre latérale 240 px repliable, tiroir sous 1 024 px, lien actif `aria-current`), composant `Page`, pages provisoires des six modules, `/` redirige vers le tableau de bord, page 404 en français. S0-13 : proxy `/api/[...chemin]` (toutes méthodes, jeton depuis le cookie `keitala_acces`, segments `..` refusés, 502/504 avec messages honnêtes), `appelerApi` + `ErreurApi`, fournisseur TanStack Query (pas de nouvel essai des écritures).
+- **Non fait / en cours** : contrôle visuel à l'écran (P-013). Rafraîchissement du jeton sur 401 : Sprint 1 avec la connexion. Tests Vitest : S0-16.
+- **Vérifications** : `pnpm lint`, `pnpm typecheck`, `pnpm build` : OK. Classes de jetons présentes dans le CSS de production ; aucune couleur hors charte dans `src`. Via le serveur de dev : `/` → 307 vers `/tableau-de-bord`, lien actif marqué, Administration masquée sans rôle ; proxy : `/api/sante` 200, 404 et 405 de l'API relayés en français, API arrêtée → 502 `API_INJOIGNABLE`.
+- **Décisions** : D-024 proposée.
+- **Problèmes** : P-013 ouvert.
+- **À reprendre par le suivant** : régler P-013 (regarder les écrans à 1 280 et 768 px), puis S0-14.
+
 ## 2026-11-13 — Claude Code — Initialisation du projet Next.js (S0-10)
 - **Tâche** : S0-10 Initialiser le projet Next.js.
 - **Fait** : projet généré par `create-next-app` 16.4.6 (App Router, TypeScript strict, Tailwind 4, ESLint, `src/`, alias `@/*`) puis épuré : page provisoire en français, `lang="fr"`, CSS réduit à Tailwind (jetons à S0-11), police Geist, favicon et images du gabarit retirés. Dépendances de la stack ajoutées (TanStack Query, React Hook Form, Zod, résolveurs, Lucide). `.env.example` (`API_URL`, serveur uniquement) ; `.gitignore` corrigé pour versionner `.env.example` ; script `typecheck` = `next typegen && tsc --noEmit` ; `@types/node` aligné sur Node 24. `AGENTS.md` imbriqué de Next.js conservé (recréé par `next dev`). README de l'app et `AGENTS.md` §10 mis à jour.

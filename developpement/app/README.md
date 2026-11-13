@@ -1,6 +1,6 @@
 # App — ERP Keitala (frontend)
 
-Frontend Next.js et proxy vers l'API. Projet initialisé (S0-10) ; charte, coquille, proxy et socle de tests : tâches S0-11 à S0-16 de `suivi/AVANCEMENT.md`.
+Frontend Next.js et proxy vers l'API. Socle en place : projet (S0-10), charte et composants (S0-11), coquille (S0-12), proxy et client d'appel (S0-13). Restent S0-14 à S0-16 de `suivi/AVANCEMENT.md`.
 
 À lire avant de travailler ici : `AGENTS.md` (racine) et **`design/CHARTE_UX_UI.md` en entier**. L'expérience utilisateur est la priorité du projet.
 
@@ -87,6 +87,12 @@ Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack 
 - Jetons de la charte dans `src/app/globals.css` ; seules ces couleurs existent dans Tailwind (D-024). Catalogue visuel en développement : http://localhost:3000/composants.
 - `components/ui` : `Button` (`principal`, `secondaire`, `discret`, `danger` ; `enCours` bloque et affiche « Enregistrement… »), `Input`, `Label`, `Champ` (libellé, « (facultatif) », aide, erreur reliés au contrôle), `Select`, `Table` (`numerique` aligne à droite), `Badge` (`succes`, `attention`, `danger`, `info`, `neutre`), `Dialog`, `Toaster`. Notifications : `notifier.succes(...)` / `notifier.erreur(...)` (`lib/notifications.ts`).
 - Ajouter un composant : `corepack pnpm dlx shadcn@4.23.0 add <nom>`, puis remplacer ses classes par les jetons et importer `cn` depuis `@/lib/utils`.
+
+## Coquille et appels à l'API (S0-12, S0-13)
+
+- Écrans dans `src/app/(erp)/<module>/page.tsx`, enveloppés par `<Page titre description action largeur>` (`components/coquille/page.tsx`). Entrées de menu : `lib/navigation.ts` (le rôle sera branché au Sprint 1).
+- Proxy : `src/app/api/[...chemin]/route.ts` → `lib/serveur/proxy-api.ts`, relaie vers `API_URL/api/v1/...`. En développement, `API_URL` vaut `http://localhost:8000` par défaut ; en production elle est obligatoire. Le jeton sera lu dans le cookie `keitala_acces` (Sprint 1).
+- Navigateur : `appelerApi<T>(chemin, { methode, corps, parametres })` (`lib/api.ts`) lève une `ErreurApi` dont le `message` s'affiche tel quel. TanStack Query est posé dans `components/fournisseurs.tsx` : pas de nouvel essai automatique d'une écriture.
 
 ## Next.js 16 : à savoir
 

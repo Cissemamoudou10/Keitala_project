@@ -123,6 +123,14 @@ Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack 
 - Listes : `useParametresAdresse()` (filtres, recherche et page dans l'adresse), `Onglets`, `ChampRecherche` (attente de 250 ms) ; erreurs de l'API sous le bon champ avec `appliquerErreurApi()`.
 - Droits : `usePeut("parametrer")` pour ce que la matrice réserve au Super Admin (comptes, dérogations). La session n'est exposée qu'après l'hydratation (`lib/session.ts`) : sans cela, un bouton réservé apparaissait côté navigateur et pas dans le HTML du serveur.
 
+## Stocks (Sprint 3)
+
+- `/stocks` (état valorisé, filtre « Sous le seuil », fiche article avec perte), `/stocks/mouvements` (journal filtrable), `/stocks/inventaires` et `/stocks/inventaires/[id]` (comptage et validation). Sous-navigation : `SousNavigationStocks`.
+- Droit `saisir_stock` (Gestionnaire seul : inventaires et pertes, matrice des droits).
+- Calcul : `soustraireDecimaux` (écarts) et `lib/recherche.simplifier` (filtre local insensible aux accents).
+- Page à adresse variable (`[id]`) : lire `params` dans un composant enfant sous `<Suspense>`, sinon le build échoue (Cache Components). La navigation de la coquille lit `usePathname()` sous `<Suspense>` pour la même raison.
+- Parcours e2e en local : 4 en parallèle et 60 s par parcours (`playwright.config.ts`) ; au-delà, les premières compilations de `next dev` saturent. Ne pas lancer `next build` pendant que `next dev` tourne (dossier `.next` partagé).
+
 ## Next.js 16 : à savoir
 
 - Version récente : lire le guide utile dans `node_modules/next/dist/docs/` avant d'écrire du code (rappel dans `AGENTS.md` de ce dossier, recréé par `next dev`).

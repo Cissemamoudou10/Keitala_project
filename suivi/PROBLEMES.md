@@ -112,7 +112,7 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 
 ## P-016 — Les parcours e2e laissent des comptes dans la base de développement
 - **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Majeur · **Signalé par** : Claude
-- **Constat** : chaque passage de Playwright crée des comptes (`e2e-…@keitala.ml`, adresses uniques) qu'on ne peut que désactiver. En CI la base est neuve ; en local, la liste des utilisateurs s'allonge.
+- **Constat** : chaque passage de Playwright crée des comptes (`e2e-…@keitala.ml`, adresses uniques), et depuis le Sprint 3 des articles « Attiéké vrac … » avec leur stock et des inventaires validés, qu'on ne peut que désactiver. En CI la base est neuve ; en local, la liste des utilisateurs s'allonge.
 - **Piste** : base dédiée aux parcours e2e (ex. `keitala_e2e_db`, API lancée dessus), à mettre en place avec les parcours métier.
 - **Mise à jour 14/11/2026** : depuis le Sprint 2, les parcours ajoutent aussi des comptes de trésorerie (« Banque test … »), des articles (`E2E-…`) et des clients (« Boutique Diarra … ») à la base de développement. Gravité relevée à Majeur : la base de développement doit être nettoyée (ou recréée) avant toute démonstration au client.
 
@@ -121,6 +121,11 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Constat** : le solde d'ouverture se saisit une fois et le journal est immuable (règle 4). Une faute de frappe (malgré la confirmation en toutes lettres) ne peut pas être corrigée par l'écran.
 - **Impact** : mise en service (S9-5).
 - **Piste** : écriture de correction (`ANNULATION` puis nouveau `SOLDE_INITIAL`, ou `ECART_CLOTURE` à la première clôture de caisse, US-TRES-04), réservée au Super Admin. À décider avec le Sprint 6.
+
+## P-018 — Abandonner un inventaire ouvert par erreur
+- **Date** : 14/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
+- **Constat** : un inventaire en cours ne peut que se valider (statuts `EN_COURS` et `VALIDE` seulement). Ouvert par erreur, il bloque l'ouverture d'un autre ; le valider sans écart ne change aucun stock mais laisse une pièce.
+- **Piste** : accepter la validation sans écart comme « abandon » (aucun mouvement écrit), ou ajouter un statut `ANNULE` (migration). À décider avec l'utilisateur.
 
 ## C. Risques à surveiller
 

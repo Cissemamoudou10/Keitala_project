@@ -178,3 +178,15 @@ Chaque décision qui engage le projet est notée ici, avec sa raison. Une décis
   - `nombres-en-lettres.ts` écrit dès ce sprint pour la confirmation du solde d'ouverture (prévu pour US-TRES-02).
 - **Conséquences** : une erreur de solde d'ouverture ne se corrige pas par l'écran (P-017). Les écrans de vente et d'achat devront utiliser `ChampQuantite` pour finir US-REF-02.
 
+## D-028 — Stock de départ valorisé et règles des inventaires
+- **Date** : 14/11/2026 · **Statut** : Acceptée (coût saisi, choisi par l'utilisateur) ; reste Proposée · **Auteur** : utilisateur et Claude
+- **Contexte** : le stock de départ est saisi par inventaire (D-018) alors que tous les coûts moyens sont à 0 ; sans valeur, il diluerait le coût moyen au premier achat et fausserait les marges.
+- **Décision (acceptée)** : migration `0002` : colonne facultative `lignes_inventaire.cout_unitaire` (≥ 0). À la validation, un excédent sur un article sans coût moyen exige ce coût ; l'entrée est valorisée à ce coût et le coût moyen recalculé (pondéré). Les autres ajustements se font au coût moyen du moment, inchangé.
+- **Décisions (proposées)** :
+  - Un seul inventaire en cours à la fois. Comptage prérempli avec le stock théorique figé (seuls les écarts sont à saisir). L'écart (compté − théorique figé) s'applique au stock du moment à la validation : une vente faite pendant le comptage reste comptée. Un inventaire en cours ne peut pas être abandonné (P-018).
+  - Matrice des droits appliquée telle quelle : inventaires et pertes sont saisis et validés par le **Gestionnaire** seul ; le Super Admin les contrôle après coup (Sprint 6), le Consultant les consulte.
+  - Pertes : motifs Casse, Avarie, Dessiccation, Autre (« Erreur de comptage » réservé aux inventaires) ; valorisées au coût moyen, sans trésorerie.
+  - État des stocks : l'indicateur suit la charte (on n'affiche que l'exception, « Stock bas » en rouge) plutôt que le vert/rouge du backlog (US-STK-02). « Sous le seuil » = stock ≤ seuil, comme la vue `v_stock_valorise` : un article à 0 avec un seuil à 0 est donc signalé (rupture).
+  - Écriture unique des stocks (`ecrire_mouvement_stock`), articles verrouillés dans l'ordre croissant des identifiants ; coût moyen arrondi à 4 décimales.
+- **Conséquences** : tant que les seuils des produits finis restent à 0 (P-001), tout produit fini sans stock apparaît « Stock bas ».
+

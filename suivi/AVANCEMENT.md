@@ -11,14 +11,14 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 | | |
 | :--- | :--- |
 | **Dernière mise à jour** | 14/11/2026 |
-| **Phase** | Sprints 0, 1 et 2 terminés (US-REF-02 : dernier critère avec les Sprints 4 et 5). Prochain : Sprint 3 (stocks). |
-| **Sprint en cours** | Sprint 3 — Stocks (à démarrer) |
-| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query, formats et champ de montant, quatre états d'écran ; build, lint et types OK ; rendu vérifié à l'écran (bureau et 768 px) ; 44 tests Vitest, 7 parcours Playwright (bureau et tablette). CI GitHub Actions écrite (`.github/workflows/ci.yml`), rejouée en local, jamais exécutée sur GitHub (P-014). Sprint 1 : connexion par cookies HttpOnly, gestion des comptes, contrôle d'accès par rôle (API 53 tests, app 62 tests, 19 parcours e2e sur la pile complète). Sprint 2 : comptes de trésorerie et soldes d'ouverture, catalogue et unités de saisie, clients et fournisseurs (API 96 tests, app 110 tests, 29 parcours e2e). |
+| **Phase** | Sprints 0 à 3 terminés (US-REF-02 : dernier critère avec les Sprints 4 et 5). Prochain : Sprint 4 (achats). |
+| **Sprint en cours** | Sprint 4 — Achats (à démarrer) |
+| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query, formats et champ de montant, quatre états d'écran ; build, lint et types OK ; rendu vérifié à l'écran (bureau et 768 px) ; 44 tests Vitest, 7 parcours Playwright (bureau et tablette). CI GitHub Actions écrite (`.github/workflows/ci.yml`), rejouée en local, jamais exécutée sur GitHub (P-014). Sprint 1 : connexion par cookies HttpOnly, gestion des comptes, contrôle d'accès par rôle (API 53 tests, app 62 tests, 19 parcours e2e sur la pile complète). Sprint 2 : comptes de trésorerie et soldes d'ouverture, catalogue et unités de saisie, clients et fournisseurs (API 96 tests, app 110 tests, 29 parcours e2e). Sprint 3 : mouvements de stock (écriture unique, coût moyen pondéré), pertes, inventaires et stock de départ valorisé (migration 0002), journal, état valorisé et alertes (API 110 tests, app 116 tests, 36 parcours e2e). |
 | **Points bloquants** | Aucun. Commandes de l'API à lancer dans le conteneur (P-012). |
 
 ## Prochaine tâche
 
-**Sprint 3, US-STK-04 : inventaire physique et régularisation** d'abord (il sert aussi au stock de départ et crée la fonction unique d'écriture des mouvements de stock, règles 1 à 4), puis US-STK-05 (journal), US-STK-06 (pertes), US-STK-02 (état valorisé) et US-STK-03 (alertes). Écrire `ecrire_mouvement_stock` sur le modèle de `ecrire_mouvement_tresorerie`. Relire avant : EPIC 3 du backlog, `schema.sql` (inventaires, mouvements_stock), D-018.
+**Sprint 4, US-ACH-01 : enregistrement d'un achat** (lignes en unité de saisie avec `ChampQuantite`, ce qui finit US-REF-02 ; entrées de stock valorisées par `ecrire_mouvement_stock(cout_entree=…)` ; règlements par `ecrire_mouvement_tresorerie` ; numéro `ACH` par `prochain_numero`), puis US-ACH-02 à 04. Trancher d'abord P-009 (double enregistrement) et P-010 (annulation et coût moyen). Relire avant : EPIC 4 du backlog, conception technique 3.3.
 
 ---
 
@@ -29,7 +29,7 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 | 0 | Fondations techniques et socle d'interface | — | Terminé |
 | 1 | Authentification, rôles, utilisateurs | 3 | Terminé |
 | 2 | Référentiels : tiers, articles, unités, comptes | 4 | Terminé (voir US-REF-02) |
-| 3 | Stocks : état, alertes, journal, inventaire, pertes | 5 | À faire |
+| 3 | Stocks : état, alertes, journal, inventaire, pertes | 5 | Terminé |
 | 4 | Achats et dettes fournisseurs | 4 | À faire |
 | 5 | Ventes, règlements, dons, factures | 6 | À faire |
 | 6 | Trésorerie, dépenses, transferts, clôtures, contrôle | 5 | À faire |
@@ -89,11 +89,11 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 
 ## Sprint 3 — Stocks
 
-- [ ] US-STK-02 État des stocks filtré et valorisé
-- [ ] US-STK-03 Alertes de réapprovisionnement
-- [ ] US-STK-05 Journal des mouvements de stock
-- [ ] US-STK-04 Inventaire physique et régularisation (sert aussi au stock de départ)
-- [ ] US-STK-06 Sortie pour perte ou avarie
+- [x] US-STK-02 État des stocks filtré et valorisé
+- [x] US-STK-03 Alertes de réapprovisionnement
+- [x] US-STK-05 Journal des mouvements de stock
+- [x] US-STK-04 Inventaire physique et régularisation (sert aussi au stock de départ)
+- [x] US-STK-06 Sortie pour perte ou avarie
 
 ## Sprint 4 — Achats
 
@@ -150,6 +150,7 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 | :--- | :--- |
 | 13/11/2026 | Analyse du dossier ; spécifications et schéma corrigés en v1.1 ; schéma validé sur PostgreSQL 16 |
 | 13/11/2026 | Mise en place de `AGENTS.md`, des fichiers de suivi, de la charte et de `developpement/` |
+| 14/11/2026 | **Sprint 3 terminé** : stocks, inventaires, stock de départ valorisé |
 | 14/11/2026 | **Sprint 2 terminé** : comptes de trésorerie, catalogue, unités, tiers |
 | 13/11/2026 | **Sprint 1 terminé** : connexion, comptes, droits par rôle |
 | 13/11/2026 | **Sprint 0 terminé** : outillage de tests de l'app (S0-16) et intégration continue (S0-17) |

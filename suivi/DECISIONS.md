@@ -179,14 +179,23 @@ Chaque décision qui engage le projet est notée ici, avec sa raison. Une décis
 - **Conséquences** : une erreur de solde d'ouverture ne se corrige pas par l'écran (P-017). Les écrans de vente et d'achat devront utiliser `ChampQuantite` pour finir US-REF-02.
 
 ## D-028 — Stock de départ valorisé et règles des inventaires
-- **Date** : 14/11/2026 · **Statut** : Acceptée (coût saisi, choisi par l'utilisateur) ; reste Proposée · **Auteur** : utilisateur et Claude
+- **Date** : 14/11/2026 · **Statut** : Acceptée (coût saisi, et inventaires et pertes réservés au Gestionnaire, confirmés par l'utilisateur) ; reste Proposée · **Auteur** : utilisateur et Claude
 - **Contexte** : le stock de départ est saisi par inventaire (D-018) alors que tous les coûts moyens sont à 0 ; sans valeur, il diluerait le coût moyen au premier achat et fausserait les marges.
 - **Décision (acceptée)** : migration `0002` : colonne facultative `lignes_inventaire.cout_unitaire` (≥ 0). À la validation, un excédent sur un article sans coût moyen exige ce coût ; l'entrée est valorisée à ce coût et le coût moyen recalculé (pondéré). Les autres ajustements se font au coût moyen du moment, inchangé.
 - **Décisions (proposées)** :
-  - Un seul inventaire en cours à la fois. Comptage prérempli avec le stock théorique figé (seuls les écarts sont à saisir). L'écart (compté − théorique figé) s'applique au stock du moment à la validation : une vente faite pendant le comptage reste comptée. Un inventaire en cours ne peut pas être abandonné (P-018).
-  - Matrice des droits appliquée telle quelle : inventaires et pertes sont saisis et validés par le **Gestionnaire** seul ; le Super Admin les contrôle après coup (Sprint 6), le Consultant les consulte.
+  - Un seul inventaire en cours à la fois. Comptage prérempli avec le stock théorique figé (seuls les écarts sont à saisir). L'écart (compté − théorique figé) s'applique au stock du moment à la validation : une vente faite pendant le comptage reste comptée. Un inventaire en cours peut être abandonné (D-029).
+  - (Acceptée le 14/11/2026) Matrice des droits appliquée telle quelle : inventaires et pertes sont saisis et validés par le **Gestionnaire** seul ; le Super Admin ne fait pas l'inventaire, il le contrôle après coup (Sprint 6) ; le Consultant consulte.
   - Pertes : motifs Casse, Avarie, Dessiccation, Autre (« Erreur de comptage » réservé aux inventaires) ; valorisées au coût moyen, sans trésorerie.
   - État des stocks : l'indicateur suit la charte (on n'affiche que l'exception, « Stock bas » en rouge) plutôt que le vert/rouge du backlog (US-STK-02). « Sous le seuil » = stock ≤ seuil, comme la vue `v_stock_valorise` : un article à 0 avec un seuil à 0 est donc signalé (rupture).
   - Écriture unique des stocks (`ecrire_mouvement_stock`), articles verrouillés dans l'ordre croissant des identifiants ; coût moyen arrondi à 4 décimales.
 - **Conséquences** : tant que les seuils des produits finis restent à 0 (P-001), tout produit fini sans stock apparaît « Stock bas ».
+
+## D-029 — Abandon d'un inventaire, seuils et base dédiée aux parcours e2e
+- **Date** : 14/11/2026 · **Statut** : Acceptée · **Auteur** : utilisateur, mis en œuvre par Claude
+- **Contexte** : réponses de l'utilisateur aux points ouverts du Sprint 3 (P-001, P-016, P-018).
+- **Décision** :
+  - Seuils d'alerte : le Super Admin les paramètre lui-même dans l'application (fiche article, « Seuil d'alerte »). Pas de liste de seuils à attendre du client avant de développer.
+  - Abandon d'un inventaire (recommandation retenue) : statut `ANNULE` (migration `0003`), réservé au Gestionnaire, motif obligatoire ajouté aux observations (« Abandonné par … : … »), aucun mouvement de stock, numéro conservé. Rien n'est supprimé (règle 5) et la numérotation reste continue.
+  - Parcours de bout en bout sur une base à part : service Docker `api-e2e` (port 8001, base `keitala_e2e_db`, préparée par `preparer_base_e2e`). La base de développement, remise à neuf le 14/11/2026, n'est plus touchée par les tests.
+- **Conséquences** : lancer `up -d api-e2e` avant `pnpm test:e2e` en local. La base de développement remise à neuf n'a plus de compte : créer le premier Super Admin (S1-T1).
 

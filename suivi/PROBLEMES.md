@@ -21,10 +21,11 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 ## A. Questions pour l'utilisateur ou le client
 
 ## P-001 — Seuils d'alerte des matières premières à confirmer
-- **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
+- **Date** : 13/11/2026 · **Statut** : Résolu · **Gravité** : Mineur · **Signalé par** : Claude
 - **Constat** : l'Excel donnait deux seuils par produit (ex. soja consommation : 50 kg et 5 sacs, soit 250 kg). Le schéma reprend le seuil « sac » converti en kg.
 - **Impact** : alertes de stock (US-STK-03).
 - **Piste** : faire confirmer le seuil de chaque matière par le client.
+- **Résolution** (14/11/2026) : le Super Admin paramètre lui-même les seuils dans l'application (D-029). Ne bloque plus le développement.
 
 ## P-002 — Catalogue incomplet
 - **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Majeur · **Signalé par** : Claude
@@ -111,10 +112,11 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Piste** : limiter dans Nginx (`limit_req` sur `/api/v1/auth/login`) au Sprint 9 (S9-1), ou compteur d'échecs par email côté API (nouvelle migration). À trancher avant la mise en production.
 
 ## P-016 — Les parcours e2e laissent des comptes dans la base de développement
-- **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Majeur · **Signalé par** : Claude
+- **Date** : 13/11/2026 · **Statut** : Résolu · **Gravité** : Majeur · **Signalé par** : Claude
 - **Constat** : chaque passage de Playwright crée des comptes (`e2e-…@keitala.ml`, adresses uniques), et depuis le Sprint 3 des articles « Attiéké vrac … » avec leur stock et des inventaires validés, qu'on ne peut que désactiver. En CI la base est neuve ; en local, la liste des utilisateurs s'allonge.
 - **Piste** : base dédiée aux parcours e2e (ex. `keitala_e2e_db`, API lancée dessus), à mettre en place avec les parcours métier.
 - **Mise à jour 14/11/2026** : depuis le Sprint 2, les parcours ajoutent aussi des comptes de trésorerie (« Banque test … »), des articles (`E2E-…`) et des clients (« Boutique Diarra … ») à la base de développement. Gravité relevée à Majeur : la base de développement doit être nettoyée (ou recréée) avant toute démonstration au client.
+- **Résolution** (14/11/2026) : parcours e2e sur leur propre API et leur propre base (`api-e2e`, `keitala_e2e_db`, D-029) ; vérifié : un passage complet laisse la base de développement inchangée. Base de développement remise à neuf (ne contenait que des données de test).
 
 ## P-017 — Corriger un solde d'ouverture saisi par erreur
 - **Date** : 14/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
@@ -123,9 +125,10 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Piste** : écriture de correction (`ANNULATION` puis nouveau `SOLDE_INITIAL`, ou `ECART_CLOTURE` à la première clôture de caisse, US-TRES-04), réservée au Super Admin. À décider avec le Sprint 6.
 
 ## P-018 — Abandonner un inventaire ouvert par erreur
-- **Date** : 14/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
+- **Date** : 14/11/2026 · **Statut** : Résolu · **Gravité** : Mineur · **Signalé par** : Claude
 - **Constat** : un inventaire en cours ne peut que se valider (statuts `EN_COURS` et `VALIDE` seulement). Ouvert par erreur, il bloque l'ouverture d'un autre ; le valider sans écart ne change aucun stock mais laisse une pièce.
 - **Piste** : accepter la validation sans écart comme « abandon » (aucun mouvement écrit), ou ajouter un statut `ANNULE` (migration). À décider avec l'utilisateur.
+- **Résolution** (14/11/2026) : statut `ANNULE` et action « Abandonner l'inventaire » (migration 0003, D-029).
 
 ## C. Risques à surveiller
 

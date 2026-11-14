@@ -75,7 +75,7 @@ Voir `suivi/PROBLEMES.md` : P-009 (protection contre le double enregistrement, �
 
 ## Commandes
 
-Voir `AGENTS.md` section 10 : tout se lance dans le conteneur `keitala_api` (D-023).
+Voir `AGENTS.md` section 10 : tout se lance dans le conteneur `keitala_api` (D-023). Le service `api-e2e` (conteneur `keitala_api_e2e`, port 8001) sert aux parcours Playwright, sur la base `keitala_e2e_db` créée et migrée au démarrage par `app.commandes.preparer_base_e2e` (refusée si le nom de la base ne contient pas « e2e »).
 
 ## Repères du socle
 

@@ -86,7 +86,7 @@ Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack 
 - `build`, `lint`, `format` (Prettier, classes Tailwind triées), `format:check`
 - `typecheck` : génère les types des routes (`next typegen`) puis lance `tsc`
 - `test` : Vitest (fichiers `src/**/*.test.ts(x)`, jsdom) ; `test:watch` en continu
-- `test:e2e` : Playwright (`e2e/`), profils bureau 1 280 px et tablette 768 px ; en local, utilise le Chrome du poste et lance `next dev` sur le port 3100
+- `test:e2e` : Playwright (`e2e/`), profils bureau 1 280 px et tablette 768 px ; en local, utilise le Chrome du poste, lance `next dev` sur le port 3100 et parle à l'API des tests (`docker compose -f developpement/docker-compose.yml up -d api-e2e`, port 8001, base `keitala_e2e_db`) : la base de développement n'est jamais touchée
 
 ## Briques d'interface (S0-11)
 

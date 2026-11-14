@@ -134,4 +134,4 @@ Tout se lance **dans le conteneur** (le poste Windows bloque Python 3.12, voir P
 - Premier Super Admin : `python -m app.commandes.creer_super_admin --nom "..." --email ...` (avec `docker exec -it`) ; comptes de test e2e : `app.commandes.comptes_e2e`
 
 ### Frontend App (`developpement/app`)
-`pnpm` (ou `corepack pnpm`) suivi de `install`, `dev`, `build`, `lint`, `format:check`, `typecheck`, `test`, `test:e2e`.
+`pnpm` (ou `corepack pnpm`) suivi de `install`, `dev`, `build`, `lint`, `format:check`, `typecheck`, `test`, `test:e2e` (après `up -d api-e2e` : API et base propres aux tests).

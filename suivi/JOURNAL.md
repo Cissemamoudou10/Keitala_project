@@ -17,6 +17,15 @@ Une entrée par session de travail, **la plus récente en haut**. C'est le relai
 
 ---
 
+## 2026-11-14 — Claude Code — Suites du Sprint 3 : seuils, abandon d'inventaire, base de tests
+- **Tâche** : réponses de l'utilisateur aux points ouverts (P-001, P-016, P-018, rôle du Super Admin dans l'inventaire).
+- **Fait** : seuils paramétrés par le Super Admin (déjà possible, P-001 résolu). Abandon d'un inventaire : migration `0003` (statut `ANNULE`, descente écrite : le type est recréé), `/stocks/inventaires/{id}/abandonner` (Gestionnaire, motif, aucun mouvement), bouton et fenêtre de confirmation, étiquette « Abandonné ». Isolation des parcours e2e : commande `preparer_base_e2e`, service Docker `api-e2e` (port 8001, base `keitala_e2e_db`), Playwright pointé dessus en local. Base de développement vérifiée (seulement des comptes et données de test), puis supprimée et recréée par les migrations. Règle « inventaires réservés au Gestionnaire » passée en Acceptée (D-028).
+- **Non fait / en cours** : rien.
+- **Vérifications** : migration 0003 montée, descendue (premier essai en échec : contrainte `chk_inventaire_validation` liée au type, corrigée) et remontée ; `alembic check` muet ; 112 tests API. Parcours e2e : 37 réussis, deux passages verts ; un parcours d'inventaire bloqué par un autre en parallèle (un seul inventaire en cours) → parcours du fichier mis en série. Isolation prouvée : un passage des parcours du Sprint 2 laisse la base de développement inchangée (0 utilisateur, 29 articles, 0 tiers, 5 comptes).
+- **Décisions** : D-029 ; D-028 partiellement acceptée.
+- **Problèmes** : P-001, P-016 et P-018 résolus.
+- **À reprendre par le suivant** : créer le premier Super Admin sur la base de développement ; puis Sprint 4 (achats), après P-009 et P-010.
+
 ## 2026-11-14 — Claude Code — Sprint 3 : stocks
 - **Tâche** : US-STK-04, US-STK-06, US-STK-05, US-STK-02, US-STK-03.
 - **Fait** : question posée à l'utilisateur sur la valeur du stock de départ (réponse : coût saisi) → migration `0002` (`lignes_inventaire.cout_unitaire`). API : `ecrire_mouvement_stock` (seule écriture du stock et du coût moyen, PUMP, stock négatif refusé sauf dérogation), `verrouiller_articles`, `prochain_numero` (règle 11) ; `/stocks/pertes`, `/stocks/inventaires` (ouverture, comptage, validation), `/stocks/mouvements`, `/stocks/etat-global`, `/stocks/alertes-rupture` ; `valeur_stock` et `en_alerte` sur chaque article, filtre `sous_seuil`. App : état des stocks (synthèse, filtre « Sous le seuil », coût moyen, valeur, « Stock bas »), journal filtrable, inventaires (liste, ouverture, comptage avec écart en direct, motif, coût du stock de départ, barre récapitulative, confirmation, avertissement si on quitte sans enregistrer), perte depuis la fiche article, premiers chiffres du tableau de bord ; sous-navigation de Stocks.

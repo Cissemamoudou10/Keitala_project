@@ -39,6 +39,32 @@ services:
       db:
         condition: service_healthy
 
+  # API des parcours de bout en bout (Playwright), sur sa propre base : la base de
+  # développement n'est jamais touchée par les tests (P-016, D-029).
+  api-e2e:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: keitala_api_e2e
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    # E2E_MOT_DE_PASSE : valeur de test, dans l'exemple de configuration de l'app
+    env_file:
+      - ./app/.env.example
+    environment:
+      - ENV=dev
+      - DEBUG=false
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-keitala_user}:${POSTGRES_PASSWORD:-keitala_dev_password}@db:5432/keitala_e2e_db
+    command: >-
+      sh -c "uv run --frozen python -m app.commandes.preparer_base_e2e
+      && uv run --frozen uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - ./api:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pgdata:
     name: keitala_pgdata

@@ -370,3 +370,70 @@ async def test_valeur_et_alertes(
     codes_en_alerte = {a["code_sku"] for a in alertes["items"]}
     assert "MP-MAI" in codes_en_alerte and "MP-SOJ-CON" not in codes_en_alerte
     assert (soja["valeur_stock"], soja["en_alerte"]) == ("250000.00", False)
+
+
+async def test_abandon_d_un_inventaire(
+    client: AsyncClient, db_session: AsyncSession, gestionnaire: Utilisateur
+) -> None:
+    entetes = entetes_pour(gestionnaire)
+    soja = await article(db_session, "MP-SOJ-CON")
+    ouverture = await client.post(
+        "/api/v1/stocks/inventaires",
+        json={"famille": "MATIERE_PREMIERE", "observations": "Comptage du soir"},
+        headers=entetes,
+    )
+    adresse = f"/api/v1/stocks/inventaires/{ouverture.json()['id']}"
+    await client.put(
+        adresse,
+        json={
+            "lignes": [
+                {
+                    "article_id": str(soja.id),
+                    "stock_physique": "50",
+                    "motif": "AUTRE",
+                    "cout_unitaire": "250",
+                }
+            ]
+        },
+        headers=entetes,
+    )
+
+    sans_motif = await client.post(f"{adresse}/abandonner", json={"motif": ""}, headers=entetes)
+    abandon = await client.post(
+        f"{adresse}/abandonner", json={"motif": "Ouvert par erreur"}, headers=entetes
+    )
+
+    assert sans_motif.status_code == 422
+    assert abandon.status_code == 200
+    assert abandon.json()["statut"] == "ANNULE"
+    assert abandon.json()["observations"] == (
+        f"Comptage du soir\nAbandonné par {gestionnaire.nom_complet} : Ouvert par erreur"
+    )
+    # Aucun ajustement écrit, stock inchangé
+    await db_session.refresh(soja)
+    assert soja.stock_actuel == Decimal("0.000")
+    nombre = await db_session.scalar(select(func.count()).select_from(MouvementStock))
+    assert nombre == 0
+    # Figé, et un nouvel inventaire peut être ouvert
+    validation = await client.post(f"{adresse}/valider", headers=entetes)
+    assert validation.status_code == 409
+    assert "abandonné" in validation.json()["message"]
+    nouveau = await client.post("/api/v1/stocks/inventaires", json={}, headers=entetes)
+    assert nouveau.status_code == 201
+
+
+async def test_abandon_reserve_au_gestionnaire(
+    client: AsyncClient, creer_compte: CreerCompte, gestionnaire: Utilisateur
+) -> None:
+    admin = await creer_compte(RoleUtilisateur.SUPER_ADMIN)
+    ouverture = await client.post(
+        "/api/v1/stocks/inventaires", json={}, headers=entetes_pour(gestionnaire)
+    )
+
+    reponse = await client.post(
+        f"/api/v1/stocks/inventaires/{ouverture.json()['id']}/abandonner",
+        json={"motif": "Essai"},
+        headers=entetes_pour(admin),
+    )
+
+    assert reponse.status_code == 403

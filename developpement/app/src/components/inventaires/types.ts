@@ -20,7 +20,7 @@ export type InventaireResume = {
   numero: string;
   date_inventaire: string;
   famille: Famille | null;
-  statut: "EN_COURS" | "VALIDE";
+  statut: "EN_COURS" | "VALIDE" | "ANNULE";
   observations: string | null;
   auteur: string;
   date_creation: string;

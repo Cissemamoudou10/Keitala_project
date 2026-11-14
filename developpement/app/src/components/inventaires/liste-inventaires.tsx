@@ -119,6 +119,7 @@ export function ListeInventaires() {
                     </TableCell>
                     <TableCell>
                       {inventaire.statut === "EN_COURS" && <Badge variant="info">En cours</Badge>}
+                      {inventaire.statut === "ANNULE" && <Badge variant="neutre">Abandonné</Badge>}
                     </TableCell>
                   </TableRow>
                 ))}

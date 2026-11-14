@@ -5,17 +5,46 @@ import { connecter } from "./outils";
 // Sprint 3 : inventaire et stock de départ (US-STK-04), pertes (US-STK-06), journal
 // (US-STK-05), état et alertes (US-STK-02, US-STK-03).
 
+// Un seul inventaire peut être en cours : les parcours de ce fichier passent l'un après l'autre
+test.describe.configure({ mode: "serial" });
+
 const visible = (texte: string | null) => (texte ?? "").replace(/[\u00A0\u202F]/g, " ");
 
-/** Un seul inventaire peut être en cours : on valide celui qu'un passage interrompu aurait laissé. */
+/** Un seul inventaire peut être en cours : on abandonne celui qu'un passage interrompu aurait laissé. */
 async function terminerInventaireEnCours(page: Page) {
   const liste = await (await page.request.get("/api/stocks/inventaires")).json();
   for (const inventaire of liste.items) {
     if (inventaire.statut === "EN_COURS") {
-      await page.request.post(`/api/stocks/inventaires/${inventaire.id}/valider`);
+      await page.request.post(`/api/stocks/inventaires/${inventaire.id}/abandonner`, {
+        data: { motif: "Laissé en cours par un passage interrompu" },
+      });
     }
   }
 }
+
+test("un inventaire ouvert par erreur s'abandonne, sans toucher au stock", async ({
+  page,
+}, infoTest) => {
+  test.skip(infoTest.project.name !== "bureau", "Un seul inventaire peut être en cours à la fois");
+  await connecter(page, "GESTIONNAIRE");
+  await terminerInventaireEnCours(page);
+  const ouverture = await page.request.post("/api/stocks/inventaires", { data: {} });
+  expect(ouverture.status()).toBe(201);
+  const inventaire = await ouverture.json();
+
+  await page.goto(`/stocks/inventaires/${inventaire.id}`);
+  await page.getByRole("button", { name: "Abandonner l'inventaire" }).click();
+  const fenetre = page.getByRole("dialog", { name: /Abandonner l'inventaire/ });
+  await fenetre.getByRole("button", { name: "Abandonner l'inventaire" }).click();
+  await expect(fenetre.getByText("Indiquez pourquoi l'inventaire est abandonné.")).toBeVisible();
+  await fenetre.getByLabel("Motif").fill("Ouvert sur la mauvaise famille");
+  await fenetre.getByRole("button", { name: "Abandonner l'inventaire" }).click();
+
+  await expect(page.getByText(/abandonné, sans ajustement de stock/).first()).toBeVisible();
+  await expect(page.getByText("Abandonné", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Ouvert sur la mauvaise famille/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Valider l'inventaire" })).toHaveCount(0);
+});
 
 test("stock de départ par inventaire, puis perte, visibles au journal", async ({
   page,

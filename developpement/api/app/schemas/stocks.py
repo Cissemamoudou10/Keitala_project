@@ -93,6 +93,12 @@ class Comptage(BaseModel):
     observations: Annotated[str, Field(max_length=1000)] | None = None
 
 
+class Abandon(BaseModel):
+    """Abandon d'un inventaire en cours (P-018) : aucun ajustement n'est écrit."""
+
+    motif: Annotated[str, Field(min_length=3, max_length=255)]
+
+
 class LigneInventaireLecture(BaseModel):
     id: int
     article: ArticleResume

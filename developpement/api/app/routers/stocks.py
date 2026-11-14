@@ -13,6 +13,7 @@ from app.models.enums import RoleUtilisateur, TypeMouvementStock
 from app.schemas.articles import ArticleLecture
 from app.schemas.common import PageReponse, PaginationParams
 from app.schemas.stocks import (
+    Abandon,
     ArticleResume,
     Comptage,
     EtatGlobal,
@@ -159,3 +160,15 @@ async def valider(
     inventaire_id: uuid.UUID, session: Session, auteur: Gestionnaire
 ) -> InventaireDetail:
     return await service_inventaires.valider_inventaire(session, inventaire_id, auteur)
+
+
+@router.post(
+    "/inventaires/{inventaire_id}/abandonner",
+    summary="Abandon d'un inventaire en cours, sans ajustement",
+)
+async def abandonner(
+    inventaire_id: uuid.UUID, donnees: Abandon, session: Session, auteur: Gestionnaire
+) -> InventaireDetail:
+    return await service_inventaires.abandonner_inventaire(
+        session, inventaire_id, donnees.motif, auteur
+    )

@@ -49,6 +49,8 @@ class StatutOf(enum.StrEnum):
 class StatutInventaire(enum.StrEnum):
     EN_COURS = "EN_COURS"
     VALIDE = "VALIDE"
+    # Abandonné sans ajustement (migration 0003)
+    ANNULE = "ANNULE"
 
 
 class MotifEcart(enum.StrEnum):

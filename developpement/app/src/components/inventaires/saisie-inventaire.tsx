@@ -9,6 +9,7 @@ import { CLE_ARTICLES, nomComplet } from "@/components/articles/types";
 import { Page } from "@/components/coquille/page";
 import { EtatRequete } from "@/components/etats/etat-requete";
 import { SqueletteTableau } from "@/components/etats/squelettes";
+import { AbandonInventaire } from "@/components/inventaires/abandon-inventaire";
 import {
   CLE_INVENTAIRES,
   type InventaireDetail,
@@ -252,9 +253,15 @@ function Comptage({ inventaire }: { inventaire: InventaireDetail }) {
             Tous les inventaires
           </Link>
         </Button>
-        {inventaire.statut === "EN_COURS" && <Badge variant="info">En cours</Badge>}
+        <span className="flex items-center gap-2">
+          {modifiable && <AbandonInventaire inventaire={inventaire} />}
+          {inventaire.statut === "EN_COURS" && <Badge variant="info">En cours</Badge>}
+          {inventaire.statut === "ANNULE" && <Badge variant="neutre">Abandonné</Badge>}
+        </span>
       </div>
-      {inventaire.observations && <p className="text-texte-2">{inventaire.observations}</p>}
+      {inventaire.observations && (
+        <p className="whitespace-pre-line text-texte-2">{inventaire.observations}</p>
+      )}
       <ChampRecherche libelle="Chercher un article" valeur={recherche} onChange={setRecherche} />
 
       <Table>

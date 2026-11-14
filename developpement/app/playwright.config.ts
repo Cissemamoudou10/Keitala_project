@@ -53,5 +53,8 @@ export default defineConfig({
     url: `http://localhost:${PORT}/tableau-de-bord`,
     reuseExistingServer: !enCI,
     timeout: 180_000,
+    // En local, l'API des parcours (service Docker `api-e2e`, sa propre base) : la base de
+    // développement n'est jamais touchée (P-016). En CI, API_URL est fourni par le workflow.
+    env: { API_URL: process.env.API_URL ?? "http://localhost:8001" },
   },
 });

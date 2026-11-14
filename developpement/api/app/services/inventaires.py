@@ -44,9 +44,10 @@ def _introuvable() -> ErreurMetier:
 
 
 def _deja_valide(inventaire: Inventaire) -> ErreurMetier:
+    etat = "abandonné" if inventaire.statut == StatutInventaire.ANNULE else "validé"
     return ErreurMetier(
         "INVENTAIRE_VALIDE",
-        f"L'inventaire {inventaire.numero} est déjà validé : il ne se modifie plus.",
+        f"L'inventaire {inventaire.numero} est déjà {etat} : il ne se modifie plus.",
         status.HTTP_409_CONFLICT,
     )
 
@@ -306,5 +307,28 @@ async def valider_inventaire(
         )
     inventaire.statut = StatutInventaire.VALIDE
     inventaire.valide_le = datetime.now(UTC)
+    await session.commit()
+    return await lire_inventaire(session, inventaire_id)
+
+
+async def abandonner_inventaire(
+    session: AsyncSession, inventaire_id: uuid.UUID, motif: str, auteur: Utilisateur
+) -> InventaireDetail:
+    """Abandon d'un inventaire ouvert par erreur (P-018, D-029) : statut ANNULE, aucun
+    mouvement de stock, numéro conservé. Le motif est ajouté aux observations."""
+    inventaire = (
+        await session.execute(
+            select(Inventaire).where(Inventaire.id == inventaire_id).with_for_update()
+        )
+    ).scalar_one_or_none()
+    if inventaire is None:
+        raise _introuvable()
+    if inventaire.statut != StatutInventaire.EN_COURS:
+        raise _deja_valide(inventaire)
+    trace = f"Abandonné par {auteur.nom_complet} : {motif.strip()}"
+    inventaire.observations = (
+        f"{inventaire.observations}\n{trace}" if inventaire.observations else trace
+    )
+    inventaire.statut = StatutInventaire.ANNULE
     await session.commit()
     return await lire_inventaire(session, inventaire_id)

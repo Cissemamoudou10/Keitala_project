@@ -3,6 +3,7 @@ from datetime import date, datetime
 from decimal import Decimal
 
 from sqlalchemy import BigInteger, Computed, Date, Index, Numeric, String, Text, text
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -43,6 +44,8 @@ class Achat(Base):
     annule_par: Mapped[uuid.UUID | None] = fk_uuid("utilisateurs.id", nullable=True)
     annule_le: Mapped[datetime | None] = horodatage_optionnel()
     motif_annulation: Mapped[str | None] = mapped_column(Text)
+    # Clé d'idempotence du formulaire (migration 0004, P-009)
+    cle_idempotence: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), unique=True)
 
 
 class LigneAchat(Base):

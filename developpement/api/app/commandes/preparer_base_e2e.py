@@ -14,12 +14,12 @@ import os
 import sys
 from pathlib import Path
 
+from alembic import command
+from alembic.config import Config
 from sqlalchemy import make_url, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import NullPool
 
-from alembic import command
-from alembic.config import Config
 from app.commandes.comptes_e2e import preparer_comptes
 from app.core.config import settings
 

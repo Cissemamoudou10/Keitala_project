@@ -74,6 +74,19 @@ def nouveau_cout_moyen(
     return ((stock * cout_moyen + quantite * cout_entree) / total).quantize(COUT, ROUND_HALF_UP)
 
 
+def cout_moyen_apres_retrait(
+    stock: Decimal, cout_moyen: Decimal, quantite: Decimal, cout_retrait: Decimal
+) -> Decimal:
+    """Inverse de la pondération (P-010) : retirer q unités valorisées à leur coût
+    d'entrée. (stock × PUMP − q × coût) / (stock − q) ; inchangé si plus rien ne reste."""
+    reste = stock - quantite
+    if reste <= 0:
+        return cout_moyen
+    valeur = (stock * cout_moyen - quantite * cout_retrait) / reste
+    # Arrondis successifs : jamais de coût négatif
+    return max(valeur, Decimal(0)).quantize(COUT, ROUND_HALF_UP)
+
+
 async def ecrire_mouvement_stock(
     session: AsyncSession,
     article: Article,
@@ -82,6 +95,7 @@ async def ecrire_mouvement_stock(
     quantite: Decimal,
     utilisateur_id: uuid.UUID,
     cout_entree: Decimal | None = None,
+    cout_retrait: Decimal | None = None,
     achat_id: uuid.UUID | None = None,
     vente_id: uuid.UUID | None = None,
     ordre_fabrication_id: uuid.UUID | None = None,
@@ -92,8 +106,10 @@ async def ecrire_mouvement_stock(
     """Seule fonction qui modifie un stock. L'article doit avoir été verrouillé.
 
     `quantite` est signée, en unité de base. `cout_entree` (entrée seulement) valorise
-    l'entrée et recalcule le coût moyen ; sinon le mouvement est valorisé au coût moyen
-    du moment, qui ne change pas. N'effectue pas le commit.
+    l'entrée et recalcule le coût moyen. `cout_retrait` (sortie seulement) retire une
+    entrée à son coût d'origine, comme l'annulation d'un achat (P-010). Sinon le
+    mouvement est valorisé au coût moyen du moment, qui ne change pas.
+    N'effectue pas le commit.
     """
     quantite = quantite.quantize(QUANTITE, ROUND_HALF_UP)
     if quantite == 0:
@@ -115,6 +131,11 @@ async def ecrire_mouvement_stock(
         cout_unitaire = cout_entree.quantize(COUT, ROUND_HALF_UP)
         article.cout_moyen = nouveau_cout_moyen(
             stock_avant, article.cout_moyen, quantite, cout_unitaire
+        )
+    elif cout_retrait is not None and quantite < 0:
+        cout_unitaire = cout_retrait.quantize(COUT, ROUND_HALF_UP)
+        article.cout_moyen = cout_moyen_apres_retrait(
+            stock_avant, article.cout_moyen, -quantite, cout_unitaire
         )
 
     mouvement = MouvementStock(

@@ -19,7 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.erreurs import ErreurMetier
 from app.models import CompteTresorerie, TransactionTresorerie
-from app.models.enums import TypeFluxTresorerie
+from app.models.enums import TypeCompteTresorerie, TypeFluxTresorerie
 from app.schemas.tresorerie import CompteCreation, CompteLecture, CompteModification
 
 Sens = Literal["CREDIT", "DEBIT"]
@@ -63,6 +63,17 @@ async def ecrire_mouvement_tresorerie(
     """
     solde_avant = compte.solde_actuel
     solde_apres = solde_avant + montant if sens == "CREDIT" else solde_avant - montant
+    # Des espèces ou un porte-monnaie électronique ne descendent pas sous zéro ; une
+    # banque peut être à découvert (D-030)
+    if solde_apres < 0 and compte.type != TypeCompteTresorerie.BANQUE:
+        raise ErreurMetier(
+            "SOLDE_INSUFFISANT",
+            f"Solde insuffisant sur « {compte.nom} » : il reste "
+            f"{format(solde_avant.quantize(Decimal(1)), ',').replace(',', ' ')} FCFA. "
+            "Réduisez le montant ou choisissez un autre compte.",
+            status.HTTP_409_CONFLICT,
+            {"compte_id": compte.id, "disponible": str(solde_avant)},
+        )
     ecriture = TransactionTresorerie(
         compte_id=compte.id,
         type_flux=type_flux,

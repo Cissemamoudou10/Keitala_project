@@ -16,6 +16,7 @@ from sqlalchemy import (
     UniqueConstraint,
     text,
 )
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -56,6 +57,8 @@ class Depense(Base):
     motif_annulation: Mapped[str | None] = mapped_column(Text)
     controle_par: Mapped[uuid.UUID | None] = fk_uuid("utilisateurs.id", nullable=True)
     controle_le: Mapped[datetime | None] = horodatage_optionnel()
+    # Clé d'idempotence du formulaire (migration 0004, P-009)
+    cle_idempotence: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), unique=True)
 
 
 class TransfertInterne(Base):
@@ -73,6 +76,8 @@ class TransfertInterne(Base):
     date_creation: Mapped[datetime] = date_creation()
     controle_par: Mapped[uuid.UUID | None] = fk_uuid("utilisateurs.id", nullable=True)
     controle_le: Mapped[datetime | None] = horodatage_optionnel()
+    # Clé d'idempotence du formulaire (migration 0004, P-009)
+    cle_idempotence: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), unique=True)
 
 
 class ClotureCaisse(Base):

@@ -24,7 +24,8 @@ Une entrée par session de travail, **la plus récente en haut**. C'est le relai
 - **Vérifications** : migration 0003 montée, descendue (premier essai en échec : contrainte `chk_inventaire_validation` liée au type, corrigée) et remontée ; `alembic check` muet ; 112 tests API. Parcours e2e : 37 réussis, deux passages verts ; un parcours d'inventaire bloqué par un autre en parallèle (un seul inventaire en cours) → parcours du fichier mis en série. Isolation prouvée : un passage des parcours du Sprint 2 laisse la base de développement inchangée (0 utilisateur, 29 articles, 0 tiers, 5 comptes).
 - **Décisions** : D-029 ; D-028 partiellement acceptée.
 - **Problèmes** : P-001, P-016 et P-018 résolus.
-- **À reprendre par le suivant** : créer le premier Super Admin sur la base de développement ; puis Sprint 4 (achats), après P-009 et P-010.
+- **Complément** : premier Super Admin créé sur la base de développement avec la commande `creer_super_admin` (nom, email et mot de passe fournis par l'utilisateur ; mot de passe passé par l'entrée standard) ; connexion vérifiée par l'app. API des parcours (`api-e2e`) en marche.
+- **À reprendre par le suivant** : Sprint 4 (achats), après P-009 et P-010.
 
 ## 2026-11-14 — Claude Code — Sprint 3 : stocks
 - **Tâche** : US-STK-04, US-STK-06, US-STK-05, US-STK-02, US-STK-03.

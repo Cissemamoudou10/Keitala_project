@@ -111,9 +111,16 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Piste** : limiter dans Nginx (`limit_req` sur `/api/v1/auth/login`) au Sprint 9 (S9-1), ou compteur d'échecs par email côté API (nouvelle migration). À trancher avant la mise en production.
 
 ## P-016 — Les parcours e2e laissent des comptes dans la base de développement
-- **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
+- **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Majeur · **Signalé par** : Claude
 - **Constat** : chaque passage de Playwright crée des comptes (`e2e-…@keitala.ml`, adresses uniques) qu'on ne peut que désactiver. En CI la base est neuve ; en local, la liste des utilisateurs s'allonge.
 - **Piste** : base dédiée aux parcours e2e (ex. `keitala_e2e_db`, API lancée dessus), à mettre en place avec les parcours métier.
+- **Mise à jour 14/11/2026** : depuis le Sprint 2, les parcours ajoutent aussi des comptes de trésorerie (« Banque test … »), des articles (`E2E-…`) et des clients (« Boutique Diarra … ») à la base de développement. Gravité relevée à Majeur : la base de développement doit être nettoyée (ou recréée) avant toute démonstration au client.
+
+## P-017 — Corriger un solde d'ouverture saisi par erreur
+- **Date** : 14/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
+- **Constat** : le solde d'ouverture se saisit une fois et le journal est immuable (règle 4). Une faute de frappe (malgré la confirmation en toutes lettres) ne peut pas être corrigée par l'écran.
+- **Impact** : mise en service (S9-5).
+- **Piste** : écriture de correction (`ANNULATION` puis nouveau `SOLDE_INITIAL`, ou `ECART_CLOTURE` à la première clôture de caisse, US-TRES-04), réservée au Super Admin. À décider avec le Sprint 6.
 
 ## C. Risques à surveiller
 

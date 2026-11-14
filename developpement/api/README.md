@@ -84,4 +84,7 @@ Voir `AGENTS.md` section 10 : tout se lance dans le conteneur `keitala_api` (D-0
 - **Listes** : `paginer(session, requete, PaginationParams)` dans `app/db/pagination.py`, avec un `ORDER BY` stable ; réponse `PageReponse[T]`.
 - **Accès** : tout routeur métier se déclare avec `dependencies=ACCES_METIER` (`app/core/dependances.py`) : session exigée, écritures du Consultant refusées (403). Rôles particuliers : `Depends(exiger_roles(...))`. Utilisateur courant : paramètre `utilisateur: UtilisateurCourant`.
 - **Session** : jeton d'accès (30 min) et de rafraîchissement (7 jours) ; l'utilisateur est relu à chaque requête, et les jetons portent une empreinte du mot de passe (une réinitialisation coupe les sessions ouvertes).
+- **Trésorerie** : toute variation de solde passe par `services/tresorerie.ecrire_mouvement_tresorerie` (compte verrouillé avec `verrouiller_compte`, ligne du journal, solde ; sans commit : l'opération appelante valide tout ensemble).
+- **Recherche** : `app/db/recherche.contient(texte, *colonnes)`, insensible aux accents et à la casse, sans extension PostgreSQL.
+- **Erreurs de validation** : pour un message métier en français dans un validateur Pydantic, lever `PydanticCustomError("code", "message")` (un `ValueError` donnerait le message générique).
 - **Tests** : fixtures `creer_compte(role)` et `entetes_pour(utilisateur)` (`tests/conftest.py`) ; fixture `db_session` (transaction annulée à la fin) ; tests de base dans `tests/db/`, avec les fixtures `gestionnaire`, `article` et `caisse`.

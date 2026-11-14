@@ -10,15 +10,15 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 
 | | |
 | :--- | :--- |
-| **Dernière mise à jour** | 13/11/2026 |
-| **Phase** | Sprints 0 et 1 terminés. Prochain : Sprint 2 (référentiels). |
-| **Sprint en cours** | Sprint 2 — Référentiels (à démarrer) |
-| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query, formats et champ de montant, quatre états d'écran ; build, lint et types OK ; rendu vérifié à l'écran (bureau et 768 px) ; 44 tests Vitest, 7 parcours Playwright (bureau et tablette). CI GitHub Actions écrite (`.github/workflows/ci.yml`), rejouée en local, jamais exécutée sur GitHub (P-014). Sprint 1 : connexion par cookies HttpOnly, gestion des comptes, contrôle d'accès par rôle (API 53 tests, app 62 tests, 19 parcours e2e sur la pile complète). |
-| **Points bloquants** | Aucun. Commandes de l'API à lancer dans le conteneur (P-012). Aucun. |
+| **Dernière mise à jour** | 14/11/2026 |
+| **Phase** | Sprints 0, 1 et 2 terminés (US-REF-02 : dernier critère avec les Sprints 4 et 5). Prochain : Sprint 3 (stocks). |
+| **Sprint en cours** | Sprint 3 — Stocks (à démarrer) |
+| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query, formats et champ de montant, quatre états d'écran ; build, lint et types OK ; rendu vérifié à l'écran (bureau et 768 px) ; 44 tests Vitest, 7 parcours Playwright (bureau et tablette). CI GitHub Actions écrite (`.github/workflows/ci.yml`), rejouée en local, jamais exécutée sur GitHub (P-014). Sprint 1 : connexion par cookies HttpOnly, gestion des comptes, contrôle d'accès par rôle (API 53 tests, app 62 tests, 19 parcours e2e sur la pile complète). Sprint 2 : comptes de trésorerie et soldes d'ouverture, catalogue et unités de saisie, clients et fournisseurs (API 96 tests, app 110 tests, 29 parcours e2e). |
+| **Points bloquants** | Aucun. Commandes de l'API à lancer dans le conteneur (P-012). |
 
 ## Prochaine tâche
 
-**Sprint 2, US-REF-03 : comptes de trésorerie et soldes d'ouverture**, puis US-REF-01, US-REF-02, US-STK-01 (US-REF-03 d'abord : les règlements des Sprints 4 et 5 en dépendent). Chaque routeur se déclare avec `ACCES_METIER` ; chaque écran cache ses actions derrière `usePeut`. Relire avant : critères des stories (backlog, EPIC 2), matrice des droits (backlog, section 4).
+**Sprint 3, US-STK-04 : inventaire physique et régularisation** d'abord (il sert aussi au stock de départ et crée la fonction unique d'écriture des mouvements de stock, règles 1 à 4), puis US-STK-05 (journal), US-STK-06 (pertes), US-STK-02 (état valorisé) et US-STK-03 (alertes). Écrire `ecrire_mouvement_stock` sur le modèle de `ecrire_mouvement_tresorerie`. Relire avant : EPIC 3 du backlog, `schema.sql` (inventaires, mouvements_stock), D-018.
 
 ---
 
@@ -28,7 +28,7 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 | :--- | :--- | :---: | :--- |
 | 0 | Fondations techniques et socle d'interface | — | Terminé |
 | 1 | Authentification, rôles, utilisateurs | 3 | Terminé |
-| 2 | Référentiels : tiers, articles, unités, comptes | 4 | À faire |
+| 2 | Référentiels : tiers, articles, unités, comptes | 4 | Terminé (voir US-REF-02) |
 | 3 | Stocks : état, alertes, journal, inventaire, pertes | 5 | À faire |
 | 4 | Achats et dettes fournisseurs | 4 | À faire |
 | 5 | Ventes, règlements, dons, factures | 6 | À faire |
@@ -82,10 +82,10 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 
 ## Sprint 2 — Référentiels
 
-- [ ] US-REF-01 Répertoire des tiers (clients et fournisseurs) avec créance et dette
-- [ ] US-REF-02 Unité de base et unités de saisie par article
-- [ ] US-REF-03 Comptes de trésorerie (Caisse, Banque, Orange Money, Mobicash, Wave) et soldes d'ouverture
-- [ ] US-STK-01 Catalogue des articles par famille (6 familles)
+- [x] US-REF-01 Répertoire des tiers (clients et fournisseurs) avec créance et dette
+- [~] US-REF-02 Unité de base et unités de saisie par article — fait : unités par article, conversion ; reste le choix de l'unité sur les lignes d'achat et de vente (composant `ChampQuantite` prêt, Sprints 4 et 5)
+- [x] US-REF-03 Comptes de trésorerie (Caisse, Banque, Orange Money, Mobicash, Wave) et soldes d'ouverture
+- [x] US-STK-01 Catalogue des articles par famille (6 familles)
 
 ## Sprint 3 — Stocks
 
@@ -150,6 +150,7 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 | :--- | :--- |
 | 13/11/2026 | Analyse du dossier ; spécifications et schéma corrigés en v1.1 ; schéma validé sur PostgreSQL 16 |
 | 13/11/2026 | Mise en place de `AGENTS.md`, des fichiers de suivi, de la charte et de `developpement/` |
+| 14/11/2026 | **Sprint 2 terminé** : comptes de trésorerie, catalogue, unités, tiers |
 | 13/11/2026 | **Sprint 1 terminé** : connexion, comptes, droits par rôle |
 | 13/11/2026 | **Sprint 0 terminé** : outillage de tests de l'app (S0-16) et intégration continue (S0-17) |
 | 13/11/2026 | App : formats, champ de montant, quatre états d'écran (S0-14, S0-15) |

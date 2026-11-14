@@ -115,6 +115,14 @@ Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack 
 - Panneau latéral (`components/ui/panneau.tsx`) et pagination (`components/ui/pagination.tsx`), page gardée dans l'adresse.
 - Parcours e2e : sur la pile complète (API lancée, comptes créés par `python -m app.commandes.comptes_e2e`) ; `connecter(page, "CONSULTANT")` dans `e2e/outils.ts`.
 
+## Référentiels (Sprint 2)
+
+- Écrans : `/tresorerie` (cartes des comptes ; ajout, modification et solde d'ouverture pour le Super Admin), `/stocks` (catalogue par famille, fiche article et unités de saisie), `/tiers` (clients et fournisseurs, hors menu, liens depuis Ventes et Achats).
+- Saisie : `ChampQuantite` (quantité + unité, conversion « 3 Sacs 50 kg = 150 kg », stock disponible et dépassement) et `quantiteEnBase()` ; à brancher sur les lignes d'achat et de vente (Sprints 4 et 5).
+- Calcul : `lib/decimal.ts` (`multiplierDecimaux`, `estInferieur`, `enSaisie`), jamais `Number()` sur un montant ou une quantité ; `lib/nombres-en-lettres.ts` (`montantEnLettres`) pour les confirmations.
+- Listes : `useParametresAdresse()` (filtres, recherche et page dans l'adresse), `Onglets`, `ChampRecherche` (attente de 250 ms) ; erreurs de l'API sous le bon champ avec `appliquerErreurApi()`.
+- Droits : `usePeut("parametrer")` pour ce que la matrice réserve au Super Admin (comptes, dérogations). La session n'est exposée qu'après l'hydratation (`lib/session.ts`) : sans cela, un bouton réservé apparaissait côté navigateur et pas dans le HTML du serveur.
+
 ## Next.js 16 : à savoir
 
 - Version récente : lire le guide utile dans `node_modules/next/dist/docs/` avant d'écrire du code (rappel dans `AGENTS.md` de ce dossier, recréé par `next dev`).

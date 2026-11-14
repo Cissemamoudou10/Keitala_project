@@ -19,6 +19,8 @@ const DROITS = {
    * (US-AUTH-03). Les modules affineront au besoin (ex. ventes : Gestionnaire seul).
    */
   ecrire: ["SUPER_ADMIN", "GESTIONNAIRE"],
+  /** Comptes de trésorerie, soldes d'ouverture, dérogation au stock négatif (matrice). */
+  parametrer: ["SUPER_ADMIN"],
 } as const satisfies Record<string, readonly Role[]>;
 
 export type Action = keyof typeof DROITS;

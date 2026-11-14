@@ -1,10 +1,6 @@
-import { Page } from "@/components/coquille/page";
+import { ComptesTresorerie } from "@/components/tresorerie/comptes-tresorerie";
 
-// Écran provisoire : contenu au Sprint 6 (suivi/AVANCEMENT.md).
+// Trésorerie : comptes et soldes (US-REF-03). Journal, dépenses, transferts : Sprint 6.
 export default function PageTresorerie() {
-  return (
-    <Page titre="Trésorerie" description="Soldes des comptes, dépenses, transferts et clôtures.">
-      <p className="text-texte-2">Cet écran sera disponible prochainement.</p>
-    </Page>
-  );
+  return <ComptesTresorerie />;
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSyncExternalStore } from "react";
+import { useQuery, useQueryClient, type UseQueryResult } from "@tanstack/react-query";
 
 import { appelerApi } from "@/lib/api";
 import { peut, type Action, type Role } from "@/lib/droits";
@@ -18,13 +19,39 @@ export type Utilisateur = {
 
 export const CLE_SESSION = ["session"] as const;
 
+const rienAEcouter = () => () => {};
+
+/**
+ * Faux côté serveur et pendant l'hydratation, vrai ensuite. Les pages sous <Suspense>
+ * s'hydratent après la coquille, qui a parfois déjà reçu la session : sans ce garde-fou,
+ * un bouton réservé à un rôle apparaîtrait côté navigateur et pas dans le HTML du
+ * serveur (erreur d'hydratation).
+ */
+function useEstHydrate(): boolean {
+  return useSyncExternalStore(
+    rienAEcouter,
+    () => true,
+    () => false,
+  );
+}
+
 /** Utilisateur connecté. Une session expirée renvoie à la connexion (components/fournisseurs). */
-export function useSession() {
-  return useQuery({
+export function useSession(): UseQueryResult<Utilisateur> {
+  const requete = useQuery({
     queryKey: CLE_SESSION,
     queryFn: ({ signal }) => appelerApi<Utilisateur>("auth/me", { signal }),
     staleTime: 5 * 60_000,
   });
+  const hydrate = useEstHydrate();
+  if (hydrate) return requete;
+  // Même rendu que le serveur tant que l'hydratation n'est pas finie : session « en cours »
+  return {
+    ...requete,
+    data: undefined,
+    isPending: true,
+    isSuccess: false,
+    status: "pending",
+  } as UseQueryResult<Utilisateur>;
 }
 
 /** Le rôle courant peut-il faire cette action ? Faux tant que la session n'est pas chargée. */

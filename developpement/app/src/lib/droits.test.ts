@@ -15,6 +15,12 @@ describe("peut", () => {
     expect(peut("CONSULTANT", "ecrire")).toBe(false);
   });
 
+  it("réserve le paramétrage (comptes, dérogations) au Super Admin", () => {
+    expect(peut("SUPER_ADMIN", "parametrer")).toBe(true);
+    expect(peut("GESTIONNAIRE", "parametrer")).toBe(false);
+    expect(peut("CONSULTANT", "parametrer")).toBe(false);
+  });
+
   it("refuse tout tant que la session n'est pas connue", () => {
     expect(peut(null, "ecrire")).toBe(false);
     expect(peut(undefined, "gerer_utilisateurs")).toBe(false);

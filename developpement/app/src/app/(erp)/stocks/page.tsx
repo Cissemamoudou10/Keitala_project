@@ -1,10 +1,13 @@
-import { Page } from "@/components/coquille/page";
+import { Suspense } from "react";
 
-// Écran provisoire : contenu au Sprint 3 (suivi/AVANCEMENT.md).
+import { CatalogueArticles } from "@/components/articles/catalogue-articles";
+
+// Stocks : catalogue des articles (US-STK-01, US-REF-02). État valorisé, alertes,
+// journal et inventaires : Sprint 3. Filtres lus dans l'adresse : rendu navigateur.
 export default function PageStocks() {
   return (
-    <Page titre="Stocks" description="État des stocks par famille, inventaires et pertes.">
-      <p className="text-texte-2">Cet écran sera disponible prochainement.</p>
-    </Page>
+    <Suspense>
+      <CatalogueArticles />
+    </Suspense>
   );
 }

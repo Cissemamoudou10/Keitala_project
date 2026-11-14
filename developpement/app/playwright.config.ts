@@ -22,6 +22,8 @@ export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
   forbidOnly: enCI,
+  // En local, `next dev` compile chaque page à sa première visite : on laisse plus de temps
+  expect: { timeout: enCI ? 5_000 : 10_000 },
   retries: enCI ? 1 : 0,
   reporter: enCI ? [["github"], ["html", { open: "never" }]] : "list",
   use: {

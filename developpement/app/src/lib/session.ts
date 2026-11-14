@@ -27,7 +27,7 @@ const rienAEcouter = () => () => {};
  * un bouton réservé à un rôle apparaîtrait côté navigateur et pas dans le HTML du
  * serveur (erreur d'hydratation).
  */
-function useEstHydrate(): boolean {
+export function useEstHydrate(): boolean {
   return useSyncExternalStore(
     rienAEcouter,
     () => true,

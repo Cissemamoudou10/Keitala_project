@@ -37,6 +37,8 @@ type ChampMontantProps = Omit<
  * Saisie d'un montant en FCFA (charte, section 9) : « 2030000 » s'affiche
  * « 2 030 000 » pendant la frappe, suffixe FCFA dans le champ, clavier numérique.
  * Compatible React Hook Form via `Controller` (value / onChange / onBlur / ref).
+ * `className` règle la largeur de l'ensemble (champ et suffixe).
+ * `className` règle la largeur de l'ensemble (champ et suffixe).
  */
 export function ChampMontant({ value, onChange, className, ref, ...props }: ChampMontantProps) {
   const champ = React.useRef<HTMLInputElement | null>(null);
@@ -85,7 +87,7 @@ export function ChampMontant({ value, onChange, className, ref, ...props }: Cham
   }
 
   return (
-    <div className="relative">
+    <div className={cn("relative", className)}>
       <Input
         ref={lierRef}
         type="text"
@@ -93,7 +95,7 @@ export function ChampMontant({ value, onChange, className, ref, ...props }: Cham
         autoComplete="off"
         value={affiche}
         onChange={gererSaisie}
-        className={cn("pr-16 tabular-nums", className)}
+        className="pr-16 tabular-nums"
         {...props}
       />
       <span

@@ -76,3 +76,16 @@ export function soustraireDecimaux(a: string, b: string): string | null {
   const texte = fraction ? `${entier}.${fraction}` : entier;
   return negatif && texte !== "0" ? `-${texte}` : texte;
 }
+
+/** Somme exacte de chaînes décimales (null si l'une est illisible), sans zéros inutiles. */
+export function additionnerDecimaux(valeurs: string[]): string | null {
+  let total = "0";
+  for (const valeur of valeurs) {
+    const negatif = valeur.trim().startsWith("-");
+    const oppose = negatif ? valeur.trim().slice(1) : `-${valeur.trim()}`;
+    const suivant = soustraireDecimaux(total, oppose);
+    if (suivant === null) return null;
+    total = suivant;
+  }
+  return total;
+}

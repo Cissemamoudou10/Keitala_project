@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { enSaisie, estInferieur, multiplierDecimaux, soustraireDecimaux } from "@/lib/decimal";
+import {
+  additionnerDecimaux,
+  enSaisie,
+  estInferieur,
+  multiplierDecimaux,
+  soustraireDecimaux,
+} from "@/lib/decimal";
 
 describe("multiplierDecimaux", () => {
   it.each([
@@ -50,5 +56,17 @@ describe("soustraireDecimaux", () => {
     ["x", "1", null],
   ])("%s − %s = %s", (a, b, attendu) => {
     expect(soustraireDecimaux(a, b)).toBe(attendu);
+  });
+});
+
+describe("additionnerDecimaux", () => {
+  it("additionne sans flottant", () => {
+    expect(additionnerDecimaux(["0.1", "0.2"])).toBe("0.3");
+    expect(additionnerDecimaux(["37500", "12500.00", "-50000"])).toBe("0");
+    expect(additionnerDecimaux([])).toBe("0");
+  });
+
+  it("refuse une valeur illisible", () => {
+    expect(additionnerDecimaux(["12", "abc"])).toBeNull();
   });
 });

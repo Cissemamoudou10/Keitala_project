@@ -118,7 +118,7 @@ Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack 
 ## Référentiels (Sprint 2)
 
 - Écrans : `/tresorerie` (cartes des comptes ; ajout, modification et solde d'ouverture pour le Super Admin), `/stocks` (catalogue par famille, fiche article et unités de saisie), `/tiers` (clients et fournisseurs, hors menu, liens depuis Ventes et Achats).
-- Saisie : `ChampQuantite` (quantité + unité, conversion « 3 Sacs 50 kg = 150 kg », stock disponible et dépassement) et `quantiteEnBase()` ; à brancher sur les lignes d'achat et de vente (Sprints 4 et 5).
+- Saisie : `ChampQuantite` (quantité + unité, conversion « 3 Sacs 50 kg = 150 kg », stock disponible et dépassement) et `quantiteEnBase()` ; branché sur les lignes d'achat (Sprint 4), à brancher sur les lignes de vente (Sprint 5).
 - Calcul : `lib/decimal.ts` (`multiplierDecimaux`, `estInferieur`, `enSaisie`), jamais `Number()` sur un montant ou une quantité ; `lib/nombres-en-lettres.ts` (`montantEnLettres`) pour les confirmations.
 - Listes : `useParametresAdresse()` (filtres, recherche et page dans l'adresse), `Onglets`, `ChampRecherche` (attente de 250 ms) ; erreurs de l'API sous le bon champ avec `appliquerErreurApi()`.
 - Droits : `usePeut("parametrer")` pour ce que la matrice réserve au Super Admin (comptes, dérogations). La session n'est exposée qu'après l'hydratation (`lib/session.ts`) : sans cela, un bouton réservé apparaissait côté navigateur et pas dans le HTML du serveur.
@@ -130,6 +130,14 @@ Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack 
 - Calcul : `soustraireDecimaux` (écarts) et `lib/recherche.simplifier` (filtre local insensible aux accents).
 - Page à adresse variable (`[id]`) : lire `params` dans un composant enfant sous `<Suspense>`, sinon le build échoue (Cache Components). La navigation de la coquille lit `usePathname()` sous `<Suspense>` pour la même raison.
 - Parcours e2e en local : 4 en parallèle et 60 s par parcours (`playwright.config.ts`) ; au-delà, les premières compilations de `next dev` saturent. Ne pas lancer `next build` pendant que `next dev` tourne (dossier `.next` partagé).
+
+## Achats (Sprint 4)
+
+- `/achats` (onglets Tous / À payer, recherche, période ; fiche dans le panneau via `?achat=<id>`, avec paiement de la dette et annulation) et `/achats/nouveau` (`components/achats/formulaire-achat.tsx`). Modèle pour la saisie des ventes.
+- `ChampChoix` (`components/ui/champ-choix.tsx`) : recherche avec suggestions (clavier, 250 ms), pour choisir un article ou un tiers. Changer sa `key` pour le remettre à vide.
+- Pièce : clé `crypto.randomUUID()` créée à l'ouverture du formulaire et gardée dans le brouillon (`localStorage`, lu après l'hydratation) : un nouvel essai après une coupure ne crée pas de doublon (P-009). Confirmation en lettres au-delà de `SEUIL_CONFIRMATION_FCFA` (`lib/seuils.ts`).
+- Droit `saisir_achat` (Gestionnaire seul). Calcul : `additionnerDecimaux`.
+- `Button` est `type="button"` par défaut : le bouton d'envoi d'un formulaire déclare `type="submit"` (P-020). `ChampMontant` : `className` règle la largeur de l'ensemble.
 
 ## Next.js 16 : à savoir
 

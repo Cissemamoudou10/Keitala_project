@@ -23,6 +23,8 @@ const DROITS = {
   parametrer: ["SUPER_ADMIN"],
   /** Inventaires et pertes : saisis par le Gestionnaire, contrôlés après coup (matrice). */
   saisir_stock: ["GESTIONNAIRE"],
+  /** Achats : saisis, réglés et annulés par le Gestionnaire (matrice des droits). */
+  saisir_achat: ["GESTIONNAIRE"],
 } as const satisfies Record<string, readonly Role[]>;
 
 export type Action = keyof typeof DROITS;

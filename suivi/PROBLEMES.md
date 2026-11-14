@@ -70,16 +70,18 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 ## B. Points techniques à trancher
 
 ## P-009 — Protection contre le double enregistrement
-- **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Majeur · **Signalé par** : Claude
+- **Date** : 13/11/2026 · **Statut** : Résolu · **Gravité** : Majeur · **Signalé par** : Claude
 - **Constat** : avec une connexion instable, une vente peut être envoyée deux fois (réponse perdue, nouvel essai). Le schéma v1.1 ne prévoit pas de clé d'idempotence.
 - **Impact** : toutes les créations de pièces, à partir du Sprint 4.
 - **Piste** : identifiant de requête généré par le formulaire et stocké avec unicité sur la pièce (migration à ajouter), ou table dédiée. À décider au plus tard au début du Sprint 4, avec entrée dans `DECISIONS.md`.
+- **Résolution** (14/11/2026) : clé d'idempotence générée par le formulaire, unique sur la pièce et le règlement (migration 0004, D-030). Appliquée aux achats ; à réutiliser pour les ventes et dépenses.
 
 ## P-010 — Annulation d'un achat dont le stock a déjà bougé
-- **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
+- **Date** : 13/11/2026 · **Statut** : Résolu · **Gravité** : Mineur · **Signalé par** : Claude
 - **Constat** : annuler un achat ancien modifie le PUMP après coup. La règle de recalcul n'est pas écrite.
 - **Impact** : US-ACH-04.
 - **Piste** : contre-passer au coût d'entrée d'origine et recalculer le PUMP sur le stock restant ; refuser si le stock deviendrait négatif.
+- **Résolution** (14/11/2026) : piste retenue telle quelle (D-030), testée côté API (coût moyen rétabli, refus si vendu).
 
 ## P-011 — Diagrammes Mermaid non vérifiés à l'affichage
 - **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
@@ -129,6 +131,17 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Constat** : un inventaire en cours ne peut que se valider (statuts `EN_COURS` et `VALIDE` seulement). Ouvert par erreur, il bloque l'ouverture d'un autre ; le valider sans écart ne change aucun stock mais laisse une pièce.
 - **Piste** : accepter la validation sans écart comme « abandon » (aucun mouvement écrit), ou ajouter un statut `ANNULE` (migration). À décider avec l'utilisateur.
 - **Résolution** (14/11/2026) : statut `ANNULE` et action « Abandonner l'inventaire » (migration 0003, D-029).
+
+## P-019 — Montant d'achat au centime, paiements en francs entiers
+- **Date** : 14/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
+- **Constat** : `lignes_achat.montant_total` est calculé par la base au centime (`ROUND(quantite * prix_unitaire, 2)`, colonne générée du schéma figé), alors que les règlements sont saisis en FCFA entiers. Avec une quantité décimale, ex. 1,5 kg à 333 FCFA = 499,50 FCFA, l'achat ne peut jamais être entièrement soldé : il resterait 0,50 FCFA « à payer ».
+- **Impact** : US-ACH-01 et 03 (et les ventes au Sprint 5, même calcul). Rare : il faut une quantité décimale et un prix impair.
+- **Piste** : (a) migration qui arrondit les montants des lignes au franc ; ou (b) accepter des règlements au centime ; ou (c) considérer comme soldé un reste inférieur à 1 FCFA. Recommandation : (a), cohérent avec « FCFA sans décimales ». À décider avec l'utilisateur.
+
+## P-020 — Les boutons d'appoint envoyaient les formulaires
+- **Date** : 14/11/2026 · **Statut** : Résolu · **Gravité** : Majeur · **Signalé par** : Claude
+- **Constat** : le composant `Button` laissait le type HTML par défaut (`submit`). Dans un formulaire, « Ajouter un article », « Payer aussi sur un autre compte » ou, dans la fiche tiers, « Ouvrir la fiche » et « Non, en créer un nouveau » envoyaient aussi le formulaire (risque de double envoi).
+- **Résolution** (14/11/2026) : `type="button"` par défaut dans `Button`, test unitaire ajouté ; les boutons d'envoi déclarent tous `type="submit"`. Vu sur les captures du Sprint 4, aucun parcours e2e ne le révélait.
 
 ## C. Risques à surveiller
 

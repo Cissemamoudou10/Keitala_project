@@ -71,7 +71,7 @@ Domaines (même découpage pour `models`, `schemas`, `services`, `routers`) : `a
 
 ## Points en attente
 
-Voir `suivi/PROBLEMES.md` : P-009 (protection contre le double enregistrement, à trancher avant le Sprint 4) et P-010 (annulation d'un achat et PUMP).
+Voir `suivi/PROBLEMES.md`, notamment P-019 (montant d'une ligne au centime, paiements en francs entiers), à trancher avant les ventes.
 
 ## Commandes
 
@@ -84,9 +84,10 @@ Voir `AGENTS.md` section 10 : tout se lance dans le conteneur `keitala_api` (D-0
 - **Listes** : `paginer(session, requete, PaginationParams)` dans `app/db/pagination.py`, avec un `ORDER BY` stable ; réponse `PageReponse[T]`.
 - **Accès** : tout routeur métier se déclare avec `dependencies=ACCES_METIER` (`app/core/dependances.py`) : session exigée, écritures du Consultant refusées (403). Rôles particuliers : `Depends(exiger_roles(...))`. Utilisateur courant : paramètre `utilisateur: UtilisateurCourant`.
 - **Session** : jeton d'accès (30 min) et de rafraîchissement (7 jours) ; l'utilisateur est relu à chaque requête, et les jetons portent une empreinte du mot de passe (une réinitialisation coupe les sessions ouvertes).
-- **Trésorerie** : toute variation de solde passe par `services/tresorerie.ecrire_mouvement_tresorerie` (compte verrouillé avec `verrouiller_compte`, ligne du journal, solde ; sans commit : l'opération appelante valide tout ensemble).
-- **Stock** : toute variation de `stock_actuel` et `cout_moyen` passe par `services/stocks.ecrire_mouvement_stock` (quantité signée en unité de base ; `cout_entree` pour une entrée valorisée, qui recalcule le coût moyen pondéré ; stock négatif refusé sauf dérogation). Verrouiller d'abord avec `verrouiller_articles(ids)` (ordre croissant des identifiants). Pas de commit dedans.
+- **Trésorerie** : toute variation de solde passe par `services/tresorerie.ecrire_mouvement_tresorerie` (compte verrouillé avec `verrouiller_compte`, ligne du journal, solde ; sans commit : l'opération appelante valide tout ensemble). Elle refuse un solde négatif hors compte Banque (`SOLDE_INSUFFISANT`, D-030).
+- **Stock** : toute variation de `stock_actuel` et `cout_moyen` passe par `services/stocks.ecrire_mouvement_stock` (quantité signée en unité de base ; `cout_entree` pour une entrée valorisée, qui recalcule le coût moyen pondéré ; `cout_retrait` pour la reprise d'une entrée annulée, qui recalcule le coût moyen à l'inverse ; stock négatif refusé sauf dérogation). Verrouiller d'abord avec `verrouiller_articles(ids)` (ordre croissant des identifiants). Pas de commit dedans.
+- **Pièces (modèle : `services/achats.py`)** : clé d'idempotence fournie par le formulaire (`cle_idempotence`, unique) : pièce existante relue et renvoyée en 200 au lieu de 201, y compris après un `IntegrityError` (envois simultanés). Verrous dans l'ordre pièce, articles, comptes. Annulation : statut `ANNULE`, mouvements `ANNULATION`, règlements contre-passés.
 - **Numérotation** : `services/numerotation.prochain_numero(session, "FAC")`, dans la transaction de la pièce.
 - **Recherche** : `app/db/recherche.contient(texte, *colonnes)`, insensible aux accents et à la casse, sans extension PostgreSQL.
 - **Erreurs de validation** : pour un message métier en français dans un validateur Pydantic, lever `PydanticCustomError("code", "message")` (un `ValueError` donnerait le message générique).
-- **Tests** : fixtures `creer_compte(role)` et `entetes_pour(utilisateur)` (`tests/conftest.py`) ; fixture `db_session` (transaction annulée à la fin) ; tests de base dans `tests/db/`, avec les fixtures `gestionnaire`, `article` et `caisse`.
+- **Tests** : fixtures `creer_compte(role)` et `entetes_pour(utilisateur)` (`tests/conftest.py`) ; fixture `db_session` (transaction annulée à la fin) ; tests de base dans `tests/db/`, avec les fixtures `gestionnaire`, `article` et `caisse`. Le client de test partage la session de la base : après une erreur métier attendue, appeler `await db_session.rollback()` avant de vérifier que rien n'a été écrit (en production, `get_db` ferme la session).

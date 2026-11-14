@@ -199,3 +199,18 @@ Chaque décision qui engage le projet est notée ici, avec sa raison. Une décis
   - Parcours de bout en bout sur une base à part : service Docker `api-e2e` (port 8001, base `keitala_e2e_db`, préparée par `preparer_base_e2e`). La base de développement, remise à neuf le 14/11/2026, n'est plus touchée par les tests.
 - **Conséquences** : lancer `up -d api-e2e` avant `pnpm test:e2e` en local. La base de développement remise à neuf n'a plus de compte : créer le premier Super Admin (S1-T1).
 
+## D-030 — Achats : idempotence, annulation et soldes de trésorerie
+- **Date** : 14/11/2026 · **Statut** : Acceptée (idempotence et annulation, validées par l'utilisateur au lancement du Sprint 4) ; reste Proposée · **Auteur** : utilisateur et Claude
+- **Contexte** : Sprint 4 (US-ACH-01 à 04). P-009 (double envoi sur réseau instable) et P-010 (annulation d'un achat après coup) devaient être tranchés avant de saisir les premières pièces.
+- **Décisions (acceptées)** :
+  - Idempotence (P-009) : migration `0004`, colonne `cle_idempotence UUID` unique et facultative sur `achats`, `ventes`, `reglements`, `depenses` et `transferts_internes`. Le formulaire génère la clé à son ouverture et la garde dans son brouillon ; un second envoi avec la même clé renvoie la pièce déjà créée (200 au lieu de 201) sans rien écrire.
+  - Annulation d'un achat (P-010) : le stock est repris au coût d'entrée d'origine (prix ÷ facteur), avec recalcul inverse du coût moyen sur le stock restant (`cout_retrait`) ; refus (`ANNULATION_IMPOSSIBLE`) si le stock deviendrait négatif, sauf dérogation ; les règlements valides passent à `ANNULE` et sont contre-passés sur leur compte (écriture `ANNULATION`).
+- **Décisions (proposées)** :
+  - Un compte Caisse ou Mobile Money ne descend jamais sous zéro (`SOLDE_INSUFFISANT`, contrôlé dans `ecrire_mouvement_tresorerie`) ; un compte Banque peut être à découvert.
+  - Droits : achats saisis, réglés et annulés par le Gestionnaire seul (matrice) ; Super Admin et Consultant consultent.
+  - Achat à crédit (reste > 0) : fournisseur du répertoire obligatoire ; un nom saisi librement suffit pour un achat payé comptant.
+  - Paiement ultérieur d'une dette : date du jour, montant plafonné au reste à payer.
+  - Formulaire : brouillon gardé dans le navigateur, premier paiement pré-rempli au total sur la Caisse, confirmation en lettres à partir de 1 000 000 FCFA (valeur de P-005, en attendant son paramétrage).
+  - Bouton de l'app : `type="button"` par défaut ; seul le bouton d'envoi déclare `type="submit"` (un bouton d'appoint envoyait le formulaire).
+- **Conséquences** : les ventes, dépenses et transferts des sprints suivants réutilisent la même clé et le même contrôle de solde.
+

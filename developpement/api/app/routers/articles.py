@@ -29,6 +29,7 @@ async def lister(
     famille: FamilleArticle | None = None,
     recherche: Annotated[str | None, Query(max_length=100)] = None,
     inclure_inactifs: bool = False,
+    sous_seuil: bool = False,
 ) -> PageReponse[ArticleLecture]:
     articles, total, pages = await service.lister_articles(
         session,
@@ -36,6 +37,7 @@ async def lister(
         famille=famille,
         recherche=recherche,
         inclure_inactifs=inclure_inactifs,
+        sous_seuil=sous_seuil,
     )
     return PageReponse(
         items=[ArticleLecture.model_validate(a) for a in articles],

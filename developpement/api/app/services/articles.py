@@ -63,8 +63,12 @@ async def lister_articles(
     famille: FamilleArticle | None = None,
     recherche: str | None = None,
     inclure_inactifs: bool = False,
+    sous_seuil: bool = False,
 ) -> tuple[list[Article], int, int]:
     requete = select(Article).options(selectinload(Article.unites))
+    if sous_seuil:
+        # Même règle que la vue v_stock_valorise : stock ≤ seuil (US-STK-03)
+        requete = requete.where(Article.stock_actuel <= Article.stock_minimum)
     if famille is not None:
         requete = requete.where(Article.famille == famille)
     if not inclure_inactifs:

@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Annotated, Self
 
-from pydantic import AfterValidator, BaseModel, ConfigDict, Field, model_validator
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field, computed_field, model_validator
 from pydantic_core import PydanticCustomError
 
 from app.models.enums import FamilleArticle
@@ -63,6 +63,18 @@ class ArticleLecture(BaseModel):
     est_actif: bool
     date_creation: datetime
     unites: list[UniteLecture]
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def valeur_stock(self) -> Decimal:
+        """Valeur au coût moyen (US-STK-02), arrondie au centime comme la vue de la base."""
+        return (self.stock_actuel * self.cout_moyen).quantize(Decimal("0.01"))
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def en_alerte(self) -> bool:
+        """Sous le seuil (stock ≤ seuil), comme la vue v_stock_valorise (US-STK-03)."""
+        return self.stock_actuel <= self.stock_minimum
 
 
 class ArticleCreation(BaseModel):

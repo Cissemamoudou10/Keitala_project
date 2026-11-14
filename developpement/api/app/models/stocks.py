@@ -101,3 +101,5 @@ class LigneInventaire(Base):
     )
     motif: Mapped[MotifEcart | None] = mapped_column(pg_enum(MotifEcart, "motif_ecart_enum"))
     commentaire: Mapped[str | None] = mapped_column(Text)
+    # Coût de l'excédent constaté, pour un article encore sans coût moyen (migration 0002)
+    cout_unitaire: Mapped[Decimal | None] = mapped_column(Numeric(15, 4))

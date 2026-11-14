@@ -49,6 +49,7 @@ function Button({
   asChild = false,
   enCours = false,
   libelleEnCours = "Enregistrement…",
+  type,
   disabled,
   children,
   ...props
@@ -58,6 +59,9 @@ function Button({
   return (
     <Comp
       data-slot="button"
+      // Jamais « submit » par défaut : un bouton d'appoint dans un formulaire (ajouter une
+      // ligne, ouvrir une fiche) ne doit pas l'envoyer. Le bouton d'envoi le déclare.
+      type={asChild ? type : (type ?? "button")}
       className={cn(buttonVariants({ variant, size }), className)}
       disabled={disabled || enCours}
       aria-busy={enCours || undefined}

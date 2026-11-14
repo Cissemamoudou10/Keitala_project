@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.erreurs import enregistrer_gestionnaires_erreurs
-from app.routers import auth, sante, utilisateurs
+from app.routers import articles, auth, sante, tiers, tresorerie, utilisateurs
 
 VERSION = "0.1.0"
 
@@ -27,7 +27,14 @@ def create_app() -> FastAPI:
     )
 
     enregistrer_gestionnaires_erreurs(app)
-    for routeur in (sante.router, auth.router, utilisateurs.router):
+    for routeur in (
+        sante.router,
+        auth.router,
+        utilisateurs.router,
+        tresorerie.router,
+        articles.router,
+        tiers.router,
+    ):
         app.include_router(routeur, prefix="/api/v1")
     return app
 

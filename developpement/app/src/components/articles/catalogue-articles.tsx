@@ -1,11 +1,14 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { History, Plus } from "lucide-react";
 
 import { EditeurUnites } from "@/components/articles/editeur-unites";
 import { FormulaireArticle } from "@/components/articles/formulaire-article";
+import { FormulairePerte } from "@/components/articles/formulaire-perte";
+import { SousNavigationStocks } from "@/components/articles/sous-navigation-stocks";
 import {
   CLE_ARTICLES,
   nomComplet,
@@ -16,6 +19,7 @@ import { Page } from "@/components/coquille/page";
 import { EtatRequete } from "@/components/etats/etat-requete";
 import { EtatVide } from "@/components/etats/etat-vide";
 import { SqueletteTableau } from "@/components/etats/squelettes";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChampRecherche } from "@/components/ui/champ-recherche";
 import { Onglets } from "@/components/ui/onglets";
@@ -37,25 +41,45 @@ import { usePeut } from "@/lib/session";
 
 type Edition = { mode: "creation" } | { mode: "fiche"; article: Article };
 
-/** Catalogue des articles par famille (US-STK-01) et leurs unités de saisie (US-REF-02). */
+type EtatGlobal = {
+  familles: {
+    famille: Famille;
+    nombre_articles: number;
+    valeur: string;
+    nombre_sous_seuil: number;
+  }[];
+  valeur_totale: string;
+  nombre_sous_seuil: number;
+};
+
+/**
+ * État des stocks (US-STK-02, US-STK-03) et catalogue des articles (US-STK-01, US-REF-02) :
+ * onglets par famille, recherche, filtre « Sous le seuil » ; quantité, coût moyen, valeur.
+ */
 export function CatalogueArticles() {
   const ecrire = usePeut("ecrire");
+  const saisirStock = usePeut("saisir_stock");
   const { lire, modifier, page } = useParametresAdresse();
   const famille = (FAMILLES as string[]).includes(lire("famille"))
     ? (lire("famille") as Famille)
     : null;
   const recherche = lire("recherche");
+  const sousSeuil = lire("sous_seuil") === "1";
   const [edition, setEdition] = React.useState<Edition | null>(null);
 
   const familles = useQuery({
     queryKey: [...CLE_ARTICLES, "familles"],
     queryFn: ({ signal }) => appelerApi<Record<Famille, number>>("articles/familles", { signal }),
   });
+  const etat = useQuery({
+    queryKey: [...CLE_ARTICLES, "etat-global"],
+    queryFn: ({ signal }) => appelerApi<EtatGlobal>("stocks/etat-global", { signal }),
+  });
   const requete = useQuery({
-    queryKey: [...CLE_ARTICLES, { famille, recherche, page }],
+    queryKey: [...CLE_ARTICLES, { famille, recherche, sousSeuil, page }],
     queryFn: ({ signal }) =>
       appelerApi<PageArticles>("articles", {
-        parametres: { famille, recherche, page },
+        parametres: { famille, recherche, sous_seuil: sousSeuil || null, page },
         signal,
       }),
     placeholderData: (precedent) => precedent,
@@ -72,9 +96,28 @@ export function CatalogueArticles() {
   return (
     <Page
       titre="Stocks"
-      description="Catalogue des articles, classés par famille."
+      description="Ce qui est en stock, ce que cela vaut, et ce qui manque."
       action={nouvelArticle}
     >
+      <SousNavigationStocks />
+      {etat.data && (
+        <p className="flex flex-wrap gap-x-6 gap-y-1 text-texte-2">
+          <span>
+            Valeur du stock :{" "}
+            <span className="font-semibold text-texte tabular-nums">
+              {formaterMontant(etat.data.valeur_totale)}
+            </span>
+          </span>
+          {etat.data.nombre_sous_seuil > 0 && (
+            <span>
+              <span className="font-semibold text-danger tabular-nums">
+                {etat.data.nombre_sous_seuil}
+              </span>{" "}
+              {etat.data.nombre_sous_seuil > 1 ? "articles sous le seuil" : "article sous le seuil"}
+            </span>
+          )}
+        </p>
+      )}
       <div className="flex flex-col gap-4">
         <Onglets
           libelleAccessible="Famille d'articles"
@@ -89,11 +132,21 @@ export function CatalogueArticles() {
             })),
           ]}
         />
-        <ChampRecherche
-          libelle="Chercher un article (nom ou code)"
-          valeur={recherche}
-          onChange={(valeur) => modifier({ recherche: valeur })}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          <ChampRecherche
+            libelle="Chercher un article (nom ou code)"
+            valeur={recherche}
+            onChange={(valeur) => modifier({ recherche: valeur })}
+          />
+          <Button
+            variant="discret"
+            aria-pressed={sousSeuil}
+            className="aria-pressed:bg-fond-actif"
+            onClick={() => modifier({ sous_seuil: sousSeuil ? null : "1" })}
+          >
+            Sous le seuil
+          </Button>
+        </div>
       </div>
 
       <EtatRequete
@@ -103,13 +156,15 @@ export function CatalogueArticles() {
         vide={
           <EtatVide
             message={
-              recherche
-                ? `Aucun article ne correspond à « ${recherche} ».`
-                : famille
-                  ? `Aucun article dans « ${LIBELLES_FAMILLES[famille]} ».`
-                  : "Le catalogue est vide."
+              sousSeuil
+                ? "Aucun article sous le seuil : les stocks sont suffisants."
+                : recherche
+                  ? `Aucun article ne correspond à « ${recherche} ».`
+                  : famille
+                    ? `Aucun article dans « ${LIBELLES_FAMILLES[famille]} ».`
+                    : "Le catalogue est vide."
             }
-            action={recherche ? undefined : nouvelArticle}
+            action={recherche || sousSeuil ? undefined : nouvelArticle}
           />
         }
       >
@@ -124,8 +179,12 @@ export function CatalogueArticles() {
                   <TableHead numerique className="hidden md:table-cell">
                     Seuil
                   </TableHead>
-                  <TableHead numerique className="hidden md:table-cell">
-                    Prix de vente
+                  <TableHead numerique className="hidden lg:table-cell">
+                    Coût moyen
+                  </TableHead>
+                  <TableHead numerique>Valeur</TableHead>
+                  <TableHead>
+                    <span className="sr-only">État</span>
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -162,11 +221,13 @@ export function CatalogueArticles() {
                     <TableCell numerique className="hidden text-texte-2 md:table-cell">
                       {formaterQuantite(article.stock_minimum, article.unite_base)}
                     </TableCell>
-                    <TableCell numerique className="hidden md:table-cell">
-                      {/* Pas de prix : rien plutôt que « 0 FCFA » (on n'affiche que l'utile) */}
-                      {/^0+(\.0+)?$/.test(article.prix_vente_standard)
-                        ? ""
-                        : formaterMontant(article.prix_vente_standard)}
+                    <TableCell numerique className="hidden text-texte-2 lg:table-cell">
+                      {formaterMontant(article.cout_moyen)}
+                    </TableCell>
+                    <TableCell numerique>{formaterMontant(article.valeur_stock)}</TableCell>
+                    <TableCell>
+                      {/* On ne signale que l'exception (charte, principe 8) */}
+                      {article.en_alerte && <Badge variant="danger">Stock bas</Badge>}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -208,6 +269,13 @@ export function CatalogueArticles() {
                 modifiable
                 onEnregistre={(article) => setEdition({ mode: "fiche", article })}
               />
+              {saisirStock && (
+                <section className="flex flex-col gap-4 border-t border-bordure pt-6">
+                  <h3 className="font-semibold">Déclarer une perte</h3>
+                  <FormulairePerte article={edition.article} onTermine={() => setEdition(null)} />
+                </section>
+              )}
+              <LienMouvements article={edition.article} />
             </div>
           ) : (
             <FicheArticle article={edition.article} />
@@ -238,6 +306,20 @@ function FicheArticle({ article }: { article: Article }) {
         ))}
       </dl>
       <EditeurUnites article={article} modifiable={false} onEnregistre={() => undefined} />
+      <LienMouvements article={article} />
+    </div>
+  );
+}
+
+function LienMouvements({ article }: { article: Article }) {
+  return (
+    <div className="border-t border-bordure pt-6">
+      <Button variant="discret" asChild>
+        <Link href={`/stocks/mouvements?article=${article.id}`}>
+          <History />
+          Voir les mouvements de cet article
+        </Link>
+      </Button>
     </div>
   );
 }

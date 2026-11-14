@@ -18,6 +18,9 @@ export type Article = {
   est_actif: boolean;
   date_creation: string;
   unites: UniteSaisie[];
+  /** Calculés par l'API : valeur au coût moyen, et stock ≤ seuil. */
+  valeur_stock: string;
+  en_alerte: boolean;
 };
 
 export type PageArticles = {

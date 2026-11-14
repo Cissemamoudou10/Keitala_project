@@ -21,6 +21,8 @@ const DROITS = {
   ecrire: ["SUPER_ADMIN", "GESTIONNAIRE"],
   /** Comptes de trésorerie, soldes d'ouverture, dérogation au stock négatif (matrice). */
   parametrer: ["SUPER_ADMIN"],
+  /** Inventaires et pertes : saisis par le Gestionnaire, contrôlés après coup (matrice). */
+  saisir_stock: ["GESTIONNAIRE"],
 } as const satisfies Record<string, readonly Role[]>;
 
 export type Action = keyof typeof DROITS;

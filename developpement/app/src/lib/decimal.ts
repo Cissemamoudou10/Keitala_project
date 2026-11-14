@@ -59,3 +59,20 @@ export function enSaisie(valeur: string): string {
   const sansZeros = texte.includes(".") ? texte.replace(/0+$/, "").replace(/\.$/, "") : texte;
   return sansZeros.replace(".", ",");
 }
+
+/** Différence exacte a − b (null si l'une est illisible), sans zéros inutiles. */
+export function soustraireDecimaux(a: string, b: string): string | null {
+  const x = lire(a);
+  const y = lire(b);
+  if (!x || !y) return null;
+  const echelle = Math.max(x.decimales, y.decimales);
+  const difference =
+    x.valeur * 10n ** BigInt(echelle - x.decimales) -
+    y.valeur * 10n ** BigInt(echelle - y.decimales);
+  const negatif = difference < 0n;
+  const chiffres = (negatif ? -difference : difference).toString().padStart(echelle + 1, "0");
+  const entier = chiffres.slice(0, chiffres.length - echelle);
+  const fraction = echelle > 0 ? chiffres.slice(-echelle).replace(/0+$/, "") : "";
+  const texte = fraction ? `${entier}.${fraction}` : entier;
+  return negatif && texte !== "0" ? `-${texte}` : texte;
+}

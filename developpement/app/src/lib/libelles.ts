@@ -34,3 +34,35 @@ export const LIBELLES_TYPES_COMPTE: Record<TypeCompte, string> = {
 
 /** Unités de base proposées à la saisie ; une autre reste possible. */
 export const UNITES_DE_BASE = ["kg", "L", "sachet", "bouteille", "pot", "unité"];
+
+export type TypeMouvement =
+  | "ENTREE_ACHAT"
+  | "SORTIE_VENTE"
+  | "SORTIE_DON"
+  | "CONSO_PRODUCTION"
+  | "ENTREE_PRODUCTION"
+  | "AJUSTEMENT_INVENTAIRE"
+  | "SORTIE_PERTE"
+  | "ANNULATION";
+
+/** Charte, section 12 : « Sortie de production », pas « Entrée de produit fini ». */
+export const LIBELLES_MOUVEMENTS: Record<TypeMouvement, string> = {
+  ENTREE_ACHAT: "Entrée achat",
+  SORTIE_VENTE: "Sortie vente",
+  SORTIE_DON: "Sortie don",
+  CONSO_PRODUCTION: "Consommation de production",
+  ENTREE_PRODUCTION: "Sortie de production",
+  AJUSTEMENT_INVENTAIRE: "Ajustement d'inventaire",
+  SORTIE_PERTE: "Perte",
+  ANNULATION: "Annulation",
+};
+
+export type MotifEcart = "CASSE" | "AVARIE" | "DESSICCATION" | "ERREUR_COMPTAGE" | "AUTRE";
+
+export const LIBELLES_MOTIFS: Record<MotifEcart, string> = {
+  CASSE: "Casse",
+  AVARIE: "Avarie",
+  DESSICCATION: "Dessiccation",
+  ERREUR_COMPTAGE: "Erreur de comptage",
+  AUTRE: "Autre",
+};

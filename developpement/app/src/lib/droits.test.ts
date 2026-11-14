@@ -21,6 +21,12 @@ describe("peut", () => {
     expect(peut("CONSULTANT", "parametrer")).toBe(false);
   });
 
+  it("réserve inventaires et pertes au Gestionnaire (matrice des droits)", () => {
+    expect(peut("GESTIONNAIRE", "saisir_stock")).toBe(true);
+    expect(peut("SUPER_ADMIN", "saisir_stock")).toBe(false);
+    expect(peut("CONSULTANT", "saisir_stock")).toBe(false);
+  });
+
   it("refuse tout tant que la session n'est pas connue", () => {
     expect(peut(null, "ecrire")).toBe(false);
     expect(peut(undefined, "gerer_utilisateurs")).toBe(false);

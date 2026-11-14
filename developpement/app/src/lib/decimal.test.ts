@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { enSaisie, estInferieur, multiplierDecimaux } from "@/lib/decimal";
+import { enSaisie, estInferieur, multiplierDecimaux, soustraireDecimaux } from "@/lib/decimal";
 
 describe("multiplierDecimaux", () => {
   it.each([
@@ -38,5 +38,17 @@ describe("enSaisie", () => {
     ["1500", "1500"],
   ])("%s → %s", (valeur, attendu) => {
     expect(enSaisie(valeur)).toBe(attendu);
+  });
+});
+
+describe("soustraireDecimaux", () => {
+  it.each([
+    ["97", "100.000", "-3"],
+    ["1000", "0.000", "1000"],
+    ["12,5", "12.500", "0"],
+    ["0.3", "0.1", "0.2"], // 0.19999999999999998 en flottant
+    ["x", "1", null],
+  ])("%s − %s = %s", (a, b, attendu) => {
+    expect(soustraireDecimaux(a, b)).toBe(attendu);
   });
 });

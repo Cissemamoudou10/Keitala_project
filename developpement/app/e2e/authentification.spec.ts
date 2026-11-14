@@ -62,19 +62,22 @@ test("le Consultant ne voit pas l'administration et en est refusé", async ({ pa
 
 test("le Super Admin crée un compte puis le désactive", async ({ page }, infoTest) => {
   // Adresse unique : la base de développement garde les comptes d'un passage à l'autre
-  const email = `e2e-${infoTest.project.name}-${Date.now()}@keitala.ml`;
+  const horodatage = Date.now();
+  const email = `e2e-${infoTest.project.name}-${horodatage}@keitala.ml`;
+  // Nom unique aussi : la liste contient les comptes des passages précédents
+  const nom = `Mariam Coulibaly ${horodatage}`;
   await connecter(page, "SUPER_ADMIN");
   await page.goto("/administration");
   await expect(page.getByRole("heading", { level: 1, name: "Utilisateurs" })).toBeVisible();
 
   await page.getByRole("button", { name: "Nouvel utilisateur" }).click();
   const panneau = page.getByRole("dialog", { name: "Nouvel utilisateur" });
-  await panneau.getByLabel("Nom complet").fill("Mariam Coulibaly");
+  await panneau.getByLabel("Nom complet").fill(nom);
   await panneau.getByLabel("Adresse email").fill(email);
   await panneau.getByLabel("Mot de passe").fill("mot-de-passe-provisoire");
   await panneau.getByRole("button", { name: "Créer le compte" }).click();
 
-  await expect(page.getByText("Compte de Mariam Coulibaly créé")).toBeVisible();
+  await expect(page.getByText(`Compte de ${nom} créé`)).toBeVisible();
   await expect(panneau).toBeHidden();
 
   // Le nouveau compte peut se connecter
@@ -86,9 +89,9 @@ test("le Super Admin crée un compte puis le désactive", async ({ page }, infoT
 
   // Désactivation depuis le panneau du compte
   await page.goto("/administration");
-  await page.getByRole("button", { name: "Mariam Coulibaly" }).first().click();
+  await page.getByRole("button", { name: nom }).click();
   await page.getByRole("button", { name: "Désactiver le compte" }).click();
-  await expect(page.getByText("Compte de Mariam Coulibaly désactivé")).toBeVisible();
+  await expect(page.getByText(`Compte de ${nom} désactivé`)).toBeVisible();
 
   const refus = await page.request.post("/api/auth/connexion", {
     data: { email, mot_de_passe: "mot-de-passe-provisoire" },

@@ -70,6 +70,6 @@ class LigneAchat(Base):
     )
     montant_total: Mapped[Decimal] = mapped_column(
         Numeric(15, 2),
-        Computed("round(quantite * prix_unitaire, 2)", persisted=True),
+        Computed("round(quantite * prix_unitaire, 0)", persisted=True),
         nullable=True,
     )

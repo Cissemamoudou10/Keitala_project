@@ -494,3 +494,26 @@ async def test_filtres_de_l_historique(
     assert par_nom.json()["total"] == 2
     assert par_nom.json()["items"][0]["fournisseur"] == "Coopérative de Ségou"
     assert futur.json()["total"] == 0
+
+
+async def test_montant_arrondi_au_franc_et_soldable(
+    client: AsyncClient, db_session: AsyncSession, gestionnaire: Utilisateur
+) -> None:
+    """P-019 : 1,5 kg à 333 FCFA = 499,5 → 500 FCFA, payable en francs entiers."""
+    await alimenter(db_session, "CAISSE", "1000", gestionnaire)
+    mais = await article(db_session, "MP-MAI")
+    caisse = await compte(db_session, "CAISSE")
+
+    reponse = await client.post(
+        "/api/v1/achats",
+        json=achat(
+            [{"article_id": str(mais.id), "quantite": "1.5", "prix_unitaire": "333"}],
+            reglements=[{"compte_id": caisse.id, "montant": "500"}],
+        ),
+        headers=entetes_pour(gestionnaire),
+    )
+
+    assert reponse.status_code == 201
+    detail = reponse.json()
+    assert (detail["montant_total"], detail["lignes"][0]["montant_total"]) == ("500.00", "500.00")
+    assert detail["reste_a_payer"] == "0.00"

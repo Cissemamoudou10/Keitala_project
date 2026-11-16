@@ -43,8 +43,18 @@ from app.schemas.achats import (
 from app.schemas.common import PaginationParams
 from app.schemas.stocks import ArticleResume
 from app.services.numerotation import prochain_numero
+from app.services.pieces import (
+    COUT,
+    aujourd_hui,
+    exiger_articles_actifs,
+    facteurs_des_lignes,
+    fcfa,
+    montant_ligne,
+    nom_article,
+    quantite_base,
+    verrouiller_comptes,
+)
 from app.services.stocks import (
-    FUSEAU,
     ecrire_mouvement_stock,
     formater_quantite,
     noms_des_auteurs,
@@ -52,21 +62,9 @@ from app.services.stocks import (
 )
 from app.services.tresorerie import ecrire_mouvement_tresorerie
 
-QUANTITE = Decimal("0.001")
-CENTIME = Decimal("0.01")
-COUT = Decimal("0.0001")
-
-
-def _fcfa(montant: Decimal) -> str:
-    return f"{format(montant.quantize(Decimal(1)), ',').replace(',', ' ')} FCFA"
-
 
 def _introuvable() -> ErreurMetier:
     return ErreurMetier("ACHAT_INTROUVABLE", "Cet achat n'existe pas.", status.HTTP_404_NOT_FOUND)
-
-
-def aujourd_hui() -> date:
-    return datetime.now(FUSEAU).date()
 
 
 # --- Lecture -------------------------------------------------------------------------
@@ -238,32 +236,6 @@ async def lire_achat(session: AsyncSession, achat_id: uuid.UUID) -> AchatDetail:
 # --- Règlements (communs à la création et aux paiements ultérieurs) ------------------
 
 
-async def _verrouiller_comptes(session: AsyncSession, ids: set[int]) -> dict[int, CompteTresorerie]:
-    comptes = {
-        c.id: c
-        for c in (
-            await session.execute(
-                select(CompteTresorerie)
-                .where(CompteTresorerie.id.in_(sorted(ids)))
-                .order_by(CompteTresorerie.id)
-                .with_for_update()
-            )
-        ).scalars()
-    }
-    for identifiant in ids:
-        compte = comptes.get(identifiant)
-        if compte is None:
-            raise ErreurMetier(
-                "COMPTE_INTROUVABLE", "Un des comptes de paiement n'existe pas.", 404
-            )
-        if not compte.est_actif:
-            raise ErreurMetier(
-                "COMPTE_INACTIF",
-                f"Le compte « {compte.nom} » est désactivé : choisissez-en un autre.",
-            )
-    return comptes
-
-
 async def _payer(
     session: AsyncSession,
     achat: Achat,
@@ -333,43 +305,22 @@ async def creer_achat(
 
     # Articles verrouillés (ordre des identifiants), puis unités de saisie
     articles = await verrouiller_articles(session, [ligne.article_id for ligne in donnees.lignes])
-    for article in articles.values():
-        if not article.est_actif:
-            raise ErreurMetier(
-                "ARTICLE_INACTIF",
-                f"L'article « {article.designation} » est retiré du catalogue.",
-            )
-    ids_unites = {ligne.unite_id for ligne in donnees.lignes if ligne.unite_id is not None}
-    unites = {
-        u.id: u
-        for u in (
-            await session.execute(select(ArticleUnite).where(ArticleUnite.id.in_(ids_unites)))
-        ).scalars()
-    }
+    exiger_articles_actifs(articles)
+    facteurs = await facteurs_des_lignes(session, donnees.lignes)
 
     calculs = []
     total = Decimal(0)
-    for saisie in donnees.lignes:
-        facteur = Decimal(1)
-        if saisie.unite_id is not None:
-            unite = unites.get(saisie.unite_id)
-            if unite is None or unite.article_id != saisie.article_id:
-                raise ErreurMetier(
-                    "UNITE_INTROUVABLE", "Une unité n'appartient pas à l'article de sa ligne.", 404
-                )
-            facteur = unite.facteur_vers_base
-        quantite_base = (saisie.quantite * facteur).quantize(QUANTITE, ROUND_HALF_UP)
-        montant = (saisie.quantite * saisie.prix_unitaire).quantize(CENTIME, ROUND_HALF_UP)
+    for saisie, facteur in zip(donnees.lignes, facteurs, strict=True):
         # Coût d'entrée par unité de base : prix du sac ÷ kg du sac (US-ACH-01, PUMP)
         cout_entree = (saisie.prix_unitaire / facteur).quantize(COUT, ROUND_HALF_UP)
-        calculs.append((saisie, facteur, quantite_base, cout_entree))
-        total += montant
+        calculs.append((saisie, facteur, quantite_base(saisie, facteur), cout_entree))
+        total += montant_ligne(saisie)
 
     regle = sum((r.montant for r in donnees.reglements), start=Decimal(0))
     if regle > total:
         raise ErreurMetier(
             "REGLEMENT_SUPERIEUR",
-            f"Les paiements ({_fcfa(regle)}) dépassent le total de l'achat ({_fcfa(total)}).",
+            f"Les paiements ({fcfa(regle)}) dépassent le total de l'achat ({fcfa(total)}).",
             details={"champ": "reglements"},
         )
     if regle < total and fournisseur is None:
@@ -379,7 +330,7 @@ async def creer_achat(
             "ou réglez la totalité.",
             details={"champ": "fournisseur_id"},
         )
-    comptes = await _verrouiller_comptes(session, {r.compte_id for r in donnees.reglements})
+    comptes = await verrouiller_comptes(session, {r.compte_id for r in donnees.reglements})
 
     achat = Achat(
         numero=await prochain_numero(session, "ACH", date_achat),
@@ -395,7 +346,7 @@ async def creer_achat(
     session.add(achat)
     await session.flush()
 
-    for saisie, facteur, quantite_base, cout_entree in calculs:
+    for saisie, facteur, base, cout_entree in calculs:
         session.add(
             LigneAchat(
                 achat_id=achat.id,
@@ -410,7 +361,7 @@ async def creer_achat(
             session,
             articles[saisie.article_id],
             type_mouvement=TypeMouvementStock.ENTREE_ACHAT,
-            quantite=quantite_base,
+            quantite=base,
             cout_entree=cout_entree,
             utilisateur_id=auteur.id,
             achat_id=achat.id,
@@ -470,10 +421,10 @@ async def payer_achat(
     if donnees.montant > reste:
         raise ErreurMetier(
             "MONTANT_SUPERIEUR_AU_RESTE",
-            f"Le reste à payer est de {_fcfa(reste)} : le paiement ne peut pas le dépasser.",
+            f"Le reste à payer est de {fcfa(reste)} : le paiement ne peut pas le dépasser.",
             details={"champ": "montant", "reste_a_payer": str(reste)},
         )
-    compte = (await _verrouiller_comptes(session, {donnees.compte_id}))[donnees.compte_id]
+    compte = (await verrouiller_comptes(session, {donnees.compte_id}))[donnees.compte_id]
     fournisseur = await session.get(Tiers, achat.fournisseur_id) if achat.fournisseur_id else None
     await _payer(
         session,
@@ -526,12 +477,11 @@ async def annuler_achat(
     for article_id, quantite in a_reprendre.items():
         article = articles[article_id]
         if article.stock_actuel < quantite and not article.autoriser_stock_negatif:
-            nom = f"{article.designation} {article.contenance or ''}".strip()
             raise ErreurMetier(
                 "ANNULATION_IMPOSSIBLE",
                 "Impossible d'annuler : il reste "
                 f"{formater_quantite(article.stock_actuel, article.unite_base)} "
-                f"de {nom}, alors que l'achat en a fait entrer "
+                f"de {nom_article(article)}, alors que l'achat en a fait entrer "
                 f"{formater_quantite(quantite, article.unite_base)}. Une partie a déjà été "
                 "vendue ou consommée.",
                 status.HTTP_409_CONFLICT,
@@ -563,7 +513,7 @@ async def annuler_achat(
             )
         ).scalars()
     )
-    comptes = await _verrouiller_comptes_existants(session, {r.compte_id for r in reglements})
+    comptes = await verrouiller_comptes(session, {r.compte_id for r in reglements}, actifs=False)
     maintenant = datetime.now(UTC)
     for reglement in reglements:
         reglement.statut = StatutDocument.ANNULE
@@ -587,21 +537,3 @@ async def annuler_achat(
     achat.motif_annulation = motif.strip()
     await session.commit()
     return await lire_achat(session, achat_id)
-
-
-async def _verrouiller_comptes_existants(
-    session: AsyncSession, ids: set[int]
-) -> dict[int, CompteTresorerie]:
-    """Comme `_verrouiller_comptes`, sans exiger un compte actif : une contre-passation
-    revient toujours sur le compte d'origine, même désactivé depuis."""
-    return {
-        c.id: c
-        for c in (
-            await session.execute(
-                select(CompteTresorerie)
-                .where(CompteTresorerie.id.in_(sorted(ids)))
-                .order_by(CompteTresorerie.id)
-                .with_for_update()
-            )
-        ).scalars()
-    }

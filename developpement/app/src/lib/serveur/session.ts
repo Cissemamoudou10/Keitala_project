@@ -59,10 +59,23 @@ export async function rafraichirJetons(
 ): Promise<JetonsApi | null> {
   const reponse = await fetch(`${base}/api/v1/auth/refresh`, {
     method: "POST",
-    headers: { "content-type": "application/json", accept: "application/json" },
+    headers: avecCleProxy(
+      new Headers({ "content-type": "application/json", accept: "application/json" }),
+    ),
     body: JSON.stringify({ jeton_rafraichissement: jetonRafraichissement }),
     cache: "no-store",
     signal: AbortSignal.timeout(10_000),
   });
   return reponse.ok ? ((await reponse.json()) as JetonsApi) : null;
+}
+
+/**
+ * En-tête secret ajouté à chaque appel vers l'API (D-037) : en production, le reverse
+ * proxy du VPS refuse toute requête qui ne le porte pas, si bien que seul ce serveur
+ * Next peut parler à l'API. Absent en développement (variable non définie).
+ */
+export function avecCleProxy(entetes: Headers): Headers {
+  const cle = process.env.API_CLE_PROXY;
+  if (cle) entetes.set("x-cle-proxy", cle);
+  return entetes;
 }

@@ -1,0 +1,28 @@
+# Reverse proxy HTTPS partagé du VPS : /opt/apps/caddy/ (D-037).
+# Seul conteneur publié sur Internet (80 pour le défi Let's Encrypt, 443).
+# Les applications le rejoignent sur le réseau « web ».
+name: caddy
+
+services:
+  caddy:
+    image: caddy:2.10.2-alpine
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - web
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  web:
+    external: true

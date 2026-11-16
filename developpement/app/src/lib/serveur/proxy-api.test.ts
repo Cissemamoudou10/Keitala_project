@@ -32,6 +32,20 @@ describe("relayerVersApi", () => {
     expect(entetes.get("cookie")).toBeNull();
   });
 
+  it("porte l'en-tête secret du reverse proxy seulement s'il est configuré (D-037)", async () => {
+    vi.stubEnv("API_URL", "http://api.test");
+    const fetchSimule = vi.fn().mockResolvedValue(Response.json({}));
+    vi.stubGlobal("fetch", fetchSimule);
+
+    await relayerVersApi(requete("/api/ventes"), ["ventes"]);
+    vi.stubEnv("API_CLE_PROXY", "secret-de-test");
+    await relayerVersApi(requete("/api/ventes"), ["ventes"]);
+
+    const [sans, avec] = fetchSimule.mock.calls.map(([, options]) => options.headers as Headers);
+    expect(sans.get("x-cle-proxy")).toBeNull();
+    expect(avec.get("x-cle-proxy")).toBe("secret-de-test");
+  });
+
   it("refuse de sortir de /api/v1", async () => {
     vi.stubEnv("API_URL", "http://api.test");
     const fetchSimule = vi.fn();

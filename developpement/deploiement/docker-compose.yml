@@ -1,0 +1,55 @@
+# Keitala en production sur le VPS : /opt/apps/keitala/ (D-037).
+# - API et base sur un réseau interne ; la base n'est jamais publiée.
+# - L'API rejoint le réseau partagé « web », où le reverse proxy Caddy la joint par son nom.
+#   Aucun port publié : seul Caddy (80/443) est exposé.
+# - Secrets dans .env (généré sur le serveur par generer-env.sh, chmod 600).
+name: keitala
+
+services:
+  db:
+    image: postgres:16.11-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: keitala
+      POSTGRES_USER: keitala
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - keitala_pgdata:/var/lib/postgresql/data
+    networks:
+      - interne
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keitala -d keitala"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./api
+      args:
+        DEPENDANCES: --no-dev
+    image: keitala-api:courante
+    container_name: keitala-api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://keitala:${POSTGRES_PASSWORD}@db:5432/keitala
+    # Migrations appliquées à chaque démarrage (sans effet si la base est à jour)
+    command: >-
+      sh -c "uv run --frozen --no-sync alembic upgrade head
+      && uv run --frozen --no-sync uvicorn app.main:app --host 0.0.0.0 --port 8000
+      --workers 2 --proxy-headers --forwarded-allow-ips '*'"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - interne
+      - web
+
+volumes:
+  keitala_pgdata:
+
+networks:
+  interne:
+  web:
+    external: true

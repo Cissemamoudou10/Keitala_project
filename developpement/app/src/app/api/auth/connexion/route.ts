@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { poserCookiesSession, urlApi, type JetonsApi } from "@/lib/serveur/session";
+import { avecCleProxy, poserCookiesSession, urlApi, type JetonsApi } from "@/lib/serveur/session";
 
 /**
  * Connexion (US-AUTH-01) : transmet les identifiants à l'API et dépose les jetons dans
@@ -19,7 +19,9 @@ export async function POST(requete: NextRequest) {
   try {
     reponse = await fetch(`${base}/api/v1/auth/login`, {
       method: "POST",
-      headers: { "content-type": "application/json", accept: "application/json" },
+      headers: avecCleProxy(
+        new Headers({ "content-type": "application/json", accept: "application/json" }),
+      ),
       body: await requete.text(),
       cache: "no-store",
       signal: AbortSignal.timeout(15_000),

@@ -4,6 +4,7 @@ import {
   COOKIE_ACCES,
   COOKIE_RAFRAICHISSEMENT,
   effacerCookiesSession,
+  avecCleProxy,
   poserCookiesSession,
   rafraichirJetons,
   urlApi,
@@ -58,7 +59,7 @@ export async function relayerVersApi(requete: NextRequest, chemin: string[]): Pr
     if (jeton) entetes.set("authorization", `Bearer ${jeton}`);
     return fetch(cible, {
       method: methode,
-      headers: entetes,
+      headers: avecCleProxy(entetes),
       body: corps,
       cache: "no-store",
       redirect: "manual",

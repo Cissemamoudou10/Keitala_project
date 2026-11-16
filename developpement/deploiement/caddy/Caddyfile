@@ -1,0 +1,24 @@
+# Certificats Let's Encrypt obtenus et renouvelés automatiquement par Caddy (sans adresse
+# e-mail : aucune donnée personnelle transmise).
+
+# API Keitala. Pas encore de nom de domaine : adresse sslip.io, qui pointe vers l'IP du
+# VPS (choix de l'utilisateur, 16/11/2026). À remplacer par un vrai domaine avant la mise
+# en service réelle.
+keitala-api.162-55-158-90.sslip.io {
+	# Seul le serveur Next (Vercel) connaît la clé : toute autre requête est refusée
+	@sans_cle not header X-Cle-Proxy {$KEITALA_CLE_PROXY}
+	respond @sans_cle "Accès refusé" 403
+
+	reverse_proxy keitala-api:8000
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		-Server
+	}
+	encode gzip
+	log {
+		output stdout
+		format console
+	}
+}

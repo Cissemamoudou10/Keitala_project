@@ -254,7 +254,7 @@ export type LibellesAnnulation = {
 };
 
 /** Annulation (US-ACH-04, US-VTE-06) : rappelle les effets et exige un motif (charte). */
-export function AnnulationPiece<T extends PieceLue>({
+export function AnnulationPiece<T extends { id: string; numero: string }>({
   piece,
   adresse,
   effets,
@@ -405,7 +405,7 @@ export function Totaux({
   libelleRegle: string;
 }) {
   return (
-    <dl className="bg-fond-2 flex flex-col gap-2 rounded-md p-4 tabular-nums">
+    <dl className="flex flex-col gap-2 rounded-md bg-fond-doux p-4 tabular-nums">
       <Ligne libelle="Total">
         <span className="font-semibold">{formaterMontant(piece.montant_total)}</span>
       </Ligne>

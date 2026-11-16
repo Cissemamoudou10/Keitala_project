@@ -5,11 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 
 import { CLE_ARTICLES } from "@/components/articles/types";
 import { Page } from "@/components/coquille/page";
+import { CLE_CONTROLES, type NombreAControler } from "@/components/controles/pieces-a-controler";
 import { EtatRequete } from "@/components/etats/etat-requete";
 import { SqueletteChiffresCles } from "@/components/etats/squelettes";
 import { Badge } from "@/components/ui/badge";
 import { appelerApi } from "@/lib/api";
 import { formaterMontant } from "@/lib/formats";
+import { usePeut } from "@/lib/session";
 
 type EtatGlobal = { valeur_totale: string; nombre_sous_seuil: number };
 
@@ -21,6 +23,13 @@ export function TableauDeBord() {
   const etat = useQuery({
     queryKey: [...CLE_ARTICLES, "etat-global"],
     queryFn: ({ signal }) => appelerApi<EtatGlobal>("stocks/etat-global", { signal }),
+  });
+  // Super Admin : opérations à contrôler après coup (US-TRES-05)
+  const controler = usePeut("controler");
+  const aControler = useQuery({
+    queryKey: [...CLE_CONTROLES, "nombre"],
+    queryFn: ({ signal }) => appelerApi<NombreAControler>("controles/nombre", { signal }),
+    enabled: controler,
   });
 
   return (
@@ -48,6 +57,17 @@ export function TableauDeBord() {
                 )}
               </p>
             </Link>
+            {controler && aControler.data && (
+              <Link
+                href="/administration/controles"
+                className="flex flex-col gap-2 rounded-md border border-bordure p-4 transition-colors hover:bg-fond-survol"
+              >
+                <h2 className="text-texte-2">Pièces à contrôler</h2>
+                <p className="text-chiffre-cle font-semibold tabular-nums">
+                  {aControler.data.total}
+                </p>
+              </Link>
+            )}
           </div>
         )}
       </EtatRequete>

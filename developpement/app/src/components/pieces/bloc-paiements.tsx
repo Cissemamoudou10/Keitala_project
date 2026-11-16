@@ -237,7 +237,7 @@ export function Recapitulatif({
   return (
     <section
       aria-label="Récapitulatif"
-      className="bg-fond-2 flex flex-col gap-2 rounded-md p-4 tabular-nums"
+      className="flex flex-col gap-2 rounded-md bg-fond-doux p-4 tabular-nums"
     >
       <p className="flex justify-between">
         <span>{libelleTotal}</span>

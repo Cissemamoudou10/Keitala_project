@@ -6,7 +6,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 
 import { AccesRefuse } from "@/components/coquille/acces-refuse";
+import { ENTREES_ADMINISTRATION } from "@/components/controles/pieces-a-controler";
 import { Page } from "@/components/coquille/page";
+import { SousNavigation } from "@/components/ui/sous-navigation";
 import { EtatRequete } from "@/components/etats/etat-requete";
 import { EtatVide } from "@/components/etats/etat-vide";
 import { SqueletteTableau } from "@/components/etats/squelettes";
@@ -84,6 +86,7 @@ function ListeUtilisateurs({ moi }: { moi: Utilisateur }) {
         </Button>
       }
     >
+      <SousNavigation libelle="Administration" entrees={ENTREES_ADMINISTRATION} />
       <EtatRequete
         requete={requete}
         chargement={<SqueletteTableau lignes={4} colonnes={4} />}

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 
@@ -18,6 +19,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Panneau } from "@/components/ui/panneau";
+import { SousNavigationTresorerie } from "@/components/tresorerie/sous-navigation-tresorerie";
+import { SyntheseTresorerie } from "@/components/tresorerie/synthese-tresorerie";
 import { appelerApi } from "@/lib/api";
 import { formaterMontant } from "@/lib/formats";
 import { LIBELLES_TYPES_COMPTE } from "@/lib/libelles";
@@ -56,6 +59,8 @@ export function ComptesTresorerie() {
         )
       }
     >
+      <SousNavigationTresorerie />
+      <SyntheseTresorerie />
       <EtatRequete
         requete={requete}
         chargement={<SqueletteChiffresCles nombre={5} />}
@@ -132,18 +137,21 @@ function CarteCompte({
         {formaterMontant(compte.solde_actuel)}
       </p>
       {ouvertureAttendue && <Badge variant="attention">Solde d&apos;ouverture à saisir</Badge>}
-      {parametrer && (
-        <div className="mt-auto flex flex-wrap gap-1 border-t border-bordure pt-2">
-          {ouvertureAttendue && (
-            <Button variant="discret" onClick={() => onEdition("ouverture")}>
-              Saisir le solde d&apos;ouverture
-            </Button>
-          )}
+      <div className="mt-auto flex flex-wrap gap-1 border-t border-bordure pt-2">
+        <Button asChild variant="discret">
+          <Link href={`/tresorerie/journal?compte=${compte.id}`}>Voir le journal</Link>
+        </Button>
+        {ouvertureAttendue && (
+          <Button variant="discret" onClick={() => onEdition("ouverture")}>
+            Saisir le solde d&apos;ouverture
+          </Button>
+        )}
+        {parametrer && (
           <Button variant="discret" onClick={() => onEdition("modification")}>
             Modifier
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </article>
   );
 }

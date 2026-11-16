@@ -27,6 +27,10 @@ const DROITS = {
   saisir_achat: ["GESTIONNAIRE"],
   /** Ventes, dons, encaissements et annulations : Gestionnaire seul (matrice). */
   saisir_vente: ["GESTIONNAIRE"],
+  /** Dépenses, transferts et clôtures de caisse : Gestionnaire seul (matrice). */
+  saisir_tresorerie: ["GESTIONNAIRE"],
+  /** Contrôle a posteriori des opérations sensibles (US-TRES-05, règle 9). */
+  controler: ["SUPER_ADMIN"],
 } as const satisfies Record<string, readonly Role[]>;
 
 export type Action = keyof typeof DROITS;

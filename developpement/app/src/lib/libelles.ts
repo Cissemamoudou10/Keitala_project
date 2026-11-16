@@ -66,3 +66,22 @@ export const LIBELLES_MOTIFS: Record<MotifEcart, string> = {
   ERREUR_COMPTAGE: "Erreur de comptage",
   AUTRE: "Autre",
 };
+
+export type TypeFlux =
+  | "SOLDE_INITIAL"
+  | "ENCAISSEMENT_VENTE"
+  | "DECAISSEMENT_ACHAT"
+  | "DEPENSE_EXPLOITATION"
+  | "TRANSFERT_INTERNE"
+  | "ECART_CLOTURE"
+  | "ANNULATION";
+
+export const LIBELLES_FLUX: Record<TypeFlux, string> = {
+  SOLDE_INITIAL: "Solde d'ouverture",
+  ENCAISSEMENT_VENTE: "Encaissement de vente",
+  DECAISSEMENT_ACHAT: "Paiement d'achat",
+  DEPENSE_EXPLOITATION: "Dépense",
+  TRANSFERT_INTERNE: "Transfert",
+  ECART_CLOTURE: "Écart de clôture",
+  ANNULATION: "Annulation",
+};

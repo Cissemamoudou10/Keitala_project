@@ -157,6 +157,11 @@ Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack 
 - `/production` (ordres), `/production/ordres/[id]` (fiche : sorties, clôture, annulation), `/production/recettes`. Droits : `gerer_recettes` (Super Admin et Gestionnaire), `piloter_production` (Gestionnaire).
 - Calcul : `diviserDecimaux` (besoins, rendement). `formaterPourcentage` attend une valeur déjà en pourcentage (0,25 → multiplier par 100).
 
+## Pilotage (Sprint 8)
+
+- `/tableau-de-bord` (chiffres clés, graphique `GraphiqueVentes` en SVG, à traiter) et `/tableau-de-bord/marges`.
+- Exports : `<Exports fichier="stocks" parametres={…} />` (lien vers `/api/exports/<fichier>.xlsx` et impression). Pour l'impression, `print:hidden` masque ce qui n'a rien à faire sur papier (menu, filtres, boutons).
+
 ## Next.js 16 : à savoir
 
 - Version récente : lire le guide utile dans `node_modules/next/dist/docs/` avant d'écrire du code (rappel dans `AGENTS.md` de ce dossier, recréé par `next dev`).

@@ -267,3 +267,12 @@ Chaque décision qui engage le projet est notée ici, avec sa raison. Une décis
   - Annulation : seulement un ordre en cours (aucun stock n'a bougé), motif ajouté aux observations ; un ordre terminé ne s'annule pas.
 - **Conséquences** : si un ordre de transformation produit des semi-finis d'unités différentes, la répartition « par quantité » n'a pas de sens ; à revoir si le cas se présente.
 
+## D-036 — Pilotage : tableau de bord, marges, exports sans dépendance
+- **Date** : 16/11/2026 · **Statut** : Proposée · **Auteur** : Claude
+- **Contexte** : Sprint 8 (US-DASH-01 à 03). L'ajout de la bibliothèque `openpyxl` pour les exports Excel a été refusé par la règle « pas de dépendance hors de la stack sans justification » ; l'utilisateur avait aussi choisi l'impression du navigateur plutôt qu'un PDF serveur pour les factures (D-032).
+- **Décisions** :
+  - Tableau de bord : six chiffres clés (ventes du jour et du mois, trésorerie, créances, valeur du stock, articles sous le seuil), soldes par compte avec dettes, ordres en cours et, pour le Super Admin, pièces à contrôler ; un graphique (ventes des 30 derniers jours, barres dans la couleur d'accent, survol, tableau des valeurs) ; « À traiter » : 5 stocks les plus bas, 5 impayés les plus anciens. Chiffre d'affaires = ventes validées hors dons, par date de vente. Ouvert à tous les rôles (matrice : accès complet).
+  - Marges : par article, chiffre d'affaires moins coût de revient (coût moyen copié sur chaque ligne de vente), en FCFA et en % ; dons et ventes annulées exclus ; triées par marge décroissante ; filtre par période.
+  - Exports : Excel par l'API (`/exports/{stocks,journal,ventes,marges}.xlsx`) avec un classeur écrit par la bibliothèque standard (`app/core/excel.py` : zip + XML, une feuille, en-tête en gras, nombres formatés), sans nouvelle dépendance ; PDF par « Imprimer ou PDF » (impression du navigateur), le menu et les boutons masqués à l'impression.
+- **Conséquences** : un classeur très simple (une feuille) ; si le client veut des mises en forme avancées, il faudra ajouter une bibliothèque (à justifier).
+

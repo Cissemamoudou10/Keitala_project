@@ -17,6 +17,15 @@ Une entrée par session de travail, **la plus récente en haut**. C'est le relai
 
 ---
 
+## 2026-11-16 — Claude Code — Sprint 8 : pilotage
+- **Tâche** : US-DASH-01 à 03. L'utilisateur a fixé la suite : déploiement (Vercel + VPS), jeu de données complet, cahier de recette joué puis envoyé au client, corrections après leur retour.
+- **Fait** : API : `/tableau-de-bord/indicateurs`, `/tableau-de-bord/marges`, `/exports/{stocks,journal,ventes,marges}.xlsx` (classeur écrit par la bibliothèque standard après le refus d'ajouter `openpyxl`). App : tableau de bord (six chiffres clés, soldes, graphique SVG des ventes sur 30 jours avec survol et tableau, à traiter), page Marges, boutons « Exporter Excel » et « Imprimer ou PDF » sur stocks, journal, ventes et marges ; menu masqué à l'impression.
+- **Non fait / en cours** : rien sur le périmètre. Le classeur Excel n'a pas été ouvert dans Excel même (pas d'Excel sur le poste) : structure vérifiée par les tests ; à ouvrir une fois par l'utilisateur.
+- **Vérifications** : API : ruff, format, mypy, 162 tests (4 nouveaux). App : format, lint, types, 123 tests Vitest, build, 77 parcours Playwright verts (6 nouveaux). Couleur du graphique validée (script du guide de visualisation : contraste et luminance). Captures bureau et 768 px, impression des marges, console sans erreur. Corrigés en route : dates de l'axe qui se chevauchaient ; période absente de l'impression des marges.
+- **Décisions** : D-036.
+- **Problèmes** : aucun nouveau.
+- **À reprendre par le suivant** : Sprint 9, déploiement.
+
 ## 2026-11-16 — Claude Code — Sprint 7 : production
 - **Tâche** : US-PROD-01 à 04.
 - **Fait** : API : `/production/recettes` (liste, création, détail, modification), `/production/ordres` (liste, lancement, détail avec besoins et manques, `/sorties`, `/sorties/{id}/retirer`, `/cloturer`, `/annuler`). App : Production › Ordres de fabrication (onglets, lancement en panneau avec besoins calculés et manques), fiche d'un ordre (`/production/ordres/[id]` : composants, sorties au fil des jours, clôture avec consommé pré-rempli, pertes, rendement en direct, confirmation des effets ; coût et rendement une fois terminé), Production › Recettes (cartes, saisie en panneau). `diviserDecimaux` et `chercherArticlesDeFamille` ajoutés.

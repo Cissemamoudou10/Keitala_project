@@ -36,10 +36,17 @@ LIBELLES_MOTIFS = {
 }
 
 
+# Unités abrégées : jamais de « s » au pluriel (même règle que l'app)
+UNITES_INVARIABLES = {"kg", "g", "t", "l", "L", "ml", "cl", "m", "cm"}
+
+
 def formater_quantite(quantite: Decimal, unite: str) -> str:
-    """« 12.000 », « sachet » → « 12 sachet(s) » pour les messages d'erreur."""
+    """« 12.000 », « sachet » → « 12 sachets » ; « 3 », « Sac 50 kg » → « 3 Sacs 50 kg »."""
     texte = format(quantite.normalize(), "f").replace(".", ",")
-    return f"{texte} {unite}"
+    premier, *reste = unite.split(" ")
+    if quantite >= 2 and premier not in UNITES_INVARIABLES and premier[-1:].lower() not in "sxz":
+        premier += "s"
+    return f"{texte} {' '.join([premier, *reste])}"
 
 
 async def verrouiller_articles(

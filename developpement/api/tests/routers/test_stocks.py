@@ -437,3 +437,13 @@ async def test_abandon_reserve_au_gestionnaire(
     )
 
     assert reponse.status_code == 403
+
+
+def test_quantites_accordees_dans_les_messages() -> None:
+    from app.services.stocks import formater_quantite
+
+    assert formater_quantite(Decimal("12.000"), "sachet") == "12 sachets"
+    assert formater_quantite(Decimal("1"), "sachet") == "1 sachet"
+    assert formater_quantite(Decimal("150.000"), "kg") == "150 kg"
+    assert formater_quantite(Decimal("3"), "Sac 50 kg") == "3 Sacs 50 kg"
+    assert formater_quantite(Decimal("0.5"), "bouteille") == "0,5 bouteille"

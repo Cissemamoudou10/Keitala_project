@@ -12,13 +12,13 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 | :--- | :--- |
 | **Dernière mise à jour** | 16/11/2026 |
 | **Phase** | Sprints 0 à 8 terminés : toutes les stories développées (US-VTE-03 : l'option WhatsApp, Could Have, sera discutée à la fin avec l'utilisateur). Prochain : Sprint 9 (mise en production et recette). |
-| **Sprint en cours** | Sprint 9 — Mise en production : déploiement de recette fait (https://keitala-negoce.vercel.app) ; prochain : jeu de données |
+| **Sprint en cours** | Sprint 9 — Mise en production : déploiement de recette, jeu de données et cahier de recette faits ; prochain : jouer la recette avec l'utilisateur |
 | **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query, formats et champ de montant, quatre états d'écran ; build, lint et types OK ; rendu vérifié à l'écran (bureau et 768 px) ; 44 tests Vitest, 7 parcours Playwright (bureau et tablette). CI GitHub Actions écrite (`.github/workflows/ci.yml`), rejouée en local, jamais exécutée sur GitHub (P-014). Sprint 1 : connexion par cookies HttpOnly, gestion des comptes, contrôle d'accès par rôle (API 53 tests, app 62 tests, 19 parcours e2e sur la pile complète). Sprint 2 : comptes de trésorerie et soldes d'ouverture, catalogue et unités de saisie, clients et fournisseurs (API 96 tests, app 110 tests, 29 parcours e2e). Sprint 3 : mouvements de stock (écriture unique, coût moyen pondéré), pertes, inventaires et stock de départ valorisé (migration 0002), journal, état valorisé et alertes (API 110 tests, app 116 tests, 36 parcours e2e). Puis abandon d'un inventaire (migration 0003) et base dédiée aux parcours e2e (API 112 tests, 37 parcours e2e). Sprint 4 : achats (saisie en sacs ou en kg, paiements sur plusieurs comptes ou à crédit, dettes, annulation avec contre-passation), clé d'idempotence (migration 0004), solde Caisse et Mobile Money jamais négatif (API 126 tests, app 119 tests, 45 parcours e2e). Sprint 5 : montants de ligne au franc (migration 0005), ventes au comptoir ou à crédit, dons, encaissement des créances, annulation, facture A4 imprimable ; briques communes aux pièces (API 139 tests, app 119 tests, 57 parcours e2e). Sprint 6 : synthèse et journal des comptes, dépenses, transferts, clôture journalière avec écart, contrôle a posteriori par le Super Admin (API 149 tests, app 119 tests, 67 parcours e2e) ; puis annulation des transferts (migration 0006), billetage. Sprint 7 : recettes, ordres de fabrication (besoins, sorties, clôture au coût de revient, rendement) (API 158 tests, app 123 tests, 71 parcours e2e). Sprint 8 : tableau de bord complet (graphique des ventes sur 30 jours), marges par article, exports Excel et impression (API 162 tests, app 123 tests, 77 parcours e2e). |
 | **Points bloquants** | Aucun. Commandes de l'API à lancer dans le conteneur (P-012). Base de développement remise à neuf le 14/11/2026, avec le premier Super Admin de l'utilisateur (S1-T1). Parcours e2e : `up -d api-e2e` d'abord. |
 
 ## Prochaine tâche
 
-**Sprint 9, S9-8 : jeu de données complet et réaliste**, chargé dans la base de recette du VPS, puis S9-9 (cahier de recette joué avec l'utilisateur et envoyé au client) et S9-10 (retours du client). Déploiement fait (D-037) : app https://keitala-negoce.vercel.app, API https://keitala-api.162-55-158-90.sslip.io ; procédure dans `developpement/deploiement/README.md`. Points ouverts : WhatsApp (à discuter), recettes réelles (P-003), en-tête réel de facture (P-006), domaine (P-007), sauvegardes hors serveur (P-023).
+**Sprint 9, S9-9 : jouer le cahier de recette avec l'utilisateur** (https://claude.ai/artifact/DDKtuqpWvUPPFfuArQnNFv), noter les anomalies, corriger, puis l'envoyer au client ; ensuite S9-10 (retours du client). Avant : créer le Super Admin de l'associé (samdollar@gmail.com) depuis l'application et désactiver l'ancien. Points ouverts : WhatsApp (à discuter), recettes réelles (P-003), en-tête réel de facture (P-006), domaine (P-007, l'utilisateur s'en charge), sauvegardes hors serveur (P-023), base de recette à vider avant la mise en service (D-038).
 
 ---
 
@@ -141,8 +141,8 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 - [ ] S9-5 Inventaire physique de départ et soldes d'ouverture des comptes
 - [ ] S9-6 Recette avec le Gestionnaire sur des cas réels ; corrections
 - [ ] S9-7 Guide d'utilisation court et formation
-- [ ] S9-8 Jeu de données complet et réaliste pour la recette
-- [ ] S9-9 Cahier de recette complet, joué avec l'utilisateur, envoyé au client
+- [x] S9-8 Jeu de données complet et réaliste pour la recette (chargé en production le 16/11/2026, D-038)
+- [~] S9-9 Cahier de recette complet, joué avec l'utilisateur, envoyé au client — rédigé (65 cas, https://claude.ai/artifact/DDKtuqpWvUPPFfuArQnNFv) ; reste à le jouer et à l'envoyer
 - [ ] S9-10 Retours du client (fonctionnalités manquantes, problèmes) : corrections
 
 ---

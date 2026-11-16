@@ -17,6 +17,15 @@ Une entrée par session de travail, **la plus récente en haut**. C'est le relai
 
 ---
 
+## 2026-11-16 — Claude Code — Jeu de données et cahier de recette (S9-8, S9-9)
+- **Tâche** : jeu de données complet, cahier de recette en document ; Super Admin de l'associé de l'utilisateur.
+- **Fait** : commande `charger_jeu_recette` (essayée deux fois sur une base jetable : jeu identique, second lancement refusé, base cohérente : stock = somme des mouvements, aucun stock ni compte négatif), puis chargée en production après une sauvegarde. Corrigé en route : objets expirés après une opération refusée (le script ne garde que des identifiants et relit l'auteur), adresses `.test` refusées par le validateur (passage à example.com), pluriel des unités dans les messages de l'API (« 12 sachets », test ajouté). Cahier de recette rédigé dans un document partagé : 65 cas (connexion et rôles, référentiels, stocks, achats, ventes, production, trésorerie, pilotage), statut par cas, relevé des anomalies ; cas AC-09 réécrit après vérification du stock réel en production.
+- **Non fait / en cours** : le Super Admin de l'associé : l'utilisateur le crée depuis l'application (Claude ne saisit pas de mot de passe choisi par l'utilisateur) ; la recette elle-même n'est pas encore jouée.
+- **Vérifications** : API 163 tests ; ruff, mypy ; déploiement c6e0f82 ; données de production relues (stocks et soldes cohérents avec le cahier).
+- **Décisions** : D-038.
+- **Problèmes** : aucun nouveau ; P-007 : le domaine sera réglé par l'utilisateur.
+- **À reprendre par le suivant** : jouer le cahier de recette avec l'utilisateur.
+
 ## 2026-11-16 — Claude Code — Déploiement de recette (S9-1 à S9-3)
 - **Tâche** : déployer l'app sur Vercel et l'API sur le VPS Hetzner ; logo fourni par l'utilisateur.
 - **Fait** : image de production de l'API (sans outils de dev, `.env` exclu), compose de production, Caddy partagé avec HTTPS (adresse sslip.io choisie par l'utilisateur), clé de proxy (en-tête secret ajouté par l'app, exigé par Caddy), secrets générés sur le serveur, sauvegarde quotidienne et restauration essayée, script de déploiement ; correction des fins de ligne (`.gitattributes`, `git archive` sans conversion). Super Admin de production créé (mot de passe généré sur le serveur et communiqué une fois à l'utilisateur). Projet Vercel `keitala` (racine `developpement/app`, Node 24, fonctions en `fra1`, protection levée sur la production seulement), variables `API_URL` et `API_CLE_PROXY`, alias https://keitala-negoce.vercel.app. Logo « Keitala Négoce » dans le menu, la connexion et la facture ; nom de l'entreprise mis à jour.

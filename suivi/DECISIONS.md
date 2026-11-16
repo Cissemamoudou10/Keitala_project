@@ -292,3 +292,13 @@ Chaque décision qui engage le projet est notée ici, avec sa raison. Une décis
   - Nom de l'entreprise : « Keitala Négoce » (logo fourni par l'utilisateur), affiché dans le menu, à la connexion et sur la facture.
 - **Conséquences** : sslip.io est un service tiers ; un vrai domaine devra le remplacer avant la mise en service réelle (P-007). Copie des sauvegardes hors serveur à mettre en place (P-023).
 
+## D-038 — Jeu de données et cahier de recette
+- **Date** : 16/11/2026 · **Statut** : Proposée · **Auteur** : Claude, à la demande de l'utilisateur
+- **Contexte** : S9-8 et S9-9. L'utilisateur veut un jeu complet et un cahier de recette « en doc », joué avec lui puis envoyé au client. Le Super Admin sera un associé de l'utilisateur (samdollar@gmail.com) ; le nom de domaine sera réglé par l'utilisateur plus tard (P-007).
+- **Décisions** :
+  - Commande `app.commandes.charger_jeu_recette --confirmer` : passe par les services de l'API (règles métier, coûts moyens, soldes, numéros), tirages figés, refuse une base qui a déjà des pièces ou des comptes autres que le Super Admin. Contenu : 5 articles ajoutés (vrac, sachets), prix et seuils, unités de saisie, 6 clients, 4 fournisseurs, soldes d'ouverture, stock de départ par inventaire, 6 recettes, 30 jours d'activité (85 ventes, 11 achats, 17 ordres, 16 dépenses, 2 dons, versements hebdomadaires, encaissements, 1 achat et 1 vente annulés, 1 ordre en cours). Les écritures de trésorerie et de stock portent la date du chargement (limite connue).
+  - Comptes de recette `gestionnaire.recette@example.com` et `consultant.recette@example.com` (domaine réservé aux exemples), mots de passe générés sur le serveur et communiqués une fois ; à désactiver à la mise en service.
+  - Chargé en production le 16/11/2026 (base sans pièce, sauvegarde faite juste avant). **Avant la mise en service réelle, la base de recette devra être vidée** (à faire avec l'accord explicite de l'utilisateur).
+  - Cahier de recette en document partagé (Claude Docs) : 65 cas sur 8 domaines, statut par cas (Non joué, OK, KO, Bloqué), relevé des anomalies avec gravité. Aucun mot de passe dans le document.
+- **Conséquences** : le Super Admin de l'associé se crée depuis l'application par le premier Super Admin (Administration › Utilisateurs), puis l'associé désactive l'ancien compte.
+

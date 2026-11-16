@@ -25,6 +25,8 @@ const DROITS = {
   saisir_stock: ["GESTIONNAIRE"],
   /** Achats : saisis, réglés et annulés par le Gestionnaire (matrice des droits). */
   saisir_achat: ["GESTIONNAIRE"],
+  /** Ventes, dons, encaissements et annulations : Gestionnaire seul (matrice). */
+  saisir_vente: ["GESTIONNAIRE"],
 } as const satisfies Record<string, readonly Role[]>;
 
 export type Action = keyof typeof DROITS;

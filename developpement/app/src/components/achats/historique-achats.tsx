@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 
 import { DetailAchat } from "@/components/achats/detail-achat";
 import {
@@ -74,14 +74,23 @@ export function HistoriqueAchats() {
       titre="Achats"
       description="Réceptions de marchandises et dettes fournisseurs."
       action={
-        peutSaisir && (
-          <Button asChild variant="principal">
-            <Link href="/achats/nouveau">
-              <Plus />
-              Nouvel achat
+        <div className="flex flex-wrap gap-2">
+          {/* Le répertoire des tiers est hors menu : on y accède depuis les achats */}
+          <Button asChild variant="discret">
+            <Link href="/tiers?type=fournisseur">
+              <Users />
+              Voir les fournisseurs
             </Link>
           </Button>
-        )
+          {peutSaisir && (
+            <Button asChild variant="principal">
+              <Link href="/achats/nouveau">
+                <Plus />
+                Nouvel achat
+              </Link>
+            </Button>
+          )}
+        </div>
       }
     >
       <Onglets

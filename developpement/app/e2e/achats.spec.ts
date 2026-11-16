@@ -144,6 +144,8 @@ for (const role of ["CONSULTANT", "SUPER_ADMIN"] as const) {
     await page.goto("/achats");
     await expect(page.getByRole("heading", { level: 1, name: "Achats" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Nouvel achat" })).toHaveCount(0);
+    // Le répertoire des tiers, hors menu, reste accessible depuis les achats
+    await expect(page.getByRole("link", { name: "Voir les fournisseurs" })).toBeVisible();
 
     await page.goto("/achats/nouveau");
     await expect(page.getByRole("heading", { level: 1, name: "Accès refusé" })).toBeVisible();

@@ -15,11 +15,12 @@ VERSION=$(git rev-parse --short HEAD)
 echo "Déploiement de $VERSION vers $SERVEUR"
 
 # 1. Le code de l'API et les fichiers de déploiement, dans des dossiers temporaires
+#    (core.autocrlf=false : fins de ligne LF telles que dans le dépôt, même sous Windows)
 ssh "$SERVEUR" 'mkdir -p /opt/apps/keitala /opt/apps/caddy &&
   rm -rf /opt/apps/keitala/api.nouvelle /tmp/deploiement-keitala &&
   mkdir /opt/apps/keitala/api.nouvelle /tmp/deploiement-keitala'
-git archive HEAD:developpement/api | ssh "$SERVEUR" 'tar -x -C /opt/apps/keitala/api.nouvelle'
-git archive HEAD:developpement/deploiement | ssh "$SERVEUR" 'tar -x -C /tmp/deploiement-keitala'
+git -c core.autocrlf=false archive HEAD:developpement/api | ssh "$SERVEUR" 'tar -x -C /opt/apps/keitala/api.nouvelle'
+git -c core.autocrlf=false archive HEAD:developpement/deploiement | ssh "$SERVEUR" 'tar -x -C /tmp/deploiement-keitala'
 
 # 2. Mise en place, reconstruction et redémarrage (le script distant est entre
 #    apostrophes : aucune variable n'est développée sur le poste)

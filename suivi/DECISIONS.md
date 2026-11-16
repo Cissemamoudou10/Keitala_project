@@ -276,3 +276,19 @@ Chaque décision qui engage le projet est notée ici, avec sa raison. Une décis
   - Exports : Excel par l'API (`/exports/{stocks,journal,ventes,marges}.xlsx`) avec un classeur écrit par la bibliothèque standard (`app/core/excel.py` : zip + XML, une feuille, en-tête en gras, nombres formatés), sans nouvelle dépendance ; PDF par « Imprimer ou PDF » (impression du navigateur), le menu et les boutons masqués à l'impression.
 - **Conséquences** : un classeur très simple (une feuille) ; si le client veut des mises en forme avancées, il faudra ajouter une bibliothèque (à justifier).
 
+## D-037 — Déploiement : Vercel, VPS Hetzner, Caddy et clé de proxy
+- **Date** : 16/11/2026 · **Statut** : Acceptée (adresse sslip.io choisie par l'utilisateur ; domaine Vercel par défaut) ; reste Proposée · **Auteur** : utilisateur et Claude
+- **Contexte** : S9-1 à S9-3. Pas de nom de domaine ; VPS Hetzner déjà sécurisé (utilisateur `deploy`, UFW, Docker, réseau `web`) ; dépôt GitHub publié par l'utilisateur.
+- **Décisions (acceptées)** :
+  - App sur Vercel : projet `keitala`, dossier racine `developpement/app`, adresse **https://keitala-negoce.vercel.app** (alias `.vercel.app` gratuit ; `keitala.vercel.app` était déjà pris). Déploiement à chaque `git push` sur `main`.
+  - API et PostgreSQL 16.16 sur le VPS (`/opt/apps/keitala/`), derrière Caddy 2.11.9 (`/opt/apps/caddy/`, partagé) à l'adresse **https://keitala-api.162-55-158-90.sslip.io**, certificat Let's Encrypt automatique.
+- **Décisions (proposées)** :
+  - Clé de proxy : l'app ajoute l'en-tête `x-cle-proxy` (variable `API_CLE_PROXY`, type *sensitive* sur Vercel) ; Caddy renvoie 403 à toute requête sans elle. Seul le serveur Next joint l'API ; atténue l'absence de limitation des tentatives de connexion (P-015). Vérifié : des robots ont tenté `/.env`, `/.bash_history`… dès la mise en ligne, tous refusés.
+  - Fonctions Vercel en Francfort (`fra1`, proche du VPS de Nuremberg), Node.js 24 ; protection Vercel gardée sur les aperçus (previews), levée sur l'adresse de production (sinon personne hors du compte Vercel ne peut ouvrir l'app).
+  - Image de l'API sans outils de développement ; migrations appliquées au démarrage ; `ENV=prod`, `DEBUG=false` (pas de `/docs`).
+  - Secrets générés sur le serveur (`generer-env.sh`, `openssl rand -hex 32`, chmod 600), jamais dans le dépôt.
+  - Déploiement de l'API par `deployer.sh` (code commité seulement, `git archive` sans conversion des fins de ligne ; `.gitattributes` force LF).
+  - Sauvegarde quotidienne (2 h 30, `pg_dump`, 14 jours) ; restauration essayée avec succès le 16/11/2026.
+  - Nom de l'entreprise : « Keitala Négoce » (logo fourni par l'utilisateur), affiché dans le menu, à la connexion et sur la facture.
+- **Conséquences** : sslip.io est un service tiers ; un vrai domaine devra le remplacer avant la mise en service réelle (P-007). Copie des sauvegardes hors serveur à mettre en place (P-023).
+

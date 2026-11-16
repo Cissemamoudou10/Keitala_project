@@ -2,7 +2,7 @@
 
 | Partie | Où | Adresse |
 | :--- | :--- | :--- |
-| App Next.js | Vercel (projet `keitala-project`, dossier racine `developpement/app`) | adresse `*.vercel.app` fournie par Vercel |
+| App Next.js | Vercel (projet `keitala`, dossier racine `developpement/app`, Node 24, fonctions `fra1`) | https://keitala-negoce.vercel.app |
 | API FastAPI + PostgreSQL 16 | VPS Hetzner `162.55.158.90`, `/opt/apps/keitala/` | `https://keitala-api.162-55-158-90.sslip.io` |
 | Reverse proxy HTTPS (Caddy) | même VPS, `/opt/apps/caddy/`, partagé entre applications | ports 80 et 443 |
 

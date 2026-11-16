@@ -157,6 +157,12 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Constat** : les récapitulatifs d'achat, de vente et les totaux des fiches utilisaient la classe `bg-fond-2`, qui n'existe pas dans les jetons de la charte : aucun fond ne s'affichait (Sprints 4 et 5). Repéré parce que le formatage rangeait la classe parmi les inconnues.
 - **Résolution** (16/11/2026) : remplacée par `bg-fond-doux` partout.
 
+## P-023 — Sauvegardes seulement sur le VPS
+- **Date** : 16/11/2026 · **Statut** : Ouvert · **Gravité** : Majeur · **Signalé par** : Claude
+- **Constat** : la sauvegarde quotidienne (`/opt/backups/keitala/`) reste sur le même serveur que la base : une panne du disque ou du serveur emporterait les deux.
+- **Impact** : S9-1 ; à régler avant la mise en service réelle (pas bloquant pour la recette).
+- **Piste** : copie automatique vers une Storage Box Hetzner (quelques euros par mois) ou un stockage objet, par `rsync`/`rclone` après la sauvegarde. À décider avec l'utilisateur. En attendant : `scp deploy@162.55.158.90:/opt/backups/keitala/<fichier> .`
+
 ## C. Risques à surveiller
 
 | Risque | Effet | Parade |

@@ -17,6 +17,15 @@ Une entrée par session de travail, **la plus récente en haut**. C'est le relai
 
 ---
 
+## 2026-11-16 — Claude Code — Déploiement de recette (S9-1 à S9-3)
+- **Tâche** : déployer l'app sur Vercel et l'API sur le VPS Hetzner ; logo fourni par l'utilisateur.
+- **Fait** : image de production de l'API (sans outils de dev, `.env` exclu), compose de production, Caddy partagé avec HTTPS (adresse sslip.io choisie par l'utilisateur), clé de proxy (en-tête secret ajouté par l'app, exigé par Caddy), secrets générés sur le serveur, sauvegarde quotidienne et restauration essayée, script de déploiement ; correction des fins de ligne (`.gitattributes`, `git archive` sans conversion). Super Admin de production créé (mot de passe généré sur le serveur et communiqué une fois à l'utilisateur). Projet Vercel `keitala` (racine `developpement/app`, Node 24, fonctions en `fra1`, protection levée sur la production seulement), variables `API_URL` et `API_CLE_PROXY`, alias https://keitala-negoce.vercel.app. Logo « Keitala Négoce » dans le menu, la connexion et la facture ; nom de l'entreprise mis à jour.
+- **Non fait / en cours** : changement du mot de passe du Super Admin : l'utilisateur voulait un mot de passe choisi par lui ; Claude ne saisit pas de mot de passe à la place de l'utilisateur, celui-ci le change dans Administration › Utilisateurs. Copie des sauvegardes hors serveur (P-023).
+- **Vérifications** : app : 124 tests Vitest, 77 parcours e2e (un échec à 0 ms de démarrage de worker, repassé vert), build ; API : 162 tests. En production : santé via Vercel → Caddy → API (`connecte`), connexion fictive refusée proprement (401), API directe sans clé → 403, `/docs` → 404, migrations 0001 à 0006 appliquées, certificat TLS 1.3.
+- **Décisions** : D-037.
+- **Problèmes** : P-023 ouvert.
+- **À reprendre par le suivant** : S9-8, jeu de données complet.
+
 ## 2026-11-16 — Claude Code — Sprint 8 : pilotage
 - **Tâche** : US-DASH-01 à 03. L'utilisateur a fixé la suite : déploiement (Vercel + VPS), jeu de données complet, cahier de recette joué puis envoyé au client, corrections après leur retour.
 - **Fait** : API : `/tableau-de-bord/indicateurs`, `/tableau-de-bord/marges`, `/exports/{stocks,journal,ventes,marges}.xlsx` (classeur écrit par la bibliothèque standard après le refus d'ajouter `openpyxl`). App : tableau de bord (six chiffres clés, soldes, graphique SVG des ventes sur 30 jours avec survol et tableau, à traiter), page Marges, boutons « Exporter Excel » et « Imprimer ou PDF » sur stocks, journal, ventes et marges ; menu masqué à l'impression.

@@ -6,7 +6,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Keitala",
+  title: "Keitala Négoce",
   description: "ERP Keitala : stocks, achats, production, ventes et trésorerie.",
 };
 

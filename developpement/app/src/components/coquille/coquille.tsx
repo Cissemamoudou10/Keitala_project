@@ -7,6 +7,7 @@ import { Dialog as DialogPrimitive } from "radix-ui";
 import { LogOut, Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 
 import { Squelette } from "@/components/etats/squelettes";
+import { Logo } from "@/components/coquille/logo";
 import { Button } from "@/components/ui/button";
 import { LIBELLES_ROLES } from "@/lib/droits";
 import { entreesPourRole, estActive, type Role } from "@/lib/navigation";
@@ -64,7 +65,7 @@ export function Coquille({ children }: { children: React.ReactNode }) {
               Afficher le menu
             </Button>
           )}
-          <span className="font-semibold">Keitala</span>
+          <Logo className="h-7" />
         </div>
 
         <main className="flex-1">{children}</main>
@@ -112,7 +113,7 @@ function BarreLaterale({
   return (
     <>
       <div className="flex h-14 items-center justify-between gap-2 px-4 lg:pr-2">
-        <span className="font-semibold">Keitala</span>
+        <Logo className="h-9" prioritaire />
         {children}
       </div>
       <nav aria-label="Navigation principale" className="flex-1 overflow-y-auto px-2 py-2">

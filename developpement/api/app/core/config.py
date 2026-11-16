@@ -24,7 +24,7 @@ class Settings(BaseSettings):
 
     # En-tête des factures (US-VTE-03). Provisoire tant que le client ne les a pas
     # fournies (P-006) : à régler dans .env, sans modifier le code.
-    ENTREPRISE_NOM: str = "Keitala"
+    ENTREPRISE_NOM: str = "Keitala Négoce"
     ENTREPRISE_ADRESSE: str = ""
     ENTREPRISE_TELEPHONE: str = ""
     # NIF, RCCM… sur une ligne (« NIF : … · RCCM : … »)

@@ -16,7 +16,7 @@ SECRET_KEY=$(openssl rand -hex 32)
 POSTGRES_PASSWORD=$(openssl rand -hex 32)
 ALLOWED_ORIGINS=[]
 # En-tête de facture FICTIF pour la recette (P-006) : à remplacer par celui du client
-ENTREPRISE_NOM=Keitala SARL
+ENTREPRISE_NOM=Keitala Négoce
 ENTREPRISE_ADRESSE=Rue 312, Porte 45, Hamdallaye ACI 2000, Bamako, Mali
 ENTREPRISE_TELEPHONE=20220000
 ENTREPRISE_IDENTIFIANTS=NIF : 000000000X · RCCM : MA.BKO.2026.B.0000

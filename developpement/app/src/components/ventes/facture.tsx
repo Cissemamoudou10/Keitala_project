@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Printer } from "lucide-react";
 
 import { nomComplet } from "@/components/articles/types";
+import { Logo } from "@/components/coquille/logo";
 import { EtatRequete } from "@/components/etats/etat-requete";
 import { SqueletteFormulaire } from "@/components/etats/squelettes";
 import { Button } from "@/components/ui/button";
@@ -86,7 +87,8 @@ function FeuilleFacture({
     >
       <header className="flex flex-wrap items-start justify-between gap-6">
         <div className="flex flex-col gap-1">
-          <p className="text-titre-section font-semibold">{entreprise?.nom ?? "Keitala"}</p>
+          <Logo className="mb-2 h-16 self-start" />
+          <p className="text-titre-section font-semibold">{entreprise?.nom ?? "Keitala Négoce"}</p>
           {entreprise?.adresse && <p className="text-texte-2">{entreprise.adresse}</p>}
           {entreprise?.telephone && (
             <p className="text-texte-2">Tél. {formaterTelephone(entreprise.telephone)}</p>

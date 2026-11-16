@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Plus, Users } from "lucide-react";
 
 import { Page } from "@/components/coquille/page";
+import { Exports } from "@/components/ui/exports";
 import { EtatRequete } from "@/components/etats/etat-requete";
 import { EtatVide } from "@/components/etats/etat-vide";
 import { SqueletteFormulaire, SqueletteTableau } from "@/components/etats/squelettes";
@@ -88,6 +89,7 @@ export function HistoriqueVentes() {
       description="Ventes au comptoir et en gros, créances clients, dons et échantillons."
       action={
         <div className="flex flex-wrap gap-2">
+          <Exports fichier="ventes" parametres={{ type: vue === "dons" ? "dons" : null, du, au }} />
           {/* Le répertoire des tiers est hors menu : on y accède depuis les ventes */}
           <Button asChild variant="discret">
             <Link href="/tiers?type=client">

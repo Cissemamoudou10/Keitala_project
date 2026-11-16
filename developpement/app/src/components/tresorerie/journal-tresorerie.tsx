@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { Page } from "@/components/coquille/page";
+import { Exports } from "@/components/ui/exports";
 import { EtatRequete } from "@/components/etats/etat-requete";
 import { EtatVide } from "@/components/etats/etat-vide";
 import { SqueletteTableau } from "@/components/etats/squelettes";
@@ -41,7 +42,11 @@ export function JournalTresorerie() {
   });
 
   return (
-    <Page titre="Trésorerie" description="Chaque entrée et chaque sortie d'argent, avec sa pièce.">
+    <Page
+      titre="Trésorerie"
+      description="Chaque entrée et chaque sortie d'argent, avec sa pièce."
+      action={<Exports fichier="journal" parametres={{ compte_id: compte, du, au }} />}
+    >
       <SousNavigationTresorerie />
       <div className="flex flex-wrap items-end gap-4">
         <FiltreCompte valeur={compte} onChange={(valeur) => modifier({ compte: valeur })} />

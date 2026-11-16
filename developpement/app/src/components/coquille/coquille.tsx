@@ -27,7 +27,7 @@ export function Coquille({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-full flex-1">
       {/* Bureau */}
       {!replie && (
-        <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-bordure bg-fond-doux lg:flex">
+        <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-bordure bg-fond-doux lg:flex print:hidden">
           <BarreLaterale utilisateur={utilisateur}>
             <Button
               variant="discret"
@@ -46,7 +46,7 @@ export function Coquille({ children }: { children: React.ReactNode }) {
         {/* Barre du haut : tablette et téléphone, ou bureau quand le menu est masqué */}
         <div
           className={cn(
-            "sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-bordure bg-fond px-2",
+            "sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-bordure bg-fond px-2 print:hidden",
             !replie && "lg:hidden",
           )}
         >

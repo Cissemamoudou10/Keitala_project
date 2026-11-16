@@ -16,6 +16,7 @@ import {
   type PageArticles,
 } from "@/components/articles/types";
 import { Page } from "@/components/coquille/page";
+import { Exports } from "@/components/ui/exports";
 import { EtatRequete } from "@/components/etats/etat-requete";
 import { EtatVide } from "@/components/etats/etat-vide";
 import { SqueletteTableau } from "@/components/etats/squelettes";
@@ -97,7 +98,12 @@ export function CatalogueArticles() {
     <Page
       titre="Stocks"
       description="Ce qui est en stock, ce que cela vaut, et ce qui manque."
-      action={nouvelArticle}
+      action={
+        <div className="flex flex-wrap gap-2">
+          <Exports fichier="stocks" parametres={{ famille }} />
+          {nouvelArticle}
+        </div>
+      }
     >
       <SousNavigationStocks />
       {etat.data && (

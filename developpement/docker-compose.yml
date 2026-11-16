@@ -33,6 +33,13 @@ services:
       - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-keitala_user}:${POSTGRES_PASSWORD:-keitala_dev_password}@db:5432/${POSTGRES_DB:-keitala_db}
       # Base distincte, recréée à chaque lancement des tests
       - TEST_DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-keitala_user}:${POSTGRES_PASSWORD:-keitala_dev_password}@db:5432/keitala_test_db
+      # En-tête de facture FICTIF, pour le développement : les vraies valeurs viendront du
+      # client (P-006) et iront dans le .env du serveur de production.
+      - ENTREPRISE_NOM=Keitala SARL
+      - "ENTREPRISE_ADRESSE=Rue 312, Porte 45, Hamdallaye ACI 2000, Bamako, Mali"
+      - ENTREPRISE_TELEPHONE=20220000
+      - "ENTREPRISE_IDENTIFIANTS=NIF : 000000000X · RCCM : MA.BKO.2026.B.0000"
+      - ENTREPRISE_MENTIONS=Merci de votre confiance.
     volumes:
       - ./api:/app
     depends_on:

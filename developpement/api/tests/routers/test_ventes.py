@@ -10,6 +10,7 @@ from httpx import AsyncClient
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.models import (
     Article,
     CompteTresorerie,
@@ -478,4 +479,5 @@ async def test_ventes_saisies_par_le_gestionnaire(
 
     assert (creation.status_code, don.status_code) == (403, 403)
     assert lecture.status_code == 200
-    assert entreprise.status_code == 200 and entreprise.json()["nom"] == "Keitala"
+    assert entreprise.status_code == 200
+    assert entreprise.json()["nom"] == settings.ENTREPRISE_NOM

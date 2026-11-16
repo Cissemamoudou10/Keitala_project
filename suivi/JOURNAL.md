@@ -17,6 +17,15 @@ Une entrée par session de travail, **la plus récente en haut**. C'est le relai
 
 ---
 
+## 2026-11-16 — Claude Code — Sprint 7 : production
+- **Tâche** : US-PROD-01 à 04.
+- **Fait** : API : `/production/recettes` (liste, création, détail, modification), `/production/ordres` (liste, lancement, détail avec besoins et manques, `/sorties`, `/sorties/{id}/retirer`, `/cloturer`, `/annuler`). App : Production › Ordres de fabrication (onglets, lancement en panneau avec besoins calculés et manques), fiche d'un ordre (`/production/ordres/[id]` : composants, sorties au fil des jours, clôture avec consommé pré-rempli, pertes, rendement en direct, confirmation des effets ; coût et rendement une fois terminé), Production › Recettes (cartes, saisie en panneau). `diviserDecimaux` et `chercherArticlesDeFamille` ajoutés.
+- **Non fait / en cours** : rien sur le périmètre ; recettes réelles à relever (P-003).
+- **Vérifications** : API : ruff, format, mypy, `alembic check`, 158 tests (7 nouveaux : transformation de bout en bout, conditionnement avec vrac restant, coût de revient, refus, droits, annulation). App : format, lint, types, 123 tests Vitest, build, 71 parcours Playwright verts (4 nouveaux). Captures bureau et 768 px, console sans erreur. Corrigé en route : rendement affiché en pourcentage (le formateur ne multiplie pas par 100).
+- **Décisions** : D-035.
+- **Problèmes** : P-003 complété.
+- **À reprendre par le suivant** : Sprint 8 (pilotage).
+
 ## 2026-11-16 — Claude Code — Corrections de fin de Sprint 6
 - **Tâche** : trois corrections demandées par l'utilisateur (question posée pour lever l'ambiguïté de « corrige-le »).
 - **Fait** : annulation d'un transfert (migration 0006, API, fiche et annulation dans l'app) ; billetage dans la clôture d'une caisse ; nom complet des comptes dans les listes de choix.

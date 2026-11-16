@@ -256,3 +256,14 @@ Chaque décision qui engage le projet est notée ici, avec sa raison. Une décis
   - Billetage : dans la clôture d'un compte Caisse, case « Compter par billets et pièces » ; nombre par coupure BCEAO (billets de 10 000 à 500, pièces de 500 à 5 FCFA) ; le montant compté se calcule seul. Le détail par coupure n'est pas enregistré (le schéma n'a pas de colonne pour cela) : seul le total compte.
   - Listes de choix : texte aligné à gauche, choix de compte élargis (nom complet visible).
 
+## D-035 — Production : recettes et ordres de fabrication
+- **Date** : 16/11/2026 · **Statut** : Proposée · **Auteur** : Claude
+- **Contexte** : Sprint 7 (US-PROD-01 à 04), règle 8. Les recettes réelles ne sont pas documentées (P-003) : l'outil permet de les saisir.
+- **Décisions** :
+  - Recette : étape (transformation ou conditionnement), produit (un semi-fini pour une transformation, un produit fini pour un conditionnement), quantité de produit obtenue, composants en unité de base. Créée et modifiée par le Super Admin et le Gestionnaire ; une modification remplace les composants, les ordres déjà lancés gardent leurs besoins ; désactivation plutôt que suppression.
+  - Ordre : lancé dès sa création (statut `EN_COURS`, le statut `BROUILLON` n'est pas utilisé) ; besoins = composants × quantité visée ÷ quantité de base ; un manque de stock est signalé mais ne bloque pas le lancement. Gestionnaire seul.
+  - Sorties : déclarées au fil des jours ; transformation → un ou plusieurs semi-finis ; conditionnement → le produit fini de la recette. Rien n'entre en stock avant la clôture ; une sortie déclarée par erreur se retire tant que l'ordre est en cours.
+  - Clôture : consommations réelles pré-remplies avec le prévu ; refusée si un composant manque ou si aucune sortie n'est déclarée ; composants sortis au coût moyen (`CONSO_PRODUCTION`) ; coût total réparti également sur les quantités produites (même coût par unité), entrée `ENTREE_PRODUCTION` à ce coût, qui recalcule le coût moyen ; rendement = produit ÷ consommé (transformation seulement) ; pertes enregistrées sans mouvement (elles sont déjà dans le consommé) ; confirmation qui rappelle les effets.
+  - Annulation : seulement un ordre en cours (aucun stock n'a bougé), motif ajouté aux observations ; un ordre terminé ne s'annule pas.
+- **Conséquences** : si un ordre de transformation produit des semi-finis d'unités différentes, la répartition « par quantité » n'a pas de sens ; à revoir si le cas se présente.
+

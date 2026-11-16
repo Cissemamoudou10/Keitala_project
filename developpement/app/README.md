@@ -152,6 +152,11 @@ Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack 
 - Droits : `saisir_tresorerie` (Gestionnaire), `controler` (Super Admin). Après une écriture, invalider `CLE_TRESORERIE` relit aussi les comptes.
 - Jetons de couleur : seulement ceux de `globals.css` (`bg-fond-doux`, pas `bg-fond-2`) ; si le formatage range une classe en tête, elle est probablement inconnue.
 
+## Production (Sprint 7)
+
+- `/production` (ordres), `/production/ordres/[id]` (fiche : sorties, clôture, annulation), `/production/recettes`. Droits : `gerer_recettes` (Super Admin et Gestionnaire), `piloter_production` (Gestionnaire).
+- Calcul : `diviserDecimaux` (besoins, rendement). `formaterPourcentage` attend une valeur déjà en pourcentage (0,25 → multiplier par 100).
+
 ## Next.js 16 : à savoir
 
 - Version récente : lire le guide utile dans `node_modules/next/dist/docs/` avant d'écrire du code (rappel dans `AGENTS.md` de ce dossier, recréé par `next dev`).

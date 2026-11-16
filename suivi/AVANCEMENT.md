@@ -11,14 +11,14 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 | | |
 | :--- | :--- |
 | **Dernière mise à jour** | 16/11/2026 |
-| **Phase** | Sprints 0 à 6 terminés (US-VTE-03 : l'option WhatsApp, Could Have, sera discutée à la fin avec l'utilisateur). Prochain : Sprint 7 (production). |
-| **Sprint en cours** | Sprint 7 — Production (à démarrer) |
-| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query, formats et champ de montant, quatre états d'écran ; build, lint et types OK ; rendu vérifié à l'écran (bureau et 768 px) ; 44 tests Vitest, 7 parcours Playwright (bureau et tablette). CI GitHub Actions écrite (`.github/workflows/ci.yml`), rejouée en local, jamais exécutée sur GitHub (P-014). Sprint 1 : connexion par cookies HttpOnly, gestion des comptes, contrôle d'accès par rôle (API 53 tests, app 62 tests, 19 parcours e2e sur la pile complète). Sprint 2 : comptes de trésorerie et soldes d'ouverture, catalogue et unités de saisie, clients et fournisseurs (API 96 tests, app 110 tests, 29 parcours e2e). Sprint 3 : mouvements de stock (écriture unique, coût moyen pondéré), pertes, inventaires et stock de départ valorisé (migration 0002), journal, état valorisé et alertes (API 110 tests, app 116 tests, 36 parcours e2e). Puis abandon d'un inventaire (migration 0003) et base dédiée aux parcours e2e (API 112 tests, 37 parcours e2e). Sprint 4 : achats (saisie en sacs ou en kg, paiements sur plusieurs comptes ou à crédit, dettes, annulation avec contre-passation), clé d'idempotence (migration 0004), solde Caisse et Mobile Money jamais négatif (API 126 tests, app 119 tests, 45 parcours e2e). Sprint 5 : montants de ligne au franc (migration 0005), ventes au comptoir ou à crédit, dons, encaissement des créances, annulation, facture A4 imprimable ; briques communes aux pièces (API 139 tests, app 119 tests, 57 parcours e2e). Sprint 6 : synthèse et journal des comptes, dépenses, transferts, clôture journalière avec écart, contrôle a posteriori par le Super Admin (API 149 tests, app 119 tests, 67 parcours e2e). |
+| **Phase** | Sprints 0 à 7 terminés (US-VTE-03 : l'option WhatsApp, Could Have, sera discutée à la fin avec l'utilisateur). Prochain : Sprint 8 (pilotage). |
+| **Sprint en cours** | Sprint 8 — Pilotage (à démarrer) |
+| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query, formats et champ de montant, quatre états d'écran ; build, lint et types OK ; rendu vérifié à l'écran (bureau et 768 px) ; 44 tests Vitest, 7 parcours Playwright (bureau et tablette). CI GitHub Actions écrite (`.github/workflows/ci.yml`), rejouée en local, jamais exécutée sur GitHub (P-014). Sprint 1 : connexion par cookies HttpOnly, gestion des comptes, contrôle d'accès par rôle (API 53 tests, app 62 tests, 19 parcours e2e sur la pile complète). Sprint 2 : comptes de trésorerie et soldes d'ouverture, catalogue et unités de saisie, clients et fournisseurs (API 96 tests, app 110 tests, 29 parcours e2e). Sprint 3 : mouvements de stock (écriture unique, coût moyen pondéré), pertes, inventaires et stock de départ valorisé (migration 0002), journal, état valorisé et alertes (API 110 tests, app 116 tests, 36 parcours e2e). Puis abandon d'un inventaire (migration 0003) et base dédiée aux parcours e2e (API 112 tests, 37 parcours e2e). Sprint 4 : achats (saisie en sacs ou en kg, paiements sur plusieurs comptes ou à crédit, dettes, annulation avec contre-passation), clé d'idempotence (migration 0004), solde Caisse et Mobile Money jamais négatif (API 126 tests, app 119 tests, 45 parcours e2e). Sprint 5 : montants de ligne au franc (migration 0005), ventes au comptoir ou à crédit, dons, encaissement des créances, annulation, facture A4 imprimable ; briques communes aux pièces (API 139 tests, app 119 tests, 57 parcours e2e). Sprint 6 : synthèse et journal des comptes, dépenses, transferts, clôture journalière avec écart, contrôle a posteriori par le Super Admin (API 149 tests, app 119 tests, 67 parcours e2e) ; puis annulation des transferts (migration 0006), billetage. Sprint 7 : recettes, ordres de fabrication (besoins, sorties, clôture au coût de revient, rendement) (API 158 tests, app 123 tests, 71 parcours e2e). |
 | **Points bloquants** | Aucun. Commandes de l'API à lancer dans le conteneur (P-012). Base de développement remise à neuf le 14/11/2026, avec le premier Super Admin de l'utilisateur (S1-T1). Parcours e2e : `up -d api-e2e` d'abord. |
 
 ## Prochaine tâche
 
-**Sprint 7, US-PROD-01 : recettes de transformation et de conditionnement**, puis US-PROD-02 à 04 (ordres de fabrication, sorties, clôture avec coût de revient). Toute variation de stock passe par `ecrire_mouvement_stock` (`cout_entree` pour les produits obtenus) ; lignes d'articles réutilisables depuis `components/pieces/`. Relire avant : EPIC 5 du backlog, règle 8 d'AGENTS.md, P-003 (recettes non documentées). À la fin du projet : discuter avec l'utilisateur de l'envoi WhatsApp des factures.
+**Sprint 8 : tableaux de bord, marges, exports** (voir la section Sprint 8 et l'EPIC 8 du backlog). Le tableau de bord a déjà la valeur du stock, les articles sous le seuil et, pour le Super Admin, les pièces à contrôler ; les marges s'appuient sur `lignes_vente.cout_unitaire_base`. À la fin du projet : discuter avec l'utilisateur de l'envoi WhatsApp des factures ; relever les recettes réelles (P-003) et l'en-tête de facture (P-006).
 
 ---
 
@@ -33,7 +33,7 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 | 4 | Achats et dettes fournisseurs | 4 | Terminé |
 | 5 | Ventes, règlements, dons, factures | 6 | Terminé (option WhatsApp non faite) |
 | 6 | Trésorerie, dépenses, transferts, clôtures, contrôle | 5 | Terminé |
-| 7 | Production : recettes et ordres de fabrication | 4 | À faire |
+| 7 | Production : recettes et ordres de fabrication | 4 | Terminé |
 | 8 | Tableaux de bord, marges, exports | 3 | À faire |
 | 9 | Mise en production et démarrage | — | À faire |
 
@@ -121,10 +121,10 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 
 ## Sprint 7 — Production
 
-- [ ] US-PROD-01 Recettes de transformation et de conditionnement
-- [ ] US-PROD-02 Création et lancement d'un ordre de fabrication
-- [ ] US-PROD-03 Déclaration des sorties de production
-- [ ] US-PROD-04 Clôture d'OF : consommations réelles, pertes, coût de revient
+- [x] US-PROD-01 Recettes de transformation et de conditionnement
+- [x] US-PROD-02 Création et lancement d'un ordre de fabrication
+- [x] US-PROD-03 Déclaration des sorties de production
+- [x] US-PROD-04 Clôture d'OF : consommations réelles, pertes, coût de revient
 
 ## Sprint 8 — Pilotage
 
@@ -150,6 +150,7 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 | :--- | :--- |
 | 13/11/2026 | Analyse du dossier ; spécifications et schéma corrigés en v1.1 ; schéma validé sur PostgreSQL 16 |
 | 13/11/2026 | Mise en place de `AGENTS.md`, des fichiers de suivi, de la charte et de `developpement/` |
+| 16/11/2026 | **Sprint 7 terminé** : recettes, ordres de fabrication, coût de revient |
 | 16/11/2026 | **Sprint 6 terminé** : trésorerie, dépenses, transferts, clôtures, contrôle |
 | 16/11/2026 | **Sprint 5 terminé** : ventes, dons, créances, facture |
 | 14/11/2026 | **Sprint 4 terminé** : achats, dettes fournisseurs, annulation |

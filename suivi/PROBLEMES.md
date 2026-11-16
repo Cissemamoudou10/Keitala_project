@@ -38,6 +38,7 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Constat** : les feuilles `Recettes_Conditionnement` et `Conditionnement` sont vides. Les quantités de la feuille `Production` sont irrégulières (« demi » potasse, « 5 » bicarbonate sans unité).
 - **Impact** : US-PROD-01, mise en service.
 - **Piste** : relever avec l'atelier une recette type par produit, avec unités.
+- **Avancement** (16/11/2026) : l'écran Production › Recettes permet de les saisir (D-035). Reste à les relever avec l'atelier avant la mise en service.
 
 ## P-004 — Soldes d'ouverture et inventaire de départ
 - **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Majeur · **Signalé par** : Claude

@@ -74,6 +74,13 @@ class TransfertInterne(Base):
     reference_paiement: Mapped[str | None] = mapped_column(String(100))
     cree_par: Mapped[uuid.UUID] = fk_uuid("utilisateurs.id")
     date_creation: Mapped[datetime] = date_creation()
+    # Annulation (migration 0006, D-034)
+    statut: Mapped[StatutDocument] = mapped_column(
+        pg_enum(StatutDocument, "statut_document_enum"), server_default="VALIDE"
+    )
+    annule_par: Mapped[uuid.UUID | None] = fk_uuid("utilisateurs.id", nullable=True)
+    annule_le: Mapped[datetime | None] = horodatage_optionnel()
+    motif_annulation: Mapped[str | None] = mapped_column(Text)
     controle_par: Mapped[uuid.UUID | None] = fk_uuid("utilisateurs.id", nullable=True)
     controle_le: Mapped[datetime | None] = horodatage_optionnel()
     # Clé d'idempotence du formulaire (migration 0004, P-009)

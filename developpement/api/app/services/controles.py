@@ -111,7 +111,8 @@ async def lister(
                         numero=t.numero,
                         date=t.date_transfert,
                         resume=f"{comptes.get(t.compte_source_id, '')} → "
-                        f"{comptes.get(t.compte_destination_id, '')}",
+                        f"{comptes.get(t.compte_destination_id, '')}"
+                        + (" (annulé)" if t.statut == StatutDocument.ANNULE else ""),
                         montant=t.montant,
                         auteur="",
                         date_creation=t.date_creation,

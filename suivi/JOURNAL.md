@@ -17,6 +17,14 @@ Une entrée par session de travail, **la plus récente en haut**. C'est le relai
 
 ---
 
+## 2026-11-16 — Claude Code — Corrections de fin de Sprint 6
+- **Tâche** : trois corrections demandées par l'utilisateur (question posée pour lever l'ambiguïté de « corrige-le »).
+- **Fait** : annulation d'un transfert (migration 0006, API, fiche et annulation dans l'app) ; billetage dans la clôture d'une caisse ; nom complet des comptes dans les listes de choix.
+- **Vérifications** : API 151 tests, migration 0006 montée, descendue et remontée, `alembic check` muet ; app 121 tests Vitest, 67 parcours Playwright verts (annulation de transfert et billetage ajoutés) ; captures bureau et 768 px.
+- **Décisions** : D-034.
+- **Problèmes** : aucun.
+- **À reprendre par le suivant** : Sprint 7 (US-PROD-01).
+
 ## 2026-11-16 — Claude Code — Sprint 6 : trésorerie
 - **Tâche** : en-tête de facture fictif (demande de l'utilisateur), puis US-TRES-01 à 05. L'envoi WhatsApp est reporté : l'utilisateur veut en discuter à la fin.
 - **Fait** : en-tête fictif dans `docker-compose.yml` et `api/.env.example`. API : `/tresorerie/synthese`, `/tresorerie/journal` (pièce d'origine par jointure), `/tresorerie/categories-depense`, `/tresorerie/depenses` (création, détail, annulation), `/tresorerie/transferts`, `/tresorerie/clotures` (+ `/preparation`), `/controles` (liste, nombre, marquage ; Super Admin) ; `paginer_lignes` pour les requêtes à plusieurs colonnes. App : sous-navigation commune (`SousNavigation`), Trésorerie (comptes avec synthèse et lien vers le journal, journal, dépenses, transferts, clôtures), Administration › À contrôler, compteur au tableau de bord du Super Admin.

@@ -16,6 +16,7 @@ import {
   FiltresDates,
   useComptes,
 } from "@/components/tresorerie/filtres";
+import { Billetage, totalBilletage, type Nombres } from "@/components/tresorerie/billetage";
 import { SousNavigationTresorerie } from "@/components/tresorerie/sous-navigation-tresorerie";
 import {
   CLE_TRESORERIE,
@@ -25,6 +26,7 @@ import {
 } from "@/components/tresorerie/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CaseACocher } from "@/components/ui/case-a-cocher";
 import { Champ } from "@/components/ui/champ";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
@@ -184,6 +186,8 @@ function FormulaireCloture({ onTermine }: { onTermine: () => void }) {
   const [compteChoisi, setCompteChoisi] = React.useState<number | null>(null);
   const [jour, setJour] = React.useState(dateDuJour());
   const [physique, setPhysique] = React.useState("");
+  const [parCoupures, setParCoupures] = React.useState(false);
+  const [nombres, setNombres] = React.useState<Nombres>({});
   const [commentaire, setCommentaire] = React.useState("");
   const [erreurs, setErreurs] = React.useState<{
     physique?: string;
@@ -204,14 +208,20 @@ function FormulaireCloture({ onTermine }: { onTermine: () => void }) {
     enabled: compteId !== null && jour !== "",
   });
   const recap = preparation.data;
-  const ecart = recap && physique ? soustraireDecimaux(physique, recap.solde_theorique) : null;
+  const compte = actifs.find((c) => c.id === compteId);
+  // Billetage : seulement pour des espèces ; le montant compté s'en déduit
+  const billetage = parCoupures && compte?.type === "CAISSE";
+  const montantCompte = billetage ? totalBilletage(nombres) : physique;
+  const ecart =
+    recap && montantCompte ? soustraireDecimaux(montantCompte, recap.solde_theorique) : null;
   const sens = ecart === null ? null : sensEcart(ecart);
 
   const envoyer = async (evenement: React.FormEvent) => {
     evenement.preventDefault();
     if (!recap || recap.deja_cloturee) return;
     const nouvelles: typeof erreurs = {};
-    if (!physique) nouvelles.physique = "Saisissez le montant compté (0 si le compte est vide).";
+    if (!montantCompte)
+      nouvelles.physique = "Saisissez le montant compté (0 si le compte est vide).";
     if (sens !== null && commentaire.trim().length === 0) {
       nouvelles.commentaire = "Expliquez l'écart : erreur de monnaie, dépense oubliée…";
     }
@@ -225,7 +235,7 @@ function FormulaireCloture({ onTermine }: { onTermine: () => void }) {
         corps: {
           compte_id: compteId,
           date_cloture: jour,
-          solde_physique: physique,
+          solde_physique: montantCompte,
           commentaire: commentaire.trim() || null,
         },
       });
@@ -249,6 +259,7 @@ function FormulaireCloture({ onTermine }: { onTermine: () => void }) {
           onChange={(id) => {
             setCompteChoisi(id);
             setPhysique("");
+            setNombres({});
           }}
         />
         <Champ libelle="Journée">
@@ -282,13 +293,26 @@ function FormulaireCloture({ onTermine }: { onTermine: () => void }) {
                 <Ligne libelle="− Sorties du jour" montant={donnees.total_sorties} />
                 <Ligne libelle="= Solde théorique" montant={donnees.solde_theorique} fort />
               </section>
-              <Champ libelle="Montant compté" erreur={erreurs.physique}>
+              {compte?.type === "CAISSE" && (
+                <CaseACocher
+                  libelle="Compter par billets et pièces"
+                  checked={parCoupures}
+                  onChange={(e) => setParCoupures(e.target.checked)}
+                />
+              )}
+              {billetage && <Billetage nombres={nombres} onChange={setNombres} />}
+              <Champ
+                libelle="Montant compté"
+                erreur={erreurs.physique}
+                aide={billetage ? "Total des billets et pièces." : undefined}
+              >
                 {(controle) => (
                   <ChampMontant
                     {...controle}
-                    autoFocus
+                    autoFocus={!billetage}
+                    readOnly={billetage}
                     className="w-52"
-                    value={physique}
+                    value={billetage ? (montantCompte === "0" ? "" : montantCompte) : physique}
                     onChange={setPhysique}
                   />
                 )}

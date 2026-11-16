@@ -1,10 +1,9 @@
 """Transferts entre comptes (US-TRES-03) : débit de la source et crédit de la
 destination du même montant, dans une seule transaction, sans effet sur le résultat.
-Pas d'annulation (le schéma n'en prévoit pas) : une erreur se corrige par un transfert
-dans l'autre sens."""
+Annulation avec motif et contre-passation (migration 0006, D-034)."""
 
 import uuid
-from datetime import date
+from datetime import UTC, date, datetime
 
 from fastapi import status
 from sqlalchemy import Select, or_, select
@@ -14,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.erreurs import ErreurMetier
 from app.db.pagination import paginer
 from app.models import CompteTresorerie, TransfertInterne, Utilisateur
-from app.models.enums import TypeFluxTresorerie
+from app.models.enums import StatutDocument, TypeFluxTresorerie
 from app.schemas.common import PaginationParams
 from app.schemas.depenses import TransfertCreation, TransfertLecture
 from app.services.depenses import date_passee
@@ -30,7 +29,12 @@ async def _lectures(
     comptes = {c.id: c.nom for c in (await session.execute(select(CompteTresorerie))).scalars()}
     auteurs = await noms_des_auteurs(
         session,
-        [u for t in transferts for u in (t.cree_par, t.controle_par) if u is not None],
+        [
+            u
+            for t in transferts
+            for u in (t.cree_par, t.annule_par, t.controle_par)
+            if u is not None
+        ],
     )
     return [
         TransfertLecture(
@@ -44,6 +48,10 @@ async def _lectures(
             montant=t.montant,
             libelle=t.libelle,
             reference_paiement=t.reference_paiement,
+            statut=t.statut,
+            annule_le=t.annule_le,
+            annule_par=auteurs.get(t.annule_par) if t.annule_par else None,
+            motif_annulation=t.motif_annulation,
             auteur=auteurs.get(t.cree_par, ""),
             date_creation=t.date_creation,
             controle_le=t.controle_le,
@@ -153,3 +161,56 @@ async def creer_transfert(
             raise
         return await lire_transfert(session, existant), False
     return await lire_transfert(session, transfert.id), True
+
+
+async def annuler_transfert(
+    session: AsyncSession, transfert_id: uuid.UUID, motif: str, auteur: Utilisateur
+) -> TransfertLecture:
+    """Statut ANNULE (D-034) : l'argent repart du compte d'arrivée vers le compte de départ,
+    par deux écritures inverses (règle 4). Refusé si le compte d'arrivée ne l'a plus."""
+    transfert = (
+        await session.execute(
+            select(TransfertInterne).where(TransfertInterne.id == transfert_id).with_for_update()
+        )
+    ).scalar_one_or_none()
+    if transfert is None:
+        raise ErreurMetier(
+            "TRANSFERT_INTROUVABLE", "Ce transfert n'existe pas.", status.HTTP_404_NOT_FOUND
+        )
+    if transfert.statut != StatutDocument.VALIDE:
+        raise ErreurMetier(
+            "TRANSFERT_ANNULE", f"Le transfert {transfert.numero} est déjà annulé.", 409
+        )
+    # Comptes d'origine, même désactivés depuis : la contre-passation y revient toujours
+    comptes = await verrouiller_comptes(
+        session,
+        {transfert.compte_source_id, transfert.compte_destination_id},
+        actifs=False,
+    )
+    libelle = f"Annulation du transfert {transfert.numero}"
+    await ecrire_mouvement_tresorerie(
+        session,
+        comptes[transfert.compte_destination_id],
+        type_flux=TypeFluxTresorerie.ANNULATION,
+        sens="DEBIT",
+        montant=transfert.montant,
+        libelle=libelle,
+        utilisateur_id=auteur.id,
+        transfert_id=transfert.id,
+    )
+    await ecrire_mouvement_tresorerie(
+        session,
+        comptes[transfert.compte_source_id],
+        type_flux=TypeFluxTresorerie.ANNULATION,
+        sens="CREDIT",
+        montant=transfert.montant,
+        libelle=libelle,
+        utilisateur_id=auteur.id,
+        transfert_id=transfert.id,
+    )
+    transfert.statut = StatutDocument.ANNULE
+    transfert.annule_par = auteur.id
+    transfert.annule_le = datetime.now(UTC)
+    transfert.motif_annulation = motif.strip()
+    await session.commit()
+    return await lire_transfert(session, transfert_id)

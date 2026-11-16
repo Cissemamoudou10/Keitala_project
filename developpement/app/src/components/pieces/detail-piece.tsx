@@ -191,7 +191,7 @@ export function ReglementUlterieur<T extends PieceLue>({
               value={compteId === null ? "" : String(compteId)}
               onValueChange={(valeur) => setCompteId(Number(valeur))}
             >
-              <SelectTrigger {...controle} className="w-52">
+              <SelectTrigger {...controle} className="w-72">
                 <SelectValue placeholder="Choisir le compte" />
               </SelectTrigger>
               <SelectContent>

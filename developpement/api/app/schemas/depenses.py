@@ -89,6 +89,10 @@ class TransfertLecture(BaseModel):
     montant: Decimal
     libelle: str | None
     reference_paiement: str | None
+    statut: StatutDocument
+    annule_le: datetime | None
+    annule_par: str | None
+    motif_annulation: str | None
     auteur: str
     date_creation: datetime
     controle_le: datetime | None

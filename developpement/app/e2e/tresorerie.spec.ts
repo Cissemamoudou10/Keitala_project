@@ -90,7 +90,9 @@ test("transfert entre deux comptes, visible des deux côtés", async ({ page }) 
   await panneau.getByLabel("Libellé").fill(libelle);
   await panneau.getByRole("button", { name: "Enregistrer le transfert" }).click();
 
-  await expect(page.getByText(/Transfert TRF-.* enregistré/).first()).toBeVisible();
+  const notification = page.getByText(/Transfert TRF-.* enregistré/).first();
+  await expect(notification).toBeVisible();
+  const numero = /TRF-\d{4}-\d+/.exec((await notification.textContent()) ?? "")![0];
   // Le libellé n'est affiché qu'en bureau : on reconnaît la ligne à ses deux comptes
   await expect(
     page
@@ -100,6 +102,19 @@ test("transfert entre deux comptes, visible des deux côtés", async ({ page }) 
   ).toBeVisible();
   await page.goto("/tresorerie/journal");
   await expect(page.getByText(/Compte Bancaire → Wave/).first()).toBeVisible();
+
+  // Annulation (D-034) : l'argent repart de Wave vers le compte bancaire
+  await page.goto("/tresorerie/transferts");
+  await page.getByRole("button", { name: numero }).click();
+  const fiche = page.getByRole("dialog", { name: `Transfert ${numero}` });
+  await fiche.getByRole("button", { name: "Annuler le transfert" }).click();
+  const fenetre = page.getByRole("dialog", { name: `Annuler le transfert ${numero}` });
+  const effets = visible(await fenetre.textContent());
+  expect(effets).toContain("1 000 FCFA sortiront de « Wave »");
+  expect(effets).toContain("1 000 FCFA reviendront sur « Compte Bancaire »");
+  await fenetre.getByLabel("Motif").fill("Mauvais compte de destination");
+  await fenetre.getByRole("button", { name: "Annuler le transfert" }).click();
+  await expect(fiche.getByText(/Annulé le .* : Mauvais compte de destination/)).toBeVisible();
 });
 
 test("clôture avec écart, puis contrôlée par le Super Admin", async ({ page }) => {
@@ -118,7 +133,10 @@ test("clôture avec écart, puis contrôlée par le Super Admin", async ({ page 
   await choisir(page, "Compte", nom);
   const recap = panneau.getByRole("region", { name: "Récapitulatif du jour" });
   expect(visible(await recap.textContent())).toContain("= Solde théorique0 FCFA");
-  await panneau.getByLabel("Montant compté").fill("500");
+  // Billetage : 2 pièces de 250 FCFA, le montant compté se calcule seul
+  await panneau.getByRole("checkbox", { name: "Compter par billets et pièces" }).check();
+  await panneau.getByLabel("Nombre : Pièce de 250 FCFA").fill("2");
+  await expect(panneau.getByLabel("Montant compté")).toHaveValue("500");
   await expect(panneau.getByText(/Excédent de 500\sFCFA/)).toBeVisible();
   await panneau.getByRole("button", { name: "Clôturer" }).click();
   await expect(panneau.getByText(/Expliquez l'écart/)).toBeVisible();

@@ -248,3 +248,11 @@ Chaque décision qui engage le projet est notée ici, avec sa raison. Une décis
   - En-tête de facture fictif (« Keitala SARL », NIF et RCCM à zéros) dans `docker-compose.yml` (service `api`) et `api/.env.example` seulement, jamais dans les valeurs par défaut du code : il ne peut pas partir en production par erreur.
 - **Conséquences** : un manquant constaté sur un jour passé débite le solde du moment ; refusé si la caisse ne l'a plus (`SOLDE_INSUFFISANT`).
 
+## D-034 — Annulation des transferts et billetage
+- **Date** : 16/11/2026 · **Statut** : Acceptée · **Auteur** : utilisateur (« corrige-le »), mis en œuvre par Claude
+- **Contexte** : à la fin du Sprint 6, l'utilisateur a demandé trois corrections : annuler un transfert, aider au billetage, voir le nom complet des comptes dans les listes de choix. Remplace, pour les transferts, la règle « pas d'annulation » de D-033.
+- **Décision** :
+  - Migration `0006` : `transferts_internes` reçoit `statut` (VALIDE par défaut), `annule_par`, `annule_le`, `motif_annulation` et la contrainte `chk_transfert_annulation`. `POST /tresorerie/transferts/{id}/annuler` (Gestionnaire, motif) : débit du compte d'arrivée puis crédit du compte de départ (écritures `ANNULATION`) ; refusé si le compte d'arrivée n'a plus l'argent (`SOLDE_INSUFFISANT`). Fiche du transfert dans un panneau, avec l'annulation.
+  - Billetage : dans la clôture d'un compte Caisse, case « Compter par billets et pièces » ; nombre par coupure BCEAO (billets de 10 000 à 500, pièces de 500 à 5 FCFA) ; le montant compté se calcule seul. Le détail par coupure n'est pas enregistré (le schéma n'a pas de colonne pour cela) : seul le total compte.
+  - Listes de choix : texte aligné à gauche, choix de compte élargis (nom complet visible).
+

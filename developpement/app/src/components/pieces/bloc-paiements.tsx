@@ -138,7 +138,7 @@ export function BlocPaiements({
                   value={paiement.compteId === null ? "" : String(paiement.compteId)}
                   onValueChange={(valeur) => modifier(paiement.cle, { compteId: Number(valeur) })}
                 >
-                  <SelectTrigger {...controle} className="w-56">
+                  <SelectTrigger {...controle} className="w-72">
                     <SelectValue placeholder="Choisir le compte" />
                   </SelectTrigger>
                   <SelectContent>

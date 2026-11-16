@@ -222,3 +222,15 @@ async def cloturer(
     donnees: ClotureCreation, session: Session, auteur: Gestionnaire
 ) -> ClotureLecture:
     return await clotures.cloturer(session, donnees, auteur)
+
+
+@router.post("/transferts/{transfert_id}/annuler", summary="Annulation avec contre-passation")
+async def annuler_transfert(
+    transfert_id: uuid.UUID, donnees: Annulation, session: Session, auteur: Gestionnaire
+) -> TransfertLecture:
+    return await transferts.annuler_transfert(session, transfert_id, donnees.motif, auteur)
+
+
+@router.get("/transferts/{transfert_id}", summary="Détail d'un transfert")
+async def lire_transfert(transfert_id: uuid.UUID, session: Session) -> TransfertLecture:
+    return await transferts.lire_transfert(session, transfert_id)

@@ -7,7 +7,8 @@ import { ArrowRight, Plus } from "lucide-react";
 import { Page } from "@/components/coquille/page";
 import { EtatRequete } from "@/components/etats/etat-requete";
 import { EtatVide } from "@/components/etats/etat-vide";
-import { SqueletteTableau } from "@/components/etats/squelettes";
+import { SqueletteFormulaire, SqueletteTableau } from "@/components/etats/squelettes";
+import { AnnulationPiece, Ligne } from "@/components/pieces/detail-piece";
 import { ConfirmationMontant } from "@/components/pieces/confirmation-montant";
 import { dateDuJour, messageEchec } from "@/components/pieces/saisie";
 import { ChampMontant } from "@/components/saisie/champ-montant";
@@ -19,6 +20,7 @@ import {
 } from "@/components/tresorerie/filtres";
 import { SousNavigationTresorerie } from "@/components/tresorerie/sous-navigation-tresorerie";
 import { CLE_TRESORERIE, type PageTransferts, type Transfert } from "@/components/tresorerie/types";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Champ } from "@/components/ui/champ";
 import { Input } from "@/components/ui/input";
@@ -34,11 +36,17 @@ import {
 } from "@/components/ui/table";
 import { appelerApi } from "@/lib/api";
 import { additionnerDecimaux, estInferieur, soustraireDecimaux } from "@/lib/decimal";
-import { formaterDate, formaterMontant, formaterMontantSeul } from "@/lib/formats";
+import {
+  formaterDate,
+  formaterDateHeure,
+  formaterMontant,
+  formaterMontantSeul,
+} from "@/lib/formats";
 import { notifier } from "@/lib/notifications";
 import { useParametresAdresse } from "@/lib/parametres-adresse";
 import { usePeut } from "@/lib/session";
 import { SEUIL_CONFIRMATION_FCFA } from "@/lib/seuils";
+import { cn } from "@/lib/utils";
 
 /** Transferts entre comptes (US-TRES-03) : versement en banque, retrait, dépôt… */
 export function Transferts() {
@@ -47,8 +55,15 @@ export function Transferts() {
   const compte = lire("compte");
   const du = lire("du");
   const au = lire("au");
+  const transfertId = lire("transfert") || null;
   const [creation, setCreation] = React.useState(false);
 
+  const detail = useQuery({
+    queryKey: [...CLE_TRESORERIE, "transferts", transfertId],
+    queryFn: ({ signal }) =>
+      appelerApi<Transfert>(`tresorerie/transferts/${transfertId}`, { signal }),
+    enabled: transfertId !== null,
+  });
   const requete = useQuery({
     queryKey: [...CLE_TRESORERIE, "transferts", { compte, du, au, page }],
     queryFn: ({ signal }) =>
@@ -101,11 +116,31 @@ export function Transferts() {
               </TableHeader>
               <TableBody>
                 {donnees.items.map((t) => (
-                  <TableRow key={t.id}>
+                  <TableRow
+                    key={t.id}
+                    className="cursor-pointer"
+                    onClick={() => modifier({ transfert: t.id, page })}
+                  >
                     <TableCell className="whitespace-nowrap text-texte-2">
                       {formaterDate(t.date_transfert)}
                     </TableCell>
-                    <TableCell className="whitespace-nowrap tabular-nums">{t.numero}</TableCell>
+                    <TableCell className="whitespace-nowrap tabular-nums">
+                      <button
+                        type="button"
+                        className={cn("text-left", t.statut === "ANNULE" && "line-through")}
+                        onClick={(evenement) => {
+                          evenement.stopPropagation();
+                          modifier({ transfert: t.id, page });
+                        }}
+                      >
+                        {t.numero}
+                      </button>
+                      {t.statut === "ANNULE" && (
+                        <Badge variant="neutre" className="ml-2">
+                          Annulé
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <span className="flex flex-wrap items-center gap-1">
                         {t.compte_source}
@@ -138,6 +173,15 @@ export function Transferts() {
         description="Le compte de départ est débité et celui d'arrivée crédité du même montant."
       >
         {creation && <FormulaireTransfert onTermine={() => setCreation(false)} />}
+      </Panneau>
+      <Panneau
+        ouvert={transfertId !== null}
+        onOuvertChange={(ouvert) => !ouvert && modifier({ transfert: null, page })}
+        titre={detail.data ? `Transfert ${detail.data.numero}` : "Transfert"}
+      >
+        <EtatRequete requete={detail} chargement={<SqueletteFormulaire champs={5} />}>
+          {(transfert) => <DetailTransfert transfert={transfert} />}
+        </EtatRequete>
       </Panneau>
     </Page>
   );
@@ -291,5 +335,65 @@ function FormulaireTransfert({ onTermine }: { onTermine: () => void }) {
         onConfirmer={enregistrer}
       />
     </form>
+  );
+}
+
+/** Fiche d'un transfert, avec son annulation (D-034). */
+function DetailTransfert({ transfert }: { transfert: Transfert }) {
+  const peutSaisir = usePeut("saisir_tresorerie");
+  const clientRequetes = useQueryClient();
+  const annule = transfert.statut === "ANNULE";
+  const montant = formaterMontant(transfert.montant);
+
+  return (
+    <div className="flex flex-col gap-6">
+      {annule && (
+        <p className="rounded-md bg-neutre-fond px-3 py-2 text-neutre">
+          Annulé le {transfert.annule_le ? formaterDateHeure(transfert.annule_le) : ""} par{" "}
+          {transfert.annule_par} : {transfert.motif_annulation}
+        </p>
+      )}
+      <dl className="flex flex-col gap-2">
+        <Ligne libelle="Montant">
+          <span className="font-semibold tabular-nums">{montant}</span>
+        </Ligne>
+        <Ligne libelle="De">{transfert.compte_source}</Ligne>
+        <Ligne libelle="Vers">{transfert.compte_destination}</Ligne>
+        {transfert.libelle && <Ligne libelle="Libellé">{transfert.libelle}</Ligne>}
+        {transfert.reference_paiement && (
+          <Ligne libelle="Référence">{transfert.reference_paiement}</Ligne>
+        )}
+        <Ligne libelle="Date">{formaterDate(transfert.date_transfert)}</Ligne>
+        <Ligne libelle="Saisi par">{transfert.auteur}</Ligne>
+        <Ligne libelle="Contrôle">
+          {transfert.controle_le
+            ? `Contrôlé le ${formaterDate(transfert.controle_le)} par ${transfert.controle_par}`
+            : "À contrôler"}
+        </Ligne>
+      </dl>
+      {peutSaisir && !annule && (
+        <div>
+          <AnnulationPiece
+            piece={transfert}
+            adresse={`tresorerie/transferts/${transfert.id}/annuler`}
+            onEnregistre={async (resultat) => {
+              clientRequetes.setQueryData([...CLE_TRESORERIE, "transferts", resultat.id], resultat);
+              await clientRequetes.invalidateQueries({ queryKey: CLE_TRESORERIE });
+            }}
+            effets={[
+              `${montant} sortiront de « ${transfert.compte_destination} ».`,
+              `${montant} reviendront sur « ${transfert.compte_source} ».`,
+            ]}
+            libelles={{
+              action: "Annuler le transfert",
+              garder: "Garder le transfert",
+              description: "Le transfert restera dans la liste, marqué « Annulé ».",
+              motifManquant: "Indiquez pourquoi le transfert est annulé.",
+              annule: (numero) => `Transfert ${numero} annulé`,
+            }}
+          />
+        </div>
+      )}
+    </div>
   );
 }

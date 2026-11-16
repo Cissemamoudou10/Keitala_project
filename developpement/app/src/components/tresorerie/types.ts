@@ -55,6 +55,10 @@ export type Transfert = Controle & {
   montant: string;
   libelle: string | null;
   reference_paiement: string | null;
+  statut: "BROUILLON" | "VALIDE" | "ANNULE";
+  annule_le: string | null;
+  annule_par: string | null;
+  motif_annulation: string | null;
   auteur: string;
   date_creation: string;
 };

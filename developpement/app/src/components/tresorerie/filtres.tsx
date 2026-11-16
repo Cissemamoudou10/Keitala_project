@@ -40,7 +40,7 @@ export function FiltreCompte({
           value={valeur || TOUS}
           onValueChange={(choix) => onChange(choix === TOUS ? null : choix)}
         >
-          <SelectTrigger {...controle} className="w-56">
+          <SelectTrigger {...controle} className="w-72">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -130,7 +130,7 @@ export function ChoixCompte({
           value={valeur === null ? "" : String(valeur)}
           onValueChange={(choix) => onChange(Number(choix))}
         >
-          <SelectTrigger {...controle} className="w-64">
+          <SelectTrigger {...controle} className="w-72">
             <SelectValue placeholder="Choisir le compte" />
           </SelectTrigger>
           <SelectContent>

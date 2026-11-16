@@ -417,3 +417,70 @@ async def test_operations_saisies_par_le_gestionnaire(
 
     assert [r.status_code for r in reponses] == [403, 403, 403]
     assert lecture.status_code == 200
+
+
+async def test_annulation_d_un_transfert(
+    client: AsyncClient, db_session: AsyncSession, gestionnaire: Utilisateur
+) -> None:
+    """D-034 : l'argent repart du compte d'arrivée vers le compte de départ."""
+    entetes = entetes_pour(gestionnaire)
+    await alimenter(db_session, "CAISSE", "50000", gestionnaire)
+    caisse = await compte(db_session, "CAISSE")
+    wave = await compte(db_session, "WAVE")
+    creation = await client.post(
+        "/api/v1/tresorerie/transferts",
+        json={
+            "cle_idempotence": str(uuid.uuid4()),
+            "compte_source_id": caisse.id,
+            "compte_destination_id": wave.id,
+            "montant": "20000",
+        },
+        headers=entetes,
+    )
+    adresse = f"/api/v1/tresorerie/transferts/{creation.json()['id']}/annuler"
+
+    annulation = await client.post(adresse, json={"motif": "Mauvais compte"}, headers=entetes)
+    encore = await client.post(adresse, json={"motif": "Encore"}, headers=entetes)
+
+    assert annulation.status_code == 200
+    assert (annulation.json()["statut"], annulation.json()["motif_annulation"]) == (
+        "ANNULE",
+        "Mauvais compte",
+    )
+    assert encore.status_code == 409
+    await db_session.refresh(caisse)
+    await db_session.refresh(wave)
+    assert (caisse.solde_actuel, wave.solde_actuel) == (Decimal("50000.00"), Decimal("0.00"))
+
+
+async def test_annulation_de_transfert_refusee_si_l_argent_est_reparti(
+    client: AsyncClient, db_session: AsyncSession, gestionnaire: Utilisateur
+) -> None:
+    entetes = entetes_pour(gestionnaire)
+    await alimenter(db_session, "CAISSE", "20000", gestionnaire)
+    caisse = await compte(db_session, "CAISSE")
+    wave = await compte(db_session, "WAVE")
+    creation = await client.post(
+        "/api/v1/tresorerie/transferts",
+        json={
+            "cle_idempotence": str(uuid.uuid4()),
+            "compte_source_id": caisse.id,
+            "compte_destination_id": wave.id,
+            "montant": "20000",
+        },
+        headers=entetes,
+    )
+    # L'argent a déjà été dépensé depuis Wave
+    await client.post(
+        "/api/v1/tresorerie/depenses",
+        json=depense(await categorie(db_session, "Divers"), wave.id, "15000"),
+        headers=entetes,
+    )
+
+    reponse = await client.post(
+        f"/api/v1/tresorerie/transferts/{creation.json()['id']}/annuler",
+        json={"motif": "Erreur"},
+        headers=entetes,
+    )
+
+    assert reponse.status_code == 409 and reponse.json()["code"] == "SOLDE_INSUFFISANT"

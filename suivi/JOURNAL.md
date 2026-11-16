@@ -17,6 +17,15 @@ Une entrée par session de travail, **la plus récente en haut**. C'est le relai
 
 ---
 
+## 2026-11-16 — Claude Code — Sprint 6 : trésorerie
+- **Tâche** : en-tête de facture fictif (demande de l'utilisateur), puis US-TRES-01 à 05. L'envoi WhatsApp est reporté : l'utilisateur veut en discuter à la fin.
+- **Fait** : en-tête fictif dans `docker-compose.yml` et `api/.env.example`. API : `/tresorerie/synthese`, `/tresorerie/journal` (pièce d'origine par jointure), `/tresorerie/categories-depense`, `/tresorerie/depenses` (création, détail, annulation), `/tresorerie/transferts`, `/tresorerie/clotures` (+ `/preparation`), `/controles` (liste, nombre, marquage ; Super Admin) ; `paginer_lignes` pour les requêtes à plusieurs colonnes. App : sous-navigation commune (`SousNavigation`), Trésorerie (comptes avec synthèse et lien vers le journal, journal, dépenses, transferts, clôtures), Administration › À contrôler, compteur au tableau de bord du Super Admin.
+- **Non fait / en cours** : aide au billetage par coupures (montant compté saisi directement) ; WhatsApp (à discuter).
+- **Vérifications** : API : ruff, format, mypy, `alembic check`, 149 tests (10 nouveaux). App : format, lint, types, 119 tests Vitest, build, 67 parcours Playwright verts (10 nouveaux). Captures bureau et 768 px, console sans erreur. Corrigés en route : test qui antidatait une écriture refusé par le déclencheur du journal immuable (insertion directe à la place) ; classe `bg-fond-2` inexistante (P-022) ; deux vérifications e2e dépendant de l'espace insécable ou d'une colonne masquée en tablette.
+- **Décisions** : D-033.
+- **Problèmes** : P-022 ouvert et résolu ; P-006 complété.
+- **À reprendre par le suivant** : Sprint 7 (US-PROD-01).
+
 ## 2026-11-16 — Claude Code — Sprint 5 : ventes
 - **Tâche** : P-019 (accord de l'utilisateur sur la recommandation), puis US-VTE-01 à 06 et la fin de US-REF-02.
 - **Fait** : questions posées sur la facture (réponses : page imprimable, A4, en-tête provisoire). API : migration `0005` (montant des lignes au franc) ; briques communes `services/pieces.py` et `schemas/pieces.py`, reprises par les achats ; `/ventes` (liste filtrée par type, client, période, « à encaisser », recherche ; création ; détail ; `/reglements` ; `/annuler`) et `/ventes/dons`, écriture réservée au Gestionnaire ; `/entreprise` (en-tête des factures, réglages `ENTREPRISE_*`). App : blocs communs `components/pieces/` (lignes d'articles, paiements, récapitulatif, confirmation, règlement ultérieur, annulation, listes), écran des achats réécrit dessus sans changement visible ; `/ventes` (onglets Toutes, À encaisser, Dons ; fiche avec encaissement et annulation ; lien vers la facture), `/ventes/nouvelle` (client ou client comptoir, prix catalogue suivant l'unité, stock disponible et blocage, encaissements, case « Don / échantillon », brouillon, Ctrl + Entrée, confirmation en lettres), `/ventes/{id}/facture` (A4, groupe de routes `(impression)` sans coquille).

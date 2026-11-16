@@ -145,6 +145,13 @@ Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack 
 - Blocs communs aux pièces dans `components/pieces/` : `LignesArticles` (`sortie` : stock disponible et prix catalogue ; `sansPrix` : don), `BlocPaiements` (`flux` : décaissement ou encaissement), `Recapitulatif`, `ConfirmationMontant`, `ReglementUlterieur`, `AnnulationPiece`, `saisie.ts` (brouillon, montants, `messageEchec`). Les écrans d'achat et de vente ne font que les assembler.
 - Droit `saisir_vente` (Gestionnaire seul). En-tête des factures : `GET /api/entreprise`.
 
+## Trésorerie (Sprint 6)
+
+- `/tresorerie` (synthèse et comptes), `/tresorerie/journal`, `/depenses`, `/transferts`, `/clotures` ; `/administration/controles` (Super Admin). Sous-navigation : `SousNavigation` (`components/ui/sous-navigation.tsx`), à placer sous `<Suspense>`.
+- Filtres et choix de compte communs : `components/tresorerie/filtres.tsx` (`useComptes`, `FiltreCompte`, `FiltresDates`, `ChoixCompte` avec solde après).
+- Droits : `saisir_tresorerie` (Gestionnaire), `controler` (Super Admin). Après une écriture, invalider `CLE_TRESORERIE` relit aussi les comptes.
+- Jetons de couleur : seulement ceux de `globals.css` (`bg-fond-doux`, pas `bg-fond-2`) ; si le formatage range une classe en tête, elle est probablement inconnue.
+
 ## Next.js 16 : à savoir
 
 - Version récente : lire le guide utile dans `node_modules/next/dist/docs/` avant d'écrire du code (rappel dans `AGENTS.md` de ce dossier, recréé par `next dev`).

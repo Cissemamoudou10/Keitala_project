@@ -57,6 +57,7 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Impact** : US-VTE-03.
 - **Piste** : demander un modèle de facture actuel au client.
 - **Avancement** (16/11/2026) : format A4 et page imprimable décidés (D-032). Reste à obtenir du client la raison sociale, l'adresse, le téléphone, les identifiants (NIF, RCCM), les mentions et le logo ; ils se règlent dans `.env` de l'API (`ENTREPRISE_*`), sans code, sauf le logo (non prévu).
+- **Avancement** (16/11/2026) : à la demande de l'utilisateur, en-tête fictif en développement (D-033) ; les vraies valeurs restent à obtenir avant la mise en production.
 
 ## P-007 — Domaine et serveur
 - **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
@@ -149,6 +150,11 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Date** : 16/11/2026 · **Statut** : Résolu · **Gravité** : Majeur · **Signalé par** : Claude
 - **Constat** : `/tiers` est hors menu ; on y arrivait par les liens « Voir les clients » et « Voir les fournisseurs » des pages provisoires Ventes et Achats. Ces pages remplacées (Sprints 4 et 5), plus aucun chemin n'y menait. Révélé par le parcours e2e du Sprint 2 qui passait par ce lien.
 - **Résolution** (16/11/2026) : liens rétablis à côté de l'action principale des pages Ventes et Achats ; le parcours des achats vérifie aussi le lien. À revoir si les tiers entrent un jour dans le menu.
+
+## P-022 — Fond des récapitulatifs invisible
+- **Date** : 16/11/2026 · **Statut** : Résolu · **Gravité** : Mineur · **Signalé par** : Claude
+- **Constat** : les récapitulatifs d'achat, de vente et les totaux des fiches utilisaient la classe `bg-fond-2`, qui n'existe pas dans les jetons de la charte : aucun fond ne s'affichait (Sprints 4 et 5). Repéré parce que le formatage rangeait la classe parmi les inconnues.
+- **Résolution** (16/11/2026) : remplacée par `bg-fond-doux` partout.
 
 ## C. Risques à surveiller
 

@@ -236,3 +236,15 @@ Chaque décision qui engage le projet est notée ici, avec sa raison. Une décis
   - Briques communes aux pièces : `services/pieces.py` et `schemas/pieces.py` (API), `components/pieces/` (app).
 - **Conséquences** : l'envoi par WhatsApp (Could Have de US-VTE-03) suppose un lien de facture accessible au client : à revoir s'il est demandé.
 
+## D-033 — Trésorerie : dépenses, transferts, clôtures, contrôle
+- **Date** : 16/11/2026 · **Statut** : Proposée · **Auteur** : Claude
+- **Contexte** : Sprint 6 (US-TRES-01 à 05). L'utilisateur a aussi demandé un en-tête de facture fictif pour le développement (P-006).
+- **Décisions** :
+  - Clôture : récapitulatif calculé depuis le journal du compte (solde d'ouverture = solde après la dernière écriture d'avant le jour ; entrées et sorties = écritures du jour, heure de Bamako). Un écart exige un commentaire et s'inscrit au journal (`ECART_CLOTURE`, crédit pour un excédent, débit pour un manquant) : le solde du compte suit le montant compté, comme le prévoit le schéma (`cloture_id`). Une clôture par compte et par jour ; date passée permise, jamais future. Pas d'aide au billetage par coupures pour l'instant (montant compté saisi directement).
+  - Transferts : débit de la source puis crédit de la destination, dans une transaction ; pas d'annulation (le schéma n'a pas de statut) : une erreur se corrige par un transfert inverse.
+  - Dépenses : catégorie obligatoire (les 7 catégories de l'Excel, dont « Divers »), compte payeur proposé = Caisse, confirmation en lettres au-delà du seuil, annulation avec motif (écriture `ANNULATION` au crédit du compte).
+  - Droits : dépenses, transferts et clôtures saisis par le Gestionnaire ; contrôle réservé au Super Admin (`/controles`, aussi en lecture) ; le Consultant consulte.
+  - Contrôle a posteriori : dépenses (annulées comprises), transferts, inventaires clos (validés ou abandonnés) et clôtures ; marquage un par un, date et nom gardés ; compteur au tableau de bord du Super Admin ; page Administration › À contrôler.
+  - En-tête de facture fictif (« Keitala SARL », NIF et RCCM à zéros) dans `docker-compose.yml` (service `api`) et `api/.env.example` seulement, jamais dans les valeurs par défaut du code : il ne peut pas partir en production par erreur.
+- **Conséquences** : un manquant constaté sur un jour passé débite le solde du moment ; refusé si la caisse ne l'a plus (`SOLDE_INSUFFISANT`).
+

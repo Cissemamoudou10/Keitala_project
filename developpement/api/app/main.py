@@ -7,11 +7,13 @@ from app.routers import (
     achats,
     articles,
     auth,
+    entreprise,
     sante,
     stocks,
     tiers,
     tresorerie,
     utilisateurs,
+    ventes,
 )
 
 VERSION = "0.1.0"
@@ -45,6 +47,8 @@ def create_app() -> FastAPI:
         tiers.router,
         stocks.router,
         achats.router,
+        ventes.router,
+        entreprise.router,
     ):
         app.include_router(routeur, prefix="/api/v1")
     return app

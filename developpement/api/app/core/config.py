@@ -22,6 +22,16 @@ class Settings(BaseSettings):
 
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
+    # En-tête des factures (US-VTE-03). Provisoire tant que le client ne les a pas
+    # fournies (P-006) : à régler dans .env, sans modifier le code.
+    ENTREPRISE_NOM: str = "Keitala"
+    ENTREPRISE_ADRESSE: str = ""
+    ENTREPRISE_TELEPHONE: str = ""
+    # NIF, RCCM… sur une ligne (« NIF : … · RCCM : … »)
+    ENTREPRISE_IDENTIFIANTS: str = ""
+    # Mention en pied de facture (ex. « Merci de votre confiance »)
+    ENTREPRISE_MENTIONS: str = ""
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     @model_validator(mode="after")

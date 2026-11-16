@@ -33,13 +33,16 @@ def nom_article(article: Article) -> str:
     return f"{article.designation} {article.contenance or ''}".strip()
 
 
-class LigneSaisie(Protocol):
+class LigneQuantite(Protocol):
     @property
     def article_id(self) -> uuid.UUID: ...
     @property
     def unite_id(self) -> int | None: ...
     @property
     def quantite(self) -> Decimal: ...
+
+
+class LigneSaisie(LigneQuantite, Protocol):
     @property
     def prix_unitaire(self) -> Decimal: ...
 
@@ -54,7 +57,7 @@ def exiger_articles_actifs(articles: dict[uuid.UUID, Article]) -> None:
 
 
 async def facteurs_des_lignes(
-    session: AsyncSession, lignes: Sequence[LigneSaisie]
+    session: AsyncSession, lignes: Sequence[LigneQuantite]
 ) -> list[Decimal]:
     """Facteur vers l'unité de base de chaque ligne (1 sans unité de saisie)."""
     ids = {ligne.unite_id for ligne in lignes if ligne.unite_id is not None}
@@ -78,7 +81,7 @@ async def facteurs_des_lignes(
     return facteurs
 
 
-def quantite_base(ligne: LigneSaisie, facteur: Decimal) -> Decimal:
+def quantite_base(ligne: LigneQuantite, facteur: Decimal) -> Decimal:
     return (ligne.quantite * facteur).quantize(QUANTITE, ROUND_HALF_UP)
 
 

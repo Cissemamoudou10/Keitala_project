@@ -1,10 +1,12 @@
-import { Page } from "@/components/coquille/page";
+import { Suspense } from "react";
 
-// Écran provisoire : contenu au Sprint 7 (suivi/AVANCEMENT.md).
+import { Ordres } from "@/components/production/ordres";
+
+// Ordres de fabrication (US-PROD-02). Filtres lus dans l'adresse : rendu sous <Suspense>.
 export default function PageProduction() {
   return (
-    <Page titre="Production" description="Recettes et ordres de fabrication.">
-      <p className="text-texte-2">Cet écran sera disponible prochainement.</p>
-    </Page>
+    <Suspense>
+      <Ordres />
+    </Suspense>
   );
 }

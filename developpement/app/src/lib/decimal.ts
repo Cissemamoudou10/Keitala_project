@@ -89,3 +89,18 @@ export function additionnerDecimaux(valeurs: string[]): string | null {
   }
   return total;
 }
+
+/** Quotient exact a ÷ b de deux décimaux positifs, arrondi (demi vers le haut). */
+export function diviserDecimaux(a: string, b: string, decimales = 3): string | null {
+  const x = lire(a);
+  const y = lire(b);
+  if (!x || !y || y.valeur === 0n || x.valeur < 0n || y.valeur < 0n) return null;
+  // a ÷ b = (xa / 10^da) ÷ (yb / 10^db) ; on garde `decimales` chiffres après la virgule
+  const numerateur = x.valeur * 10n ** BigInt(y.decimales + decimales);
+  const denominateur = y.valeur * 10n ** BigInt(x.decimales);
+  let quotient = numerateur / denominateur;
+  if ((numerateur % denominateur) * 2n >= denominateur) quotient += 1n;
+  const chiffres = quotient.toString().padStart(decimales + 1, "0");
+  const entier = chiffres.slice(0, chiffres.length - decimales);
+  return decimales > 0 ? `${entier}.${chiffres.slice(-decimales)}` : entier;
+}

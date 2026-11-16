@@ -31,6 +31,10 @@ const DROITS = {
   saisir_tresorerie: ["GESTIONNAIRE"],
   /** Contrôle a posteriori des opérations sensibles (US-TRES-05, règle 9). */
   controler: ["SUPER_ADMIN"],
+  /** Recettes : créées et modifiées par le Super Admin et le Gestionnaire (matrice). */
+  gerer_recettes: ["SUPER_ADMIN", "GESTIONNAIRE"],
+  /** Ordres de fabrication : lancés, déclarés et clôturés par le Gestionnaire seul. */
+  piloter_production: ["GESTIONNAIRE"],
 } as const satisfies Record<string, readonly Role[]>;
 
 export type Action = keyof typeof DROITS;

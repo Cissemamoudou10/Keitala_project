@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   additionnerDecimaux,
+  diviserDecimaux,
   enSaisie,
   estInferieur,
   multiplierDecimaux,
@@ -68,5 +69,18 @@ describe("additionnerDecimaux", () => {
 
   it("refuse une valeur illisible", () => {
     expect(additionnerDecimaux(["12", "abc"])).toBeNull();
+  });
+});
+
+describe("diviserDecimaux", () => {
+  it("divise sans flottant, arrondi au plus proche", () => {
+    expect(diviserDecimaux("250", "100", 3)).toBe("2.500");
+    expect(diviserDecimaux("0.5000", "1.000", 3)).toBe("0.500");
+    expect(diviserDecimaux("2", "3", 3)).toBe("0.667");
+    expect(diviserDecimaux("21650", "96", 4)).toBe("225.5208");
+  });
+
+  it("refuse une division par zéro", () => {
+    expect(diviserDecimaux("1", "0")).toBeNull();
   });
 });

@@ -89,11 +89,18 @@ export function totalRegle(paiements: Paiement[]): string {
 }
 
 export async function chercherArticles(texte: string, signal: AbortSignal): Promise<Article[]> {
-  const page = await appelerApi<PageArticles>("articles", {
-    parametres: { recherche: texte, taille: 20 },
-    signal,
-  });
-  return page.items;
+  return chercherArticlesDeFamille(null)(texte, signal);
+}
+
+/** Recherche limitée à une famille (ex. le produit d'une recette : un semi-fini). */
+export function chercherArticlesDeFamille(famille: string | null) {
+  return async (texte: string, signal: AbortSignal): Promise<Article[]> => {
+    const page = await appelerApi<PageArticles>("articles", {
+      parametres: { recherche: texte, famille, taille: 20 },
+      signal,
+    });
+    return page.items;
+  };
 }
 
 // --- Brouillon : la saisie survit à un réseau coupé ou à un onglet fermé -------------

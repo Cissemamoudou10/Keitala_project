@@ -1,0 +1,13 @@
+# Fichiers exécutés ou lus sous Linux (serveur, conteneurs) : fins de ligne LF, même
+# sur un poste Windows (core.autocrlf), sinon bash échoue sur « \r ».
+*.sh text eol=lf
+Dockerfile text eol=lf
+Caddyfile text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+.dockerignore text eol=lf
+*.py text eol=lf
+*.toml text eol=lf
+*.lock text eol=lf
+*.ini text eol=lf
+*.mako text eol=lf

@@ -214,3 +214,25 @@ Chaque décision qui engage le projet est notée ici, avec sa raison. Une décis
   - Bouton de l'app : `type="button"` par défaut ; seul le bouton d'envoi déclare `type="submit"` (un bouton d'appoint envoyait le formulaire).
 - **Conséquences** : les ventes, dépenses et transferts des sprints suivants réutilisent la même clé et le même contrôle de solde.
 
+## D-031 — Montant des lignes arrondi au franc
+- **Date** : 16/11/2026 · **Statut** : Acceptée · **Auteur** : utilisateur (recommandation de Claude)
+- **Contexte** : P-019. La base calculait le montant d'une ligne au centime alors que les règlements se saisissent en FCFA entiers : 1,5 kg à 333 FCFA = 499,50 FCFA restait impossible à solder.
+- **Décision** : migration `0005` : `lignes_achat.montant_total` et `lignes_vente.montant_total` deviennent `ROUND(quantite * prix_unitaire, 0)` (colonne supprimée puis recréée, PostgreSQL 16 ne sachant pas modifier une expression calculée ; aucune vue ne l'utilise) ; totaux des pièces recalculés. L'API (`services/pieces.montant_ligne`) et l'app (`montantLigne`) arrondissent de même. `schema.sql` v1.1 reste figé : l'écart est porté par la migration.
+- **Conséquences** : un montant au demi-franc est arrondi au franc supérieur (500 FCFA pour 499,50).
+
+## D-032 — Ventes, dons et facture
+- **Date** : 16/11/2026 · **Statut** : Acceptée (facture : page imprimable, A4, en-tête provisoire, choisis par l'utilisateur) ; reste Proposée · **Auteur** : utilisateur et Claude
+- **Contexte** : Sprint 5 (US-VTE-01 à 06), P-006 (contenu de la facture).
+- **Décisions (acceptées)** :
+  - Facture : page A4 imprimable (`/ventes/{id}/facture`, sans la coquille) ; « Imprimer » ouvre la fenêtre du navigateur, qui propose aussi « Enregistrer en PDF ». Pas de PDF généré par le serveur ni de dépendance ajoutée. L'endpoint `GET /ventes/{id}/facture-pdf` de la conception technique n'est donc pas créé.
+  - En-tête provisoire réglable sans code : réglages `ENTREPRISE_NOM`, `ENTREPRISE_ADRESSE`, `ENTREPRISE_TELEPHONE`, `ENTREPRISE_IDENTIFIANTS`, `ENTREPRISE_MENTIONS` de l'API (`.env`), lus par `GET /entreprise`.
+- **Décisions (proposées)** :
+  - Facture : montant total en lettres (« Arrêtée la présente facture à la somme de … »), règlements reçus avec compte et référence, reste à payer ; une facture annulée s'imprime barrée d'un bandeau « FACTURE ANNULÉE ». Un don n'a pas de facture.
+  - Ventes, dons, encaissements et annulations : Gestionnaire seul (matrice) ; Super Admin et Consultant consultent.
+  - Client comptoir : client vide, ou nom libre d'un client de passage ; vente à crédit seulement avec un client du répertoire.
+  - Stock : contrôlé avant toute écriture, lignes d'un même article additionnées, message explicite (« il reste 100 kg, la vente en demande 120 kg ») ; prix catalogue proposé pour l'unité choisie (prix au kg × facteur du sac), modifiable.
+  - Don : même écran que la vente, case « Don / échantillon » ; bénéficiaire et motif obligatoires ; `POST /ventes/dons`, numéro `DON-AAAA-NNNN`, prix à 0, mouvement `SORTIE_DON`.
+  - Annulation d'une vente : articles remis en stock à leur coût de sortie (`cout_unitaire_base`, le coût moyen est recalculé) ; encaissements contre-passés au débit de leur compte, refusée (`SOLDE_INSUFFISANT`) si une caisse ou un compte Mobile Money n'a plus l'argent.
+  - Briques communes aux pièces : `services/pieces.py` et `schemas/pieces.py` (API), `components/pieces/` (app).
+- **Conséquences** : l'envoi par WhatsApp (Could Have de US-VTE-03) suppose un lien de facture accessible au client : à revoir s'il est demandé.
+

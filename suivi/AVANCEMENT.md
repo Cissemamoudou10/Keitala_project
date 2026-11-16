@@ -10,15 +10,15 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 
 | | |
 | :--- | :--- |
-| **Dernière mise à jour** | 14/11/2026 |
-| **Phase** | Sprints 0 à 4 terminés (US-REF-02 : reste le choix de l'unité sur les lignes de vente, Sprint 5). Prochain : Sprint 5 (ventes). |
-| **Sprint en cours** | Sprint 5 — Ventes (à démarrer) |
-| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query, formats et champ de montant, quatre états d'écran ; build, lint et types OK ; rendu vérifié à l'écran (bureau et 768 px) ; 44 tests Vitest, 7 parcours Playwright (bureau et tablette). CI GitHub Actions écrite (`.github/workflows/ci.yml`), rejouée en local, jamais exécutée sur GitHub (P-014). Sprint 1 : connexion par cookies HttpOnly, gestion des comptes, contrôle d'accès par rôle (API 53 tests, app 62 tests, 19 parcours e2e sur la pile complète). Sprint 2 : comptes de trésorerie et soldes d'ouverture, catalogue et unités de saisie, clients et fournisseurs (API 96 tests, app 110 tests, 29 parcours e2e). Sprint 3 : mouvements de stock (écriture unique, coût moyen pondéré), pertes, inventaires et stock de départ valorisé (migration 0002), journal, état valorisé et alertes (API 110 tests, app 116 tests, 36 parcours e2e). Puis abandon d'un inventaire (migration 0003) et base dédiée aux parcours e2e (API 112 tests, 37 parcours e2e). Sprint 4 : achats (saisie en sacs ou en kg, paiements sur plusieurs comptes ou à crédit, dettes, annulation avec contre-passation), clé d'idempotence (migration 0004), solde Caisse et Mobile Money jamais négatif (API 126 tests, app 119 tests, 45 parcours e2e). |
+| **Dernière mise à jour** | 16/11/2026 |
+| **Phase** | Sprints 0 à 5 terminés (US-VTE-03 : l'option WhatsApp, Could Have, n'est pas faite). Prochain : Sprint 6 (trésorerie). |
+| **Sprint en cours** | Sprint 6 — Trésorerie (à démarrer) |
+| **Code existant** | `api` : FastAPI, 24 modèles alignés sur la migration 0001 (= `schema.sql` v1.1), format d'erreur, pagination, `/api/v1/sante`, 20 tests verts. `app` : Next.js 16, jetons de la charte et composants de base (catalogue `/composants` en dev), coquille et pages provisoires des modules, proxy `/api/*` vers FastAPI, client d'appel et TanStack Query, formats et champ de montant, quatre états d'écran ; build, lint et types OK ; rendu vérifié à l'écran (bureau et 768 px) ; 44 tests Vitest, 7 parcours Playwright (bureau et tablette). CI GitHub Actions écrite (`.github/workflows/ci.yml`), rejouée en local, jamais exécutée sur GitHub (P-014). Sprint 1 : connexion par cookies HttpOnly, gestion des comptes, contrôle d'accès par rôle (API 53 tests, app 62 tests, 19 parcours e2e sur la pile complète). Sprint 2 : comptes de trésorerie et soldes d'ouverture, catalogue et unités de saisie, clients et fournisseurs (API 96 tests, app 110 tests, 29 parcours e2e). Sprint 3 : mouvements de stock (écriture unique, coût moyen pondéré), pertes, inventaires et stock de départ valorisé (migration 0002), journal, état valorisé et alertes (API 110 tests, app 116 tests, 36 parcours e2e). Puis abandon d'un inventaire (migration 0003) et base dédiée aux parcours e2e (API 112 tests, 37 parcours e2e). Sprint 4 : achats (saisie en sacs ou en kg, paiements sur plusieurs comptes ou à crédit, dettes, annulation avec contre-passation), clé d'idempotence (migration 0004), solde Caisse et Mobile Money jamais négatif (API 126 tests, app 119 tests, 45 parcours e2e). Sprint 5 : montants de ligne au franc (migration 0005), ventes au comptoir ou à crédit, dons, encaissement des créances, annulation, facture A4 imprimable ; briques communes aux pièces (API 139 tests, app 119 tests, 57 parcours e2e). |
 | **Points bloquants** | Aucun. Commandes de l'API à lancer dans le conteneur (P-012). Base de développement remise à neuf le 14/11/2026, avec le premier Super Admin de l'utilisateur (S1-T1). Parcours e2e : `up -d api-e2e` d'abord. |
 
 ## Prochaine tâche
 
-**Sprint 5, US-VTE-01 : saisie rapide de vente** (comptoir et gros), puis US-VTE-02 à 06. Reprendre le modèle des achats : `services/achats.py` (clé d'idempotence, verrous pièce puis articles puis comptes, `ecrire_mouvement_stock`, `ecrire_mouvement_tresorerie`, contre-passation) et `components/achats/formulaire-achat.tsx` (lignes avec `ChampChoix` et `ChampQuantite`, ce qui finira US-REF-02 ; paiements ; brouillon). Faire trancher P-019 (montants au centime) avant les ventes. Relire avant : EPIC 6 du backlog, conception technique.
+**Sprint 6, US-TRES-01 : soldes et journaux des comptes**, puis US-TRES-02 à 05 (dépenses, transferts, clôture de caisse, contrôle par le Super Admin). Reprendre `services/pieces.py` et `components/pieces/` (clé d'idempotence, paiements, confirmation des gros montants, annulation) ; toute variation de solde passe par `ecrire_mouvement_tresorerie`. Relire avant : EPIC 7 du backlog. En parallèle, obtenir du client l'en-tête de facture (P-006).
 
 ---
 
@@ -28,10 +28,10 @@ Mis à jour par chaque agent en fin de session. Les identifiants `US-...` renvoi
 | :--- | :--- | :---: | :--- |
 | 0 | Fondations techniques et socle d'interface | — | Terminé |
 | 1 | Authentification, rôles, utilisateurs | 3 | Terminé |
-| 2 | Référentiels : tiers, articles, unités, comptes | 4 | Terminé (voir US-REF-02) |
+| 2 | Référentiels : tiers, articles, unités, comptes | 4 | Terminé |
 | 3 | Stocks : état, alertes, journal, inventaire, pertes | 5 | Terminé |
 | 4 | Achats et dettes fournisseurs | 4 | Terminé |
-| 5 | Ventes, règlements, dons, factures | 6 | À faire |
+| 5 | Ventes, règlements, dons, factures | 6 | Terminé (option WhatsApp non faite) |
 | 6 | Trésorerie, dépenses, transferts, clôtures, contrôle | 5 | À faire |
 | 7 | Production : recettes et ordres de fabrication | 4 | À faire |
 | 8 | Tableaux de bord, marges, exports | 3 | À faire |
@@ -83,7 +83,7 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 ## Sprint 2 — Référentiels
 
 - [x] US-REF-01 Répertoire des tiers (clients et fournisseurs) avec créance et dette
-- [~] US-REF-02 Unité de base et unités de saisie par article — fait : unités par article, conversion ; choix de l'unité sur les lignes d'achat (Sprint 4) ; reste les lignes de vente (Sprint 5)
+- [x] US-REF-02 Unité de base et unités de saisie par article (choix de l'unité sur les lignes d'achat et de vente : Sprints 4 et 5)
 - [x] US-REF-03 Comptes de trésorerie (Caisse, Banque, Orange Money, Mobicash, Wave) et soldes d'ouverture
 - [x] US-STK-01 Catalogue des articles par famille (6 familles)
 
@@ -104,12 +104,12 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 
 ## Sprint 5 — Ventes
 
-- [ ] US-VTE-01 Saisie rapide de vente (comptoir et gros)
-- [ ] US-VTE-02 Règlements : caisse, banque, Mobile Money, crédit, paiement mixte
-- [ ] US-VTE-03 Facture ou reçu en PDF (envoi WhatsApp : option, à faire en dernier)
-- [ ] US-VTE-04 Dons et échantillons
-- [ ] US-VTE-05 Encaissement d'une créance client
-- [ ] US-VTE-06 Annulation d'une vente
+- [x] US-VTE-01 Saisie rapide de vente (comptoir et gros)
+- [x] US-VTE-02 Règlements : caisse, banque, Mobile Money, crédit, paiement mixte
+- [x] US-VTE-03 Facture A4 imprimable, enregistrable en PDF par le navigateur (D-032) ; envoi WhatsApp (Could Have) non fait ; en-tête provisoire (P-006)
+- [x] US-VTE-04 Dons et échantillons
+- [x] US-VTE-05 Encaissement d'une créance client
+- [x] US-VTE-06 Annulation d'une vente
 
 ## Sprint 6 — Trésorerie
 
@@ -150,6 +150,7 @@ L'ordre suit les dépendances : les comptes de trésorerie (Sprint 2) précèden
 | :--- | :--- |
 | 13/11/2026 | Analyse du dossier ; spécifications et schéma corrigés en v1.1 ; schéma validé sur PostgreSQL 16 |
 | 13/11/2026 | Mise en place de `AGENTS.md`, des fichiers de suivi, de la charte et de `developpement/` |
+| 16/11/2026 | **Sprint 5 terminé** : ventes, dons, créances, facture |
 | 14/11/2026 | **Sprint 4 terminé** : achats, dettes fournisseurs, annulation |
 | 14/11/2026 | **Sprint 3 terminé** : stocks, inventaires, stock de départ valorisé |
 | 14/11/2026 | **Sprint 2 terminé** : comptes de trésorerie, catalogue, unités, tiers |

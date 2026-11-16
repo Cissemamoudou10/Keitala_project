@@ -52,10 +52,11 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Piste** : proposer 1 000 000 FCFA par défaut, paramétrable ; à confirmer.
 
 ## P-006 — Contenu de la facture
-- **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
+- **Date** : 13/11/2026 · **Statut** : En cours · **Gravité** : Mineur · **Signalé par** : Claude
 - **Constat** : logo, raison sociale, adresse, téléphone, numéros d'identification et mentions à faire figurer sur la facture ne sont pas fournis. Format d'impression non précisé (A4, ticket).
 - **Impact** : US-VTE-03.
 - **Piste** : demander un modèle de facture actuel au client.
+- **Avancement** (16/11/2026) : format A4 et page imprimable décidés (D-032). Reste à obtenir du client la raison sociale, l'adresse, le téléphone, les identifiants (NIF, RCCM), les mentions et le logo ; ils se règlent dans `.env` de l'API (`ENTREPRISE_*`), sans code, sauf le logo (non prévu).
 
 ## P-007 — Domaine et serveur
 - **Date** : 13/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
@@ -133,15 +134,21 @@ Tout ce qui bloque, inquiète ou reste à trancher. Un agent qui rencontre un do
 - **Résolution** (14/11/2026) : statut `ANNULE` et action « Abandonner l'inventaire » (migration 0003, D-029).
 
 ## P-019 — Montant d'achat au centime, paiements en francs entiers
-- **Date** : 14/11/2026 · **Statut** : Ouvert · **Gravité** : Mineur · **Signalé par** : Claude
+- **Date** : 14/11/2026 · **Statut** : Résolu · **Gravité** : Mineur · **Signalé par** : Claude
 - **Constat** : `lignes_achat.montant_total` est calculé par la base au centime (`ROUND(quantite * prix_unitaire, 2)`, colonne générée du schéma figé), alors que les règlements sont saisis en FCFA entiers. Avec une quantité décimale, ex. 1,5 kg à 333 FCFA = 499,50 FCFA, l'achat ne peut jamais être entièrement soldé : il resterait 0,50 FCFA « à payer ».
 - **Impact** : US-ACH-01 et 03 (et les ventes au Sprint 5, même calcul). Rare : il faut une quantité décimale et un prix impair.
 - **Piste** : (a) migration qui arrondit les montants des lignes au franc ; ou (b) accepter des règlements au centime ; ou (c) considérer comme soldé un reste inférieur à 1 FCFA. Recommandation : (a), cohérent avec « FCFA sans décimales ». À décider avec l'utilisateur.
+- **Résolution** (16/11/2026) : option (a) retenue par l'utilisateur ; migration 0005 (D-031).
 
 ## P-020 — Les boutons d'appoint envoyaient les formulaires
 - **Date** : 14/11/2026 · **Statut** : Résolu · **Gravité** : Majeur · **Signalé par** : Claude
 - **Constat** : le composant `Button` laissait le type HTML par défaut (`submit`). Dans un formulaire, « Ajouter un article », « Payer aussi sur un autre compte » ou, dans la fiche tiers, « Ouvrir la fiche » et « Non, en créer un nouveau » envoyaient aussi le formulaire (risque de double envoi).
 - **Résolution** (14/11/2026) : `type="button"` par défaut dans `Button`, test unitaire ajouté ; les boutons d'envoi déclarent tous `type="submit"`. Vu sur les captures du Sprint 4, aucun parcours e2e ne le révélait.
+
+## P-021 — Répertoire des tiers devenu inaccessible
+- **Date** : 16/11/2026 · **Statut** : Résolu · **Gravité** : Majeur · **Signalé par** : Claude
+- **Constat** : `/tiers` est hors menu ; on y arrivait par les liens « Voir les clients » et « Voir les fournisseurs » des pages provisoires Ventes et Achats. Ces pages remplacées (Sprints 4 et 5), plus aucun chemin n'y menait. Révélé par le parcours e2e du Sprint 2 qui passait par ce lien.
+- **Résolution** (16/11/2026) : liens rétablis à côté de l'action principale des pages Ventes et Achats ; le parcours des achats vérifie aussi le lien. À revoir si les tiers entrent un jour dans le menu.
 
 ## C. Risques à surveiller
 

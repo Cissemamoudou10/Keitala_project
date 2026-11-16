@@ -139,6 +139,12 @@ Depuis `developpement/app`, avec `pnpm` ou, s'il n'est pas installé, `corepack 
 - Droit `saisir_achat` (Gestionnaire seul). Calcul : `additionnerDecimaux`.
 - `Button` est `type="button"` par défaut : le bouton d'envoi d'un formulaire déclare `type="submit"` (P-020). `ChampMontant` : `className` règle la largeur de l'ensemble.
 
+## Ventes (Sprint 5)
+
+- `/ventes` (onglets Toutes, À encaisser, Dons ; fiche via `?vente=<id>`), `/ventes/nouvelle` (vente ou don, case « Don / échantillon »), `/ventes/[id]/facture` (A4 imprimable, groupe `(impression)` sans coquille ; `print:hidden` pour les boutons).
+- Blocs communs aux pièces dans `components/pieces/` : `LignesArticles` (`sortie` : stock disponible et prix catalogue ; `sansPrix` : don), `BlocPaiements` (`flux` : décaissement ou encaissement), `Recapitulatif`, `ConfirmationMontant`, `ReglementUlterieur`, `AnnulationPiece`, `saisie.ts` (brouillon, montants, `messageEchec`). Les écrans d'achat et de vente ne font que les assembler.
+- Droit `saisir_vente` (Gestionnaire seul). En-tête des factures : `GET /api/entreprise`.
+
 ## Next.js 16 : à savoir
 
 - Version récente : lire le guide utile dans `node_modules/next/dist/docs/` avant d'écrire du code (rappel dans `AGENTS.md` de ce dossier, recréé par `next dev`).

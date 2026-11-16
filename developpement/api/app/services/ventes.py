@@ -74,7 +74,7 @@ def _date_valide(saisie: date | None) -> date:
 # --- Lecture -------------------------------------------------------------------------
 
 
-def _total_regle() -> ScalarSelect[Any]:
+def total_regle() -> ScalarSelect[Any]:
     return (
         select(func.coalesce(func.sum(Reglement.montant), 0))
         .where(Reglement.vente_id == Vente.id, Reglement.statut == StatutDocument.VALIDE)
@@ -155,7 +155,7 @@ async def lister_ventes(
     if a_encaisser:
         # Créances clients : ventes non soldées (US-VTE-05)
         requete = requete.where(
-            Vente.statut == StatutDocument.VALIDE, Vente.montant_total > _total_regle()
+            Vente.statut == StatutDocument.VALIDE, Vente.montant_total > total_regle()
         )
     if recherche and recherche.strip():
         requete = requete.where(

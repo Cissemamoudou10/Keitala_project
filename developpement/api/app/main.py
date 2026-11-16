@@ -12,6 +12,7 @@ from app.routers import (
     production,
     sante,
     stocks,
+    tableau_de_bord,
     tiers,
     tresorerie,
     utilisateurs,
@@ -53,6 +54,7 @@ def create_app() -> FastAPI:
         entreprise.router,
         controles.router,
         production.router,
+        tableau_de_bord.router,
     ):
         app.include_router(routeur, prefix="/api/v1")
     return app
